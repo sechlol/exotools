@@ -1,0 +1,12 @@
+numpy
+pandas
+pandas[performance]
+pyarrow==18.1.0
+
+astropy
+astroquery
+casjobs
+
+tqdm
+matplotlib
+ruff

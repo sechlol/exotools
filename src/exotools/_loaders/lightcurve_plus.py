@@ -1,0 +1,188 @@
+from math import ceil
+from typing import Any, Optional
+
+import numpy as np
+from astropy.time import TimeDelta, Time
+from astropy.units import Quantity
+from lightkurve import LightCurve, FoldedLightCurve
+
+from .star_system.planet import Planet
+from .lightcurve_loader import copy_lightcurve
+
+
+class LightCurvePlus:
+    def __init__(self, lightcurve: LightCurve, obs_id: Optional[int] = None):
+        self.lc: LightCurve = _convert_time_to_jd(lightcurve)
+        self._time_shift = TimeDelta(0, format=self.lc.time.format, scale=self.lc.time.scale)
+        self._obs_id = obs_id
+
+    @property
+    def time_x(self) -> np.ndarray:
+        return self.lc.time.value
+
+    @property
+    def time(self) -> Time:
+        return self.lc.time
+
+    @property
+    def flux_y(self) -> np.ndarray:
+        return self.lc.flux.value
+
+    @property
+    def flux(self) -> np.ndarray:
+        return self.lc.flux
+
+    @property
+    def tic_id(self) -> int:
+        return self.meta["TICID"]
+
+    @property
+    def obs_id(self) -> Optional[int]:
+        return self._obs_id
+
+    @property
+    def meta(self) -> dict[str, Any]:
+        return self.lc.meta
+
+    def to_numpy(self) -> np.ndarray:
+        return np.array([self.time_x, self.flux_y]).T
+
+    def remove_outliers(self) -> "LightCurvePlus":
+        return LightCurvePlus(self.lc.remove_outliers())
+
+    def normalize(self) -> "LightCurvePlus":
+        return LightCurvePlus(self.lc.normalize())
+
+    def get_first_transit_value(self, planet: Planet) -> Time:
+        i = self.get_transit_first_index(planet)
+        return self.lc.time[i]
+
+    def get_transit_first_index(self, planet: Planet) -> int:
+        """
+        Get the index of the first transit in the light curve time series.
+        """
+        return _find_fist_transit_index(
+            time=self.time_x, period=planet.orbital_period.central.value, midpoint=self._get_aligned_midpoint(planet)
+        )
+
+    def shift_time(self, shift: Quantity | float) -> "LightCurvePlus":
+        delta = TimeDelta(shift, format=self.lc.time.format, scale=self.lc.time.scale)
+        self._time_shift += delta
+        self.lc.time += delta
+        return self
+
+    def start_at_zero(self) -> "LightCurvePlus":
+        return self.shift_time(shift=-self.lc.time[0].value)
+
+    def get_transit_phase(self, planet: Planet) -> np.ndarray:
+        return _get_phase(
+            time=self.time_x, period=planet.orbital_period.central.value, midpoint=self._get_aligned_midpoint(planet)
+        )
+
+    def get_transit_mask(self, planet: Planet, duration_increase_percent: float = 0) -> np.ndarray:
+        """
+        Args:
+            planet: planet with transit information
+            duration_increase_percent: increases the transit duration by a given percentage (0 to 1).
+            This changes the size of the masked regions
+
+        Returns: a boolean array were 1 corresponds to planet transits
+        """
+        return self.lc.create_transit_mask(
+            period=planet.orbital_period.central,
+            transit_time=self._get_aligned_midpoint(planet),
+            duration=planet.transit_duration.central + duration_increase_percent * planet.transit_duration.central,
+        )
+
+    def get_transit_count(self, planet: Planet) -> int:
+        # mask          = 000011100000011100
+        # mask[:-1]     = 00001110000001110
+        # mask[1:]      = 00011100000011100
+        # xor_mask      = 00010010000010010
+        mask = self.get_transit_mask(planet=planet)
+        xor_mask = mask[:-1] ^ mask[1:]
+        return ceil(xor_mask.sum() / 2)
+
+    def get_combined_transit_mask(self, planets: list[Planet]) -> np.ndarray:
+        return self.lc.create_transit_mask(
+            period=[p.orbital_period.central for p in planets],
+            transit_time=[self._get_aligned_midpoint(p) for p in planets],
+            duration=[p.transit_duration.central for p in planets],
+        )
+
+    def fold_with_planet(self, planet: Planet, normalize_time: bool = False) -> FoldedLightCurve:
+        return self.lc.fold(
+            epoch_time=self._get_aligned_midpoint(planet),
+            period=planet.orbital_period.central,
+            normalize_phase=normalize_time,
+        )
+
+    def copy_with_flux(self, flux: np.ndarray) -> "LightCurvePlus":
+        lc = copy_lightcurve(self.lc, with_flux=flux)
+        return LightCurvePlus(lc)
+
+    def _get_aligned_midpoint(self, planet: Planet) -> float:
+        return (planet.transit_midpoint.central + self._time_shift).value
+
+    def fold(self, period=None, epoch_time=None, epoch_phase=0, wrap_phase=None, normalize_phase=False):
+        return self.lc.fold(
+            period=period,
+            epoch_time=epoch_time,
+            epoch_phase=epoch_phase,
+            wrap_phase=wrap_phase,
+            normalize_phase=normalize_phase,
+        )
+
+    def __len__(self) -> int:
+        return len(self.time_x)
+
+    def __sub__(self, other):
+        if isinstance(other, LightCurvePlus):
+            return LightCurvePlus(lightcurve=self.lc - other.lc)
+        return LightCurvePlus(lightcurve=self.lc - other)
+
+    def __add__(self, other):
+        if isinstance(other, LightCurvePlus):
+            return LightCurvePlus(lightcurve=self.lc + other.lc)
+        return LightCurvePlus(lightcurve=self.lc + other)
+
+    def __getitem__(self, index) -> "LightCurvePlus":
+        return LightCurvePlus(self.lc[index])
+
+
+def _btjd_to_jd_time(time: Time) -> Time:
+    return Time(val=time.value + 2457000, format="jd", scale="tdb")
+
+
+def _convert_time_to_jd(lc: LightCurve) -> LightCurve:
+    if lc.time.scale != "tdb":
+        raise ValueError(f"Time scale {lc.time.scale} unknown/unsupported.")
+
+    match lc.time.format:
+        case "jd":
+            return lc
+        case "btjd":
+            new_t = _btjd_to_jd_time(lc.time)
+            return LightCurve(time=new_t, flux=lc.flux, flux_err=lc.flux_err, meta=lc.meta)
+        case _:
+            raise ValueError(f"Unknown time format: {lc.time.format}")
+
+
+def _get_phase(time: np.ndarray, period: float, midpoint: float) -> np.ndarray:
+    k = np.round((time - midpoint) / period)
+    closest_event_time = midpoint + k * period
+    return np.abs(closest_event_time - time)
+
+
+def _find_fist_transit_index(time: np.ndarray, period: float, midpoint: float, step: int = 100) -> int:
+    phase = _get_phase(time=time, midpoint=midpoint, period=period)
+
+    i = 1
+    length = len(time) - 1
+    while i < length and phase[i - 1] < phase[i]:
+        i = min(i + step, length)
+    while i < length and phase[i - 1] > phase[i]:
+        i = min(i + step, length)
+    while i > 0 and phase[i - 1] < phase[i]:
+        i = max(i - step, -1)
+    return i
