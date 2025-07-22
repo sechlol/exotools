@@ -6,8 +6,8 @@ from astropy.table import QTable
 
 from ._downloaders.exoplanets_downloader import KnownExoplanetsDownloader
 from ._downloaders.gaia_downloader import GaiaDownloader
-from ._loaders.exo_db import ExoDB
-from ._loaders.gaia_db import GaiaDB
+from .db.exo_db import ExoDB
+from .db.gaia_db import GaiaDB
 from .utils.qtable_utils import read_qtable
 
 
