@@ -82,8 +82,11 @@ class ExoDB(BaseDB):
 
         parameters_with_err = [c.removesuffix("err1") for c in dataset.colnames if "err1" in c]
         for c in parameters_with_err:
-            dataset[f"{c}_upper"] = dataset[c] + dataset[f"{c}err1"]
-            dataset[f"{c}_lower"] = dataset[c] + dataset[f"{c}err2"]
+            try:
+                dataset[f"{c}_upper"] = dataset[c] + dataset[f"{c}err1"]
+                dataset[f"{c}_lower"] = dataset[c] + dataset[f"{c}err2"]
+            except ValueError:
+                print(f"Could not compute bounds for {c}")
 
     @staticmethod
     def convert_time_columns(dataset: QTable):

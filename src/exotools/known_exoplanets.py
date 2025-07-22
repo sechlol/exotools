@@ -13,7 +13,7 @@ from .utils.qtable_utils import read_qtable
 
 class KnownExoplanetsDataset:
     _DATASET_NAME_EXO = "known_exoplanets"
-    _DATASET_NAME_GAIA = "gaia_astro_parameters"
+    _DATASET_NAME_GAIA = "known_gaia_astro_parameters"
 
     def __init__(self, storage_folder_path: Path):
         self._folder_path = storage_folder_path
@@ -33,7 +33,10 @@ class KnownExoplanetsDataset:
         try:
             exo_qtable = read_qtable(file_path=self._folder_path, file_name=self._DATASET_NAME_EXO)
         except ValueError:
-            print("Exoplanets dataset not found. You need to download it first by calling download_known_exoplanets().")
+            print(
+                "Known Exoplanets dataset not found. "
+                "You need to download it first by calling download_known_exoplanets()."
+            )
             return None
 
         return _create_exo_db(exo_dataset=exo_qtable, gaia_db=gaia_db)

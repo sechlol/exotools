@@ -1,14 +1,13 @@
 from typing import Optional, Sequence
-
-import astropy.units.cds as cds
 import astropy.units as u
 import numpy as np
 import pandas as pd
 from astropy.table import QTable, MaskedColumn
 from astropy.units import Unit
 
-from .dataset_downloader import fix_unrecognized_units, override_units, DatasetDownloader
 from src.exotools.utils.qtable_utils import TableColumnInfo, QTableHeader
+from src.exotools.utils.unit_mapper import UNIT_MAPPER
+from .dataset_downloader import fix_unrecognized_units, override_units, DatasetDownloader
 from .tap_service import ExoService, TapService
 
 
@@ -27,65 +26,6 @@ class KnownExoplanetsDownloader(DatasetDownloader):
     """
 
     _table_name = "ps"
-
-    # UNIT MAPPER from:
-    # https://astroquery.readthedocs.io/en/latest/_modules/astroquery/ipac/nexsci/nasa_exoplanet_archive/core.html
-    _unit_map = {
-        "day": u.day,
-        "Rearth": u.R_earth,
-        "Mearth": u.M_earth,
-        "Mjupiter": u.M_jupiter,
-        "Rjupiter": u.R_jupiter,
-        "g/cm**3": u.g / u.cm**3,
-        "log(cm/s**2)": u.LogUnit(u.cm / u.s**2),
-        "dex": u.dex,
-        "deg": u.deg,
-        "log(Lsun)": u.LogUnit(u.solLum),
-        "D_L": u.pc,
-        "D_S": u.pc,
-        "micron": u.um,
-        "microns": u.um,
-        "Earth flux": u.L_sun / (4 * np.pi * u.au**2),
-        "Earth Flux": u.L_sun / (4 * np.pi * u.au**2),
-        "Fearth": u.L_sun / (4 * np.pi * u.au**2),
-        "M_E": u.M_earth,
-        "Earth Mass": u.M_earth,
-        "M_J": u.M_jupiter,
-        "Jupiter Mass": u.M_jupiter,
-        "R_Earth": u.R_earth,  # Add u.R_jupiter
-        "Earth Radius": u.R_earth,
-        "Jupiter Radius": u.R_jupiter,
-        "Searth": u.L_sun / (4 * np.pi * u.au**2),
-        "R_Sun": u.R_sun,
-        "Rstar": u.R_sun,
-        "a_perp": u.au,
-        "arc-sec/year": u.arcsec / u.yr,
-        "cm/s**2": u.cm / u.s**2,
-        "days": u.day,
-        "degrees": u.deg,
-        "dexincgs": u.dex(u.cm / u.s**2),
-        "hours": u.hr,
-        "hour": u.hr,
-        "hrs": u.hr,
-        "kelvin": u.K,
-        "logLsun": u.dex(u.L_sun),
-        "log(Solar)": u.dex(u.L_sun),
-        "mags": u.mag,
-        "microas": u.uas,
-        "uas": u.uas,
-        "perc": u.percent,
-        "pi_E": None,
-        "pi_EE": None,
-        "pi_EN": None,
-        "pi_rel": None,
-        "ppm": cds.ppm,
-        "seconds": u.s,
-        "Solar mass": u.M_sun,
-        "solarradius": u.R_sun,
-        "Solar Radius": u.R_sun,
-        "log10(cm/s**2)": u.dex(u.cm / u.s**2),
-        "sexagesimal": None,
-    }
 
     # NOTE: the units of pl_tranmid and its boundaries are mistakenly labelled as "day". It should be "hours"
     #   see https://exoplanetarchive.ipac.caltech.edu/docs/API_PS_columns.html
@@ -111,7 +51,7 @@ class KnownExoplanetsDownloader(DatasetDownloader):
 
     def _clean_and_fix(self, table: QTable) -> QTable:
         _parse_ids(table)
-        fix_unrecognized_units(table=table, units_map=self._unit_map)
+        fix_unrecognized_units(table=table, units_map=UNIT_MAPPER)
         override_units(table=table, unit_overrides=self._unit_overrides)
 
         return table

@@ -5,7 +5,7 @@ from .gaia_db import GaiaDB
 from .lightcurve_db import LightcurveDB
 from .starsystem_db import StarSystemDB
 from .tic_db import TicDB
-from .toi_db import ToiDB
+from .toi_db import CandidateDB
 from .urls_db import UrlsDB
 from utils.io import read_qtable, get_file_paths_in_subfolder
 
@@ -17,12 +17,6 @@ def load_star_system_db() -> StarSystemDB:
     ExoDB.convert_time_columns(dataset)
     dataset = StarSystemDB.preprocess_dataset(dataset)
     return StarSystemDB(dataset)
-
-
-def load_toi_db() -> ToiDB:
-    dataset = read_qtable(configs.DATASET_CANDIDATE_EXOPLANETS)
-    ExoDB.compute_bounds(dataset)
-    return ToiDB(dataset)
 
 
 def load_sunlike_star_tic_db() -> TicDB:

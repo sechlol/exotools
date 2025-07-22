@@ -1,12 +1,14 @@
 from typing import Optional
 
 import pandas as pd
-from astropy import units as u
+import astropy.units as u
 from astropy.table import QTable
 
-from .dataset_downloader import DatasetDownloader, fix_unrecognized_units
-from .exoplanets_downloader import _get_fixed_table_header
 from src.exotools.utils.qtable_utils import QTableHeader
+from src.exotools.utils.unit_mapper import UNIT_MAPPER
+
+from .dataset_downloader import DatasetDownloader, fix_unrecognized_units, override_units
+from .exoplanets_downloader import _get_fixed_table_header, _get_error_parameters
 from .tap_service import ExoService
 
 
@@ -21,14 +23,9 @@ class CandidateExoplanetsDownloader(DatasetDownloader):
         raise NotImplementedError("CandidateExoplanetsDownloader does not support this download method")
 
     _table_name = "toi"
-    _unit_map = {
-        "days": u.day,
-        "BJD": u.day,
-        "hours": u.hour,
-        "R_Earth": u.R_earth,
-        "R_Sun": u.solRad,
-        "cm/s**2": u.cm / u.s**2,
-    }
+
+    # originally marked as "ppm", but it's not a recognized unit
+    _unit_overrides = {p: (u.Unit("%") * 1e-6) for p in _get_error_parameters(["pl_trandep"], True)}
 
     def __init__(self):
         self._exo_service = ExoService()
@@ -37,7 +34,7 @@ class CandidateExoplanetsDownloader(DatasetDownloader):
         limit_clause = f"top {limit}" if limit else ""
         query_str = f"select {limit_clause} * from {self._table_name}"
 
-        print(f"Downloading Candidate exoplanets: \n{query_str}")
+        print(f"Downloading Candidate exoplanets...")
         dataset = self._exo_service.query(query_str, sync=True)
         n_unique = len(pd.unique(dataset["toi"]))
 
@@ -45,7 +42,8 @@ class CandidateExoplanetsDownloader(DatasetDownloader):
         return dataset
 
     def _clean_and_fix(self, table: QTable) -> QTable:
-        fix_unrecognized_units(table=table, units_map=self._unit_map)
+        fix_unrecognized_units(table=table, units_map=UNIT_MAPPER)
+        override_units(table=table, unit_overrides=self._unit_overrides)
         table.rename_column("tid", "tic_id")
         return table
 
