@@ -7,7 +7,6 @@ from astropy.units import Quantity
 from lightkurve import LightCurve, FoldedLightCurve
 
 from .star_system.planet import Planet
-from .lightcurve_loader import copy_lightcurve
 
 
 class LightCurvePlus:
@@ -166,6 +165,15 @@ def _convert_time_to_jd(lc: LightCurve) -> LightCurve:
             return LightCurve(time=new_t, flux=lc.flux, flux_err=lc.flux_err, meta=lc.meta)
         case _:
             raise ValueError(f"Unknown time format: {lc.time.format}")
+
+
+def copy_lightcurve(lightcurve: LightCurve, with_flux: Optional[np.ndarray] = None) -> LightCurve:
+    if with_flux is None:
+        return lightcurve.copy(copy_data=True)
+
+    lc = LightCurve(time=lightcurve.time.copy(), flux=with_flux.copy())
+    lc.meta = lightcurve.meta
+    return lc
 
 
 def _get_phase(time: np.ndarray, period: float, midpoint: float) -> np.ndarray:

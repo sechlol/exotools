@@ -5,9 +5,9 @@ import pandas as pd
 from astropy.table import QTable
 from tqdm import tqdm
 
-from src.exotools.utils.observations_fix import Observations
+from exotools.utils.observations_fix import Observations
 from .dataset_downloader import DatasetDownloader, iterate_chunks
-from src.exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
+from exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
 
 
 class TessObservationsDownloader(DatasetDownloader):

@@ -6,7 +6,7 @@ from astropy import units as u
 from astropy.table import QTable
 from astropy.units import UnrecognizedUnit
 
-from src.exotools.utils.qtable_utils import QTableHeader, save_qtable
+from exotools.utils.qtable_utils import QTableHeader, save_qtable
 
 _DEFAULT_FILENAME = "dataset"
 

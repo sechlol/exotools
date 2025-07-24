@@ -4,8 +4,8 @@ from typing import Optional, Sequence
 import numpy as np
 from astropy.table import QTable
 
-from ._downloaders.exoplanets_downloader import KnownExoplanetsDownloader
-from ._downloaders.gaia_downloader import GaiaDownloader
+from .downloaders.exoplanets_downloader import KnownExoplanetsDownloader
+from .downloaders.gaia_downloader import GaiaDownloader
 from .db.exo_db import ExoDB
 from .db.gaia_db import GaiaDB
 from .db.starsystem_db import StarSystemDB

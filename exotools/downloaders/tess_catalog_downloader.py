@@ -5,7 +5,7 @@ import astropy.units as u
 from astropy.table import QTable, vstack
 from casjobs import CasJobs
 
-from src.exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
+from exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
 from .dataset_downloader import DatasetDownloader, override_units, iterate_chunks
 from .tap_service import TicService
 

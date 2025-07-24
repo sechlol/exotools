@@ -4,7 +4,7 @@ import pyvo as vo
 from astropy.table import QTable
 from pyvo.dal.vosi import VOSITables
 
-from src.exotools.utils.qtable_utils import QTableHeader, TableColumnInfo
+from exotools.utils.qtable_utils import QTableHeader, TableColumnInfo
 
 
 class TapService:

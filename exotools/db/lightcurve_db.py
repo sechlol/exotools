@@ -2,15 +2,25 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
+from astropy.io import fits
 from astropy.table import QTable
-from lightkurve import LightCurveCollection
+from astropy.time import Time
+from lightkurve import LightCurve, LightCurveCollection
 
 from .base_db import BaseDB
 from .lightcurve_plus import LightCurvePlus
-from .lightcurve_loader import load_lightcurve
 
 
 class LightcurveDB(BaseDB):
+    """
+    Dtypes:
+    ------------------
+    obs_id     int64
+    tic_id     int64
+    path      object
+    ------------------
+    """
+
     def __init__(self, dataset: QTable):
         super().__init__(dataset=dataset, id_field="obs_id")
 
@@ -74,3 +84,27 @@ class LightcurveDB(BaseDB):
             {"tic_id": tic, "obs_id": int(path.stem), "path": path} for tic, paths in path_map.items() for path in paths
         ]
         return QTable(tabular_data)
+
+
+def load_lightcurve(fits_file_path: Path | str) -> LightCurve:
+    # This line stores all the additional information from the fits file. But takes more time to execute
+    # return lightkurve.utils.read(downloaded)
+
+    with fits.open(str(fits_file_path)) as hdul:
+        lightcurve_data = hdul["LIGHTCURVE"].data
+        time_array: np.ndarray = lightcurve_data["TIME"]
+        flux: np.ndarray = lightcurve_data["PDCSAP_FLUX"]
+        error: np.ndarray = lightcurve_data["PDCSAP_FLUX_ERR"]
+        valid_range = ~np.isnan(time_array) & ~np.isnan(flux)
+
+        # Convert to JD time
+        time = Time(time_array[valid_range] + 2457000, format="jd", scale="tdb")
+        flux = flux[valid_range]
+
+        return LightCurve(time=time, flux=flux, flux_err=error[valid_range], meta=dict(hdul[0].header))
+
+
+def load_lightcurve_collection(paths: list[Path]) -> LightCurveCollection:
+    lightcurves = [load_lightcurve(p).remove_outliers() for p in paths]
+    lightcurves = [(lc if np.median(lc.flux.value) > 0 else None) for lc in lightcurves]
+    return LightCurveCollection([lc for lc in lightcurves if lc is not None])

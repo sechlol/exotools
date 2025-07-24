@@ -5,6 +5,17 @@ _ID_FIELD = "tic_id"
 
 
 class TicDB(BaseDB):
+    """
+    Dtypes:
+    -------------------
+    tic_id        int64
+    gaia_id       int64
+    priority    float64
+    ra          float64
+    dec         float64
+    -------------------
+    """
+
     def __init__(self, dataset: QTable):
         super().__init__(dataset, id_field="tic_id")
 

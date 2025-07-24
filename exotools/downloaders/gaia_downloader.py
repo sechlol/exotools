@@ -5,7 +5,7 @@ from astropy.table import QTable, vstack
 from astroquery.gaia import Gaia
 from tqdm import tqdm
 
-from src.exotools.utils.qtable_utils import QTableHeader
+from exotools.utils.qtable_utils import QTableHeader
 from .dataset_downloader import DatasetDownloader, iterate_chunks
 from .tap_service import GaiaService
 

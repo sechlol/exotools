@@ -4,8 +4,8 @@ import pandas as pd
 import astropy.units as u
 from astropy.table import QTable
 
-from src.exotools.utils.qtable_utils import QTableHeader
-from src.exotools.utils.unit_mapper import UNIT_MAPPER
+from exotools.utils.qtable_utils import QTableHeader
+from exotools.utils.unit_mapper import UNIT_MAPPER
 
 from .dataset_downloader import DatasetDownloader, fix_unrecognized_units, override_units
 from .exoplanets_downloader import _get_fixed_table_header, _get_error_parameters

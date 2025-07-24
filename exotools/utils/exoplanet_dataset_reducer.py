@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from astropy.table import QTable
 
-from src.exotools.db.exo_db import ExoDB
+from exotools.db.exo_db import ExoDB
 from .qtable_utils import get_empty_table_header, TableColumnInfo, QTableHeader
 
 

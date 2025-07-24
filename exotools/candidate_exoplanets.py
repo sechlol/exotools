@@ -3,7 +3,7 @@ from typing import Optional
 
 from astropy.table import QTable
 
-from ._downloaders.toi_exoplanets_downloader import CandidateExoplanetsDownloader
+from .downloaders.toi_exoplanets_downloader import CandidateExoplanetsDownloader
 from .db.exo_db import ExoDB
 from .db.toi_db import CandidateDB
 from .utils.qtable_utils import read_qtable

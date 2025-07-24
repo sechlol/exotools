@@ -7,6 +7,19 @@ _ID_FIELD = "tic_id"
 
 
 class TessMetaDB(BaseDB):
+    """
+    Dtypes:
+    ---------------------------
+    tic_id               int64
+    sequence_number       int8
+    dataURL             object
+    t_obs_release      float64
+    t_min              float64
+    t_max              float64
+    obs_id               int64
+    ---------------------------
+    """
+
     def __init__(self, meta_dataset: QTable):
         super().__init__(meta_dataset, id_field=_ID_FIELD)
 
