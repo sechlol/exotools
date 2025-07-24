@@ -2,7 +2,7 @@ numpy
 pandas
 pandas[performance]
 pyarrow==18.1.0
-
+pydantic
 lightkurve
 astropy
 astroquery

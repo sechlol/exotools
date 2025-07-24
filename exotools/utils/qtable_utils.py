@@ -1,21 +1,23 @@
-import json
-import pandas as pd
-
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
-from datetime import datetime
+
+import pandas as pd
+import pydantic
 from astropy import units as u
 from astropy.table import QTable
-from dataclasses import dataclass, asdict
 
 
-@dataclass
-class TableColumnInfo:
-    unit: Optional[str]
+class TableColumnInfo(pydantic.BaseModel):
     description: str
+    unit: Optional[str] = None
 
 
 QTableHeader = dict[str, TableColumnInfo]
+
+
+class RootQTableHeader(pydantic.RootModel):
+    root: QTableHeader
 
 
 def get_empty_table_header(table: QTable) -> QTableHeader:
@@ -38,11 +40,11 @@ def save_qtable(
     data_path.parent.mkdir(parents=True, exist_ok=True)
 
     if header is not None:
-        header_data = {k: asdict(v) for k, v in header.items()}
+        root_model = RootQTableHeader(root=header)
 
         # Store table unit info in json format
         with open(header_path, "w") as f:
-            json.dump(header_data, f, indent=4)
+            f.write(root_model.model_dump_json(indent=4))
 
     # Store table data in feather format
     df = table.to_pandas().reset_index()
@@ -95,7 +97,4 @@ def _read_qtable_header(header_path: Path) -> Optional[QTableHeader]:
         return None
 
     with open(header_path, "r") as file:
-        data = json.load(file)
-
-    # Convert the loaded JSON dictionary into QTableHeader
-    return {key: TableColumnInfo(**value) for key, value in data.items()}
+        return RootQTableHeader.model_validate_json(file.read()).root
