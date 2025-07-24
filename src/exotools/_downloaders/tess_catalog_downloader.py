@@ -5,8 +5,8 @@ import astropy.units as u
 from astropy.table import QTable, vstack
 from casjobs import CasJobs
 
-from .dataset_downloader import DatasetDownloader, override_units, iterate_chunks
 from src.exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
+from .dataset_downloader import DatasetDownloader, override_units, iterate_chunks
 from .tap_service import TicService
 
 
@@ -18,23 +18,47 @@ class TessCatalogDownloader(DatasetDownloader):
     # See also: https://tess.mit.edu/science/tess-input-catalogue/
     """
 
-    _priority_threshold = 0.001
-    _star_mass_range = [0.7, 1.3]
     _catalog = "TESS_v82"
     _units_override = {"ra": u.deg, "dec": u.deg}
 
-    def __init__(self, username: str, password: str):
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        star_mass_range: tuple[float, float] = (0.7, 1.3),
+        priority_threshold: float = 0.001,
+        verbose_log: bool = False,
+    ):
         """
         This class uses CasJobs interface to query the service, you need to create an account at
         https://mastweb.stsci.edu/mcasjobs/CreateAccount.aspx and provide the username and password
         """
+        self._priority_threshold = priority_threshold
+        self._star_mass_range = star_mass_range
         self._tic_service = TicService()
+        self._verbose_log = verbose_log
         self._casjob_api = CasJobs(
             userid=username,
             password=password,
             base_url="https://mastweb.stsci.edu/mcasjobs/services/jobs.asmx",
             context=self._catalog,
         )
+
+    @property
+    def star_mass_range(self) -> tuple[float, float]:
+        return self._star_mass_range
+
+    @star_mass_range.setter
+    def star_mass_range(self, value: tuple[float, float]):
+        self._star_mass_range = value
+
+    @property
+    def priority_threshold(self) -> float:
+        return self._priority_threshold
+
+    @priority_threshold.setter
+    def priority_threshold(self, value: float):
+        self._priority_threshold = value
 
     def _clean_and_fix(self, table: QTable) -> QTable:
         override_units(table, self._units_override)
@@ -62,12 +86,11 @@ class TessCatalogDownloader(DatasetDownloader):
 
         for i, ids in enumerate(chunks):
             print(f"Query chunk {i + 1}/{len(chunks)}")
-            ids = [f"'{tid}'" for tid in ids]
-            formatted_ids = f"({','.join(ids)})"
+            formatted_ids = ",".join([f"'{tid}'" for tid in ids])
 
             query = f"""select id as tic_id, gaia as gaia_id, priority, ra, dec 
                         from dbo.CatalogRecord 
-                        where gaia is not null and id IN {formatted_ids}"""
+                        where gaia is not null and id IN ({formatted_ids})"""
             table = self._tic_service.query(query_string=query, sync=True)
             all_tables.append(table)
 
@@ -81,8 +104,7 @@ class TessCatalogDownloader(DatasetDownloader):
                     and priority > {self._priority_threshold} 
                     and mass between {self._star_mass_range[0]} and {self._star_mass_range[1]}"""
         result = self._query_ctl_casjob(catalog=self._catalog, query=query, estimated_minutes=1)
-
-        print(f"DONE. Collected {len(result)} stars.")
+        self._log(f"DONE. Collected {len(result)} stars.")
 
         return result
 
@@ -93,7 +115,7 @@ class TessCatalogDownloader(DatasetDownloader):
             return self._casjob_api.quick(q=query, context=catalog)
 
         temp_table = "temp_table"
-        print("Preparing remote DB")
+        self._log("Preparing remote DB")
         try:
             self._casjob_api.drop_table(temp_table)
         except Exception:
@@ -101,23 +123,22 @@ class TessCatalogDownloader(DatasetDownloader):
             pass
 
         cas_query = f"select * into mydb.{temp_table} from ({query}) as subquery"
-        print(cas_query)
+        self._log(cas_query)
         job_id = self._casjob_api.submit(cas_query, context=catalog, task_name="python_api", estimate=estimated_minutes)
-        print(f"Started Casjob {job_id}")
+        self._log(f"Started Casjob {job_id}")
         status_code, status_name = self._casjob_api.monitor(job_id)
-        print(f"Job {job_id} ended with status {status_code}: {status_name}")
+        self._log(f"Job {job_id} ended with status {status_code}: {status_name}")
         if status_code != 5:
             return None
 
         buffer_csv = BytesIO()
-        print(f"Downloading output")
+        self._log(f"Downloading output")
         self._casjob_api.request_and_get_output(temp_table, outtype="CSV", outfn=buffer_csv)
-
-        print(f"Downloaded {(buffer_csv.getbuffer().nbytes / 10 ** 6):.2f} MB of data")
+        self._log(f"Downloaded {(buffer_csv.getbuffer().nbytes / 10 ** 6):.2f} MB of data")
 
         # Cleanup result table
         try:
-            print(f"Cleanup remote data")
+            self._log(f"Cleanup remote data")
             self._casjob_api.drop_table(temp_table)
         except Exception as e:
             print("Exception raised in query_ctl_casjob():", repr(e))
@@ -126,3 +147,7 @@ class TessCatalogDownloader(DatasetDownloader):
 
         buffer_csv.seek(0)
         return QTable.read(buffer_csv, format="csv")
+
+    def _log(self, message: str):
+        if self._verbose_log:
+            print(message)
