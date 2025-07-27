@@ -1,12 +1,11 @@
 from abc import abstractmethod, ABC
-from pathlib import Path
 from typing import Optional, Iterator, Sequence
 
 from astropy import units as u
 from astropy.table import QTable
 from astropy.units import UnrecognizedUnit
 
-from exotools.utils.qtable_utils import QTableHeader, save_qtable
+from exotools.utils.qtable_utils import QTableHeader
 
 _DEFAULT_FILENAME = "dataset"
 
@@ -49,32 +48,17 @@ class DatasetDownloader(ABC):
         """
         pass
 
-    def download(
-        self,
-        limit: Optional[int] = None,
-        out_folder_path: Optional[Path | str] = None,
-        out_file_name: Optional[str] = None,
-    ) -> QTable:
+    def download(self, limit: Optional[int] = None) -> tuple[QTable, QTableHeader]:
         """
         Download data from the dataset and store it.
 
         Args:
             limit: Maximum number of rows to download.
-            out_folder_path: if given, persists the dataset to the specified folder, overriding existing ones
-            out_file_name: if given together with out_folder_path, store the file with the given name
 
         Returns:
             QTable: Downloaded data as a QTable.
+            QTableHeader: Table header with info on data types, units and field descriptions
         """
-        # Check preconditions and create parent folders if provided
-        if out_folder_path:
-            if not out_folder_path.is_dir():
-                raise ValueError(f"The provided path must be a directory. Given: {out_folder_path}")
-            out_folder_path.mkdir(parents=True, exist_ok=True)
-            out_file_name = out_file_name or _DEFAULT_FILENAME
-
-        if out_file_name and not out_folder_path:
-            raise ValueError("If out_file_name is provided, out_folder_path must also be provided.")
 
         # Download
         raw_data = self._download(limit=limit)
@@ -85,27 +69,19 @@ class DatasetDownloader(ABC):
         # Fetch metadata
         table_header = self._get_table_header(cleaned_table)
 
-        # Store
-        if out_folder_path:
-            out_folder_path = Path(out_folder_path)
-            out_file_name = out_file_name or _DEFAULT_FILENAME
-            save_qtable(table=cleaned_table, header=table_header, file_path=out_folder_path, file_name=out_file_name)
+        # Assign descriptions
+        for c in cleaned_table.columns:
+            cleaned_table[c].description = table_header[c].description if c in table_header else None
 
-        return cleaned_table
+        return cleaned_table, table_header
 
-    def download_by_id(
-        self,
-        ids: Sequence[int],
-        out_folder_path: Optional[Path | str] = None,
-        out_file_name: Optional[str] = None,
-    ) -> QTable:
+    def download_by_id(self, ids: Sequence[int]) -> tuple[QTable, QTableHeader]:
         """
         Download data from the dataset by selecting fields by ID.
 
         Args:
             ids: list of IDs to download
-            out_folder_path: if given, persists the dataset to the specified folder, overriding existing ones
-            out_file_name: if given together with out_folder_path, store the file with the given name
+
 
         Returns:
             QTable: Downloaded data as a QTable.
@@ -116,13 +92,10 @@ class DatasetDownloader(ABC):
         # Fix table units
         cleaned_table = self._clean_and_fix(raw_data)
 
-        # Store
+        # Fetch metadata
         table_header = self._get_table_header(cleaned_table)
-        if out_folder_path:
-            out_folder_path = Path(out_folder_path)
-            out_file_name = out_file_name or _DEFAULT_FILENAME
-            save_qtable(table=cleaned_table, header=table_header, file_path=out_folder_path, file_name=out_file_name)
-        return cleaned_table
+
+        return cleaned_table, table_header
 
 
 def fix_unrecognized_units(table: QTable, units_map: dict[str, u.Unit]):

@@ -1,0 +1,536 @@
+{
+    "toi": {
+        "description": "TESS Object of Interest Identifier (TOI nnn.xx)",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "toipfx": {
+        "description": "TESS Object of Interest Prefix (Stellar Portion of TOI Name)",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "ctoi_alias": {
+        "description": "Community TESS Object of Interest Alias",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "pl_pnum": {
+        "description": "Number of Planets",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "tfopwg_disp": {
+        "description": "TFOPWG Disposition",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "st_tmag": {
+        "description": "Stellar TESS Magnitude Value",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_tmagerr1": {
+        "description": "Stellar TESS Magnitude Upper Uncertainty",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_tmagerr2": {
+        "description": "Stellar TESS Magnitude Lower Uncertainty",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_tmagsymerr": {
+        "description": "Stellar TESS Magnitude Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_tmaglim": {
+        "description": "Stellar TESS Magnitude Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "rastr": {
+        "description": "Right Ascension (J2000) String for Display",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "ra": {
+        "description": "Right Ascension (J2000) Value",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "raerr1": {
+        "description": "Right Ascension (J2000) Upper Uncertainty",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "raerr2": {
+        "description": "Right Ascension (J2000) Lower Undertainty",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "rasymerr": {
+        "description": "Right Ascension (J2000) Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "decstr": {
+        "description": "Declination (J2000) String for Display",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "dec": {
+        "description": "Declination (J2000) Value",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "decerr1": {
+        "description": "Declination (J2000) Upper Uncertainty",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "decerr2": {
+        "description": "Declination (J2000) Lower Uncertainty",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "decsymerr": {
+        "description": "Declination (J2000) Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_pmra": {
+        "description": "Stellar Proper Motion in Right Ascension Value",
+        "unit": "mas / yr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_pmraerr1": {
+        "description": "Stellar Proper Motion in Right Ascension Upper Uncertainty",
+        "unit": "mas / yr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_pmraerr2": {
+        "description": "Stellar Proper Motion in Right Ascension Lower Uncertainty",
+        "unit": "mas / yr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_pmrasymerr": {
+        "description": "Stellar Proper Motion in Right Ascension Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_pmralim": {
+        "description": "stellar proper motion in right ascension limit flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_pmdec": {
+        "description": "Stellar Proper Motion in Declination Value",
+        "unit": "mas / yr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_pmdecerr1": {
+        "description": "Stellar Proper Motion in Declination Upper Uncertainty",
+        "unit": "mas / yr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_pmdecerr2": {
+        "description": "Stellar Proper Motion in Declination Lower Uncertainty",
+        "unit": "mas / yr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_pmdecsymerr": {
+        "description": "Stellar Proper Motion in Declination Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_pmdeclim": {
+        "description": "Stellar Proper Motion in Declination Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_tranmid": {
+        "description": "Planet Transit Midpoint Value",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_tranmiderr1": {
+        "description": "Planet Transit Midpoint Upper Uncertainty",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_tranmiderr2": {
+        "description": "Planit Transit Midpoint Lower Uncertainty",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_tranmidsymerr": {
+        "description": "Planet Transit Midpoint Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_tranmidlim": {
+        "description": "Planet Transit Midpoint Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_orbper": {
+        "description": "Planet Orbital Period Value",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbpererr1": {
+        "description": "Planet Orbital Period Upper Uncertainty",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbpererr2": {
+        "description": "Planet Orbital Period Lower Uncertainty",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbpersymerr": {
+        "description": "Planet Orbital Period Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_orbperlim": {
+        "description": "Planet Orbital Period Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_trandurh": {
+        "description": "Planet Transit Duration Value",
+        "unit": "h",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandurherr1": {
+        "description": "Planet Transit Duration Upper Uncertainty",
+        "unit": "h",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandurherr2": {
+        "description": "Planet Transit Duration Lower Uncertainty",
+        "unit": "h",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandurhsymerr": {
+        "description": "Planet Transit Duration Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_trandurhlim": {
+        "description": "Planet Transit Duration Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_trandep": {
+        "description": "Planet Transit Depth Value",
+        "unit": "%",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandeperr1": {
+        "description": "Planet Transit Depth Upper Uncertainty",
+        "unit": "%",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandeperr2": {
+        "description": "Planet Transit Depth Lower Uncertainty",
+        "unit": "%",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandepsymerr": {
+        "description": "Planet Transit Depth Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_trandeplim": {
+        "description": "Planet Transit Depth Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_rade": {
+        "description": "Planet Radius Value",
+        "unit": "earthRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_radeerr1": {
+        "description": "Planet Radius Upper Uncertainty",
+        "unit": "earthRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_radeerr2": {
+        "description": "Planet Radius Lower Uncertainty",
+        "unit": "earthRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_radesymerr": {
+        "description": "Planet Radius Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_radelim": {
+        "description": "Planet Radius Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_insol": {
+        "description": "Planet Insolation Value",
+        "unit": "solLum / AU2",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_insolerr1": {
+        "description": "Planet Insolation Upper Uncertainty",
+        "unit": "solLum / AU2",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_insolerr2": {
+        "description": "Planet Insolation Lower Uncertainty",
+        "unit": "solLum / AU2",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_insolsymerr": {
+        "description": "Planet Insolation Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_insollim": {
+        "description": "Planet Insolation Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_eqt": {
+        "description": "Planet Equilibrium Temperature Value",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_eqterr1": {
+        "description": "Planet Equilibrium Temperature Upper Uncertainty",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_eqterr2": {
+        "description": "Planet Equilibrium Temperature Lower Uncertainty",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_eqtsymerr": {
+        "description": "Planet Equilibrium Temperature Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_eqtlim": {
+        "description": "Planet Equilibrium Temperature Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_dist": {
+        "description": "Stellar Distance Value",
+        "unit": "pc",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_disterr1": {
+        "description": "Stellar Distance Upper Uncertainty",
+        "unit": "pc",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_disterr2": {
+        "description": "Stellar Distance Lower Uncertainty",
+        "unit": "pc",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_distsymerr": {
+        "description": "Stellar Distance Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_distlim": {
+        "description": "Stellar Distance Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_teff": {
+        "description": "Stellar Effective Temperature Value",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_tefferr1": {
+        "description": "Stellar Effective Termperature Upper Uncertainty",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_tefferr2": {
+        "description": "Stellar Effecitve Temperature Lower Uncertainty",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_teffsymerr": {
+        "description": "Stellar Effective Temperature Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_tefflim": {
+        "description": "Stellar Effective Temperature Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_logg": {
+        "description": "Stellar log(g) Value",
+        "unit": "cm / s2",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_loggerr1": {
+        "description": "Stellar log(g) Upper Uncertanty",
+        "unit": "cm / s2",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_loggerr2": {
+        "description": "Stellar log(g) Lower Uncertainty",
+        "unit": "cm / s2",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_loggsymerr": {
+        "description": "Stellar log(g) Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_logglim": {
+        "description": "Stellar log(g) Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_rad": {
+        "description": "Stellar Radius Value",
+        "unit": "solRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_raderr1": {
+        "description": "Stellar Radius Upper Uncertainty",
+        "unit": "solRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_raderr2": {
+        "description": "Stellar Radius Lower Uncertainty",
+        "unit": "solRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_radsymerr": {
+        "description": "Stellar Radius Symmetric Error Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_radlim": {
+        "description": "Stellar Radius Limit Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "sectors": {
+        "description": "Sectors (TBD)",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "toi_created": {
+        "description": "TOI Created Date",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "rowupdate": {
+        "description": "Last Update Date",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "release_date": {
+        "description": "Release Date",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    }
+}

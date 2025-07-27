@@ -63,7 +63,11 @@ class TapService:
     def _get_fields_info(table) -> QTableHeader:
         return {
             # NOTE: column.name was previously column.feature_name, after this method started to fail for GAIA data downloader
-            column.name: TableColumnInfo(unit=column.unit, description=column.description)
+            column.name: TableColumnInfo(
+                unit=column.unit,
+                description=column.description,
+                dtype=column.datatype.content,
+            )
             for column in table.columns
         }
 

@@ -96,7 +96,6 @@ def _get_gaia_targets_data_query(
                   dr3.phot_variable_flag, 
                   dr3_astro.teff_gspphot, teff_gspspec, teff_esphs, teff_espucd, teff_msc1, teff_msc2, 
                   dr3_astro.mh_gspphot,
-                  dr3_astro.logg_gspphot,  
                   dr3_astro.distance_gspphot, distance_msc,  
                   mg_gspphot,  
                   spectraltype_esphs,  

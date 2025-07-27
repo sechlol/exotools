@@ -3,10 +3,10 @@
 __version__ = "0.1.0"
 
 from .db.star_system import Star, Planet, StarSystem, UncertainValue, UncertainDataSource
-from .known_exoplanets import KnownExoplanetsDataset
-from .candidate_exoplanets import CandidateExoplanetsDataset
-from .tess import TessDataset
-from .lightcurves import LightcurveDataset
+from exotools.datasets.known_exoplanets import KnownExoplanetsDataset
+from exotools.datasets.candidate_exoplanets import CandidateExoplanetsDataset
+from exotools.datasets.tess import TessDataset
+from exotools.datasets.lightcurves import LightcurveDataset
 
 from .db import (
     CandidateDB,

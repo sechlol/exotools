@@ -65,13 +65,24 @@ class KnownExoplanetsDownloader(DatasetDownloader):
 
 def _get_fixed_table_header(table: QTable, table_name: str, tap_service: TapService) -> QTableHeader:
     descriptions = tap_service.get_field_descriptions(table_name)
-    return {
+    header = {}
+    for c in table.columns:
+        if c in descriptions:
+            dtype = table[c].dtype.str if hasattr(table[c], "dtype") and table[c].dtype is not None else None
+            unit = str(table[c].unit) if hasattr(table[c], "unit") and table[c].unit is not None else None
+            header[c] = TableColumnInfo(unit=unit, dtype=dtype, description=descriptions[c])
+
+    return header
+    header = {
         c: TableColumnInfo(
-            unit=table[c].unit.name if isinstance(table[c].unit, Unit) else None, description=descriptions[c]
+            unit=table[c].unit.name if hasattr(table[c], "unit") and table[c].unit is not None else None,
+            dtype=table[c].dtype.name if hasattr(table[c], "dtype") and table[c].dtype is not None else None,
+            description=descriptions[c],
         )
         for c in table.columns
         if c in descriptions
     }
+    return header
 
 
 def _parse_ids(table: QTable):

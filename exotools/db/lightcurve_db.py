@@ -81,7 +81,9 @@ class LightcurveDB(BaseDB):
     @staticmethod
     def path_map_to_qtable(path_map: dict[int, list[Path]]) -> QTable:
         tabular_data = [
-            {"tic_id": tic, "obs_id": int(path.stem), "path": path} for tic, paths in path_map.items() for path in paths
+            {"tic_id": tic, "obs_id": int(path.stem), "path": str(path)}
+            for tic, paths in path_map.items()
+            for path in paths
         ]
         return QTable(tabular_data)
 
