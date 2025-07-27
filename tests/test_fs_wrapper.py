@@ -6,8 +6,10 @@ from astropy.table import QTable
 
 from exotools.io.fs_storage import FeatherStorage, EcsvStorage
 from exotools.utils.qtable_utils import get_header_from_table
-from tests.paths import TEST_TMP_DIR
-from tests.utils import compare_qtables
+
+from .conftest import TEST_TMP_DIR
+from .utils.comparison import compare_qtables
+
 
 _TEST_DIR = TEST_TMP_DIR / "fs_test"
 

@@ -1,7 +1,15 @@
+import os
+from pathlib import Path
+
 import pytest
 from astropy.table import QTable
 
-from tests.paths import TEST_ASSETS_QTABLES
+
+_CURRENT_DIR = Path(os.path.realpath(__file__)).parent
+_TEST_ASSETS_DIR = _CURRENT_DIR / "test_assets"
+
+TEST_TMP_DIR = _CURRENT_DIR / "tmp"
+TEST_ASSETS_QTABLES = _TEST_ASSETS_DIR / "qtables"
 
 
 @pytest.fixture(scope="session")

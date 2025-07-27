@@ -2,8 +2,8 @@ import numpy as np
 
 from exotools import KnownExoplanetsDataset, CandidateExoplanetsDataset, TessDataset
 from exotools.io.fs_storage import EcsvStorage
-from tests.paths import TEST_ASSETS_QTABLES
-from tests.utils import compare_qtables
+from tests.conftest import TEST_ASSETS_QTABLES
+from tests.utils.comparison import compare_qtables
 
 
 def generate_test_qtables():

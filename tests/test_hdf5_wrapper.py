@@ -1,11 +1,10 @@
-import numpy as np
 from astropy import units as u
 from astropy.table import QTable
 
-from exotools.io.hdf5_wrapper import Hdf5Wrapper
+from exotools.io.hdf5_storage import Hdf5Wrapper
 from exotools.utils.qtable_utils import get_header_from_table
-from tests.paths import TEST_TMP_DIR, TEST_ASSETS_QTABLES
-from tests.test_fs_wrapper import _compare_tables
+from tests.conftest import TEST_TMP_DIR, TEST_ASSETS_QTABLES
+from tests.utils.comparison import compare_qtables
 
 _TEST_FILE = TEST_TMP_DIR / "test.hdf5"
 
@@ -84,7 +83,7 @@ class TestHdf5Wrapper:
         read_table = w.read_qtable("test_stars")
 
         # Verify the data matches using our comparison function
-        assert _compare_tables(test_table, read_table)
+        assert compare_qtables(test_table, read_table)
 
     def test_write_read_qtable_full(self, all_test_qtables: dict[str, QTable]):
         w = Hdf5Wrapper(_TEST_FILE)
@@ -92,7 +91,7 @@ class TestHdf5Wrapper:
             header = get_header_from_table(qtable)
             w.write_qtable(qtable, header, name)
             read_qtable = w.read_qtable(name)
-            assert _compare_tables(qtable, read_qtable)
+            assert compare_qtables(qtable, read_qtable)
 
     def test_write_qtable_same_name(self):
         w = Hdf5Wrapper(_TEST_FILE)
@@ -123,7 +122,7 @@ class TestHdf5Wrapper:
 
         # Add some data
         w.write_json({"test": "data"}, "json_data")
-        
+
         # Create test QTable
         test_table = QTable(
             {
@@ -136,10 +135,10 @@ class TestHdf5Wrapper:
 
         # Get structure
         structure = w.get_structure()
-        
+
         # Check that our data is in the structure
         assert len(structure) > 0
-        
+
         # Check for the JSON dataset
         json_found = False
         for item in structure:
@@ -147,7 +146,7 @@ class TestHdf5Wrapper:
                 json_found = True
                 break
         assert json_found, "JSON dataset not found in structure"
-        
+
         # Check for the QTable data
         qtable_found = False
         for item in structure:
