@@ -14,7 +14,11 @@ class ExoDB(BaseDB):
         super().__init__(exoplanets_dataset, id_field=_ID_FIELD)
 
     @property
-    def gaia_id(self) -> np.ndarray:
+    def tic_ids(self) -> np.ndarray:
+        return self.view["tic_id"].value
+
+    @property
+    def gaia_ids(self) -> np.ndarray:
         return self.view["gaia_id"].value
 
     def _factory(self, dataset: QTable) -> "ExoDB":

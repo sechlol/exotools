@@ -18,7 +18,7 @@ class KnownExoplanetsDataset:
         self._storage = storage
         self._gaia_dataset = GaiaParametersDataset(storage)
 
-    def load_known_exoplanets_dataset(self, with_gaia_star_data: bool = True) -> Optional[ExoDB]:
+    def load_known_exoplanets_dataset(self, with_gaia_star_data: bool = False) -> Optional[ExoDB]:
         gaia_db = None
         if with_gaia_star_data:
             gaia_db = self._gaia_dataset.load_gaia_parameters_dataset()

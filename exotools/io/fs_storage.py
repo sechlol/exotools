@@ -15,8 +15,8 @@ from .base_storage import BaseStorage
 
 
 class FsStorage(BaseStorage, ABC):
-    def __init__(self, root_path: Path):
-        self._root_path = root_path
+    def __init__(self, root_path: Path | str):
+        self._root_path = Path(root_path)
 
     @property
     def root_path(self) -> Path:
