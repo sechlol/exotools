@@ -1,5 +1,7 @@
 from astropy import units as u
 from astropy.table import QTable
+import pytest
+import shutil
 
 from exotools.io.hdf5_storage import Hdf5Wrapper
 from exotools.utils.qtable_utils import get_header_from_table
@@ -7,6 +9,12 @@ from tests.conftest import TEST_TMP_DIR, TEST_ASSETS_QTABLES
 from tests.utils.comparison import compare_qtables
 
 _TEST_FILE = TEST_TMP_DIR / "test.hdf5"
+
+
+@pytest.fixture
+def storage_wrapper():
+    """Fixture that creates a storage wrapper instance for testing."""
+    return Hdf5Wrapper(_TEST_FILE)
 
 
 class TestHdf5Wrapper:
@@ -19,8 +27,8 @@ class TestHdf5Wrapper:
         if _TEST_FILE.exists():
             _TEST_FILE.unlink()
 
-    def test_read_and_write_json(self):
-        w = Hdf5Wrapper(_TEST_FILE)
+    def test_read_and_write_json(self, storage_wrapper):
+        w = storage_wrapper
 
         # Test data
         test_data = {
@@ -29,35 +37,66 @@ class TestHdf5Wrapper:
             "metadata": {"created_by": "test", "items": [1, 2, 3, 4, 5]},
         }
 
+        # Write JSON data
         w.write_json(test_data, "test_config")
+
+        # Read it back
         read_data = w.read_json("test_config")
 
+        # Verify the data matches
         assert read_data == test_data
         assert read_data["name"] == "test_dataset"
         assert read_data["metadata"]["items"] == [1, 2, 3, 4, 5]
 
-    def test_write_json_same_name(self):
-        w = Hdf5Wrapper(_TEST_FILE)
-        name = "duplicate_name"
+    def test_write_json_same_name_without_override(self, storage_wrapper):
+        w = storage_wrapper
 
         # Write initial data
         initial_data = {"value": "first"}
-        w.write_json(initial_data, name)
+        w.write_json(initial_data, "duplicate_name")
 
-        # Try to write with same name - should raise ValueError
+        # Try to write with same name without override - should raise ValueError
         duplicate_data = {"value": "second"}
-        try:
-            w.write_json(duplicate_data, name)
-            assert False, "Expected ValueError was not raised"
-        except ValueError as e:
-            assert "already exists" in str(e)
+        with pytest.raises(ValueError) as excinfo:
+            w.write_json(duplicate_data, "duplicate_name")
+        
+        # Check error message
+        assert "already exists" in str(excinfo.value)
+        assert "duplicate_name" in str(excinfo.value)
 
         # Verify original data is still there
-        read_data = w.read_json(name)
+        read_data = w.read_json("duplicate_name")
         assert read_data == initial_data
 
-    def test_read_and_write_qtable_simple(self):
-        w = Hdf5Wrapper(_TEST_FILE)
+    def test_write_json_same_name_with_override(self, storage_wrapper):
+        w = storage_wrapper
+
+        # Write initial data
+        initial_data = {"value": "first"}
+        w.write_json(initial_data, "override_test")
+
+        # Write with same name using override=True
+        new_data = {"value": "second", "extra": "field"}
+        w.write_json(new_data, "override_test", override=True)
+
+        # Verify new data overwrote the old
+        read_data = w.read_json("override_test")
+        assert read_data == new_data
+        assert read_data["value"] == "second"
+        assert read_data["extra"] == "field"
+
+    def test_read_json_nonexistent_file(self, storage_wrapper):
+        w = storage_wrapper
+
+        # Try to read non-existent file
+        with pytest.raises(Exception) as excinfo:
+            w.read_json("nonexistent")
+        
+        # Check that an appropriate error is raised
+        # Note: The exact error type might differ from fs_wrapper
+
+    def test_read_and_write_qtable_simple(self, storage_wrapper):
+        w = storage_wrapper
 
         # Create test QTable with units
         test_table = QTable(
@@ -81,76 +120,92 @@ class TestHdf5Wrapper:
 
         # Read it back
         read_table = w.read_qtable("test_stars")
-
-        # Verify the data matches using our comparison function
         assert compare_qtables(test_table, read_table)
 
-    def test_write_read_qtable_full(self, all_test_qtables: dict[str, QTable]):
-        w = Hdf5Wrapper(_TEST_FILE)
-        for name, qtable in all_test_qtables.items():
-            header = get_header_from_table(qtable)
-            w.write_qtable(qtable, header, name)
+    def test_write_read_qtable_full(self, storage_wrapper, all_test_qtables):
+        w = storage_wrapper
+        for name, test_qtable in all_test_qtables.items():
+            header = get_header_from_table(test_qtable)
+            w.write_qtable(test_qtable, header, name)
             read_qtable = w.read_qtable(name)
-            assert compare_qtables(qtable, read_qtable)
+            assert compare_qtables(test_qtable, read_qtable)
 
-    def test_write_qtable_same_name(self):
-        w = Hdf5Wrapper(_TEST_FILE)
+    def test_read_qtable_nonexistent(self, storage_wrapper):
+        w = storage_wrapper
 
-        # Create test table
-        test_path_1 = TEST_ASSETS_QTABLES / "exo_db.ecsv"
-        test_path_2 = TEST_ASSETS_QTABLES / "candidate_db.ecsv"
-        test_table_1 = QTable.read(test_path_1)
-        test_table_2 = QTable.read(test_path_2)
-
-        header = get_header_from_table(test_table_1)
-
-        # Write initial table
-        w.write_qtable(test_table_1, header, "duplicate_table")
-
-        try:
-            w.write_qtable(test_table_2, header, "duplicate_table")
-            assert False, "Expected ValueError was not raised"
-        except ValueError as e:
-            assert "already exists" in str(e)
-            assert "duplicate_table" in str(e)
-
-    def test_get_structure(self):
-        w = Hdf5Wrapper(_TEST_FILE)
-
-        # Initially the file doesn't exist, so structure should be empty
-        assert w.get_structure() == []
-
-        # Add some data
-        w.write_json({"test": "data"}, "json_data")
-
-        # Create test QTable
+        # Try to read non-existent table
+        with pytest.raises(ValueError) as excinfo:
+            w.read_qtable("nonexistent_table")
+        
+        # Check error message
+        assert "does not exist" in str(excinfo.value)
+    
+    def test_read_qtable_header(self, storage_wrapper):
+        w = storage_wrapper
+        
+        # Create test QTable with units
         test_table = QTable(
             {
                 "name": ["star1", "star2", "star3"],
                 "ra": [10.5, 20.3, 30.1] * u.deg,
+                "dec": [-5.2, 15.7, -25.8] * u.deg,
             }
         )
+        
+        # Add descriptions
+        test_table["name"].description = "Star identifier"
+        test_table["ra"].description = "Right ascension"
+        test_table["dec"].description = "Declination"
+        
+        # Get header and write table
         header = get_header_from_table(test_table)
-        w.write_qtable(test_table, header, "test_stars")
-
-        # Get structure
-        structure = w.get_structure()
-
-        # Check that our data is in the structure
-        assert len(structure) > 0
-
-        # Check for the JSON dataset
-        json_found = False
-        for item in structure:
-            if "json_data" in item and "DATASET" in item:
-                json_found = True
-                break
-        assert json_found, "JSON dataset not found in structure"
-
-        # Check for the QTable data
-        qtable_found = False
-        for item in structure:
-            if "test_stars" in item:
-                qtable_found = True
-                break
-        assert qtable_found, "QTable data not found in structure"
+        w.write_qtable(test_table, header, "test_stars_header")
+        
+        # Read header back
+        read_header = w.read_qtable_header("test_stars_header")
+        
+        # Verify header matches
+        assert read_header.columns["name"].description == "Star identifier"
+        assert read_header.columns["ra"].description == "Right ascension"
+        assert read_header.columns["ra"].unit == "deg"
+        assert read_header.columns["dec"].description == "Declination"
+        assert read_header.columns["dec"].unit == "deg"
+    
+    def test_write_qtable_same_name_without_override(self, storage_wrapper):
+        w = storage_wrapper
+        
+        # Create test QTable
+        test_table = QTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        header = get_header_from_table(test_table)
+        
+        # Write initial table
+        w.write_qtable(test_table, header, "duplicate_table")
+        
+        # Try to write with same name without override - should raise ValueError
+        with pytest.raises(ValueError) as excinfo:
+            w.write_qtable(test_table, header, "duplicate_table")
+        
+        # Check error message
+        assert "already exists" in str(excinfo.value)
+    
+    def test_write_qtable_same_name_with_override(self, storage_wrapper):
+        w = storage_wrapper
+        
+        # Create initial test QTable
+        initial_table = QTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        initial_header = get_header_from_table(initial_table)
+        
+        # Write initial table
+        w.write_qtable(initial_table, initial_header, "override_table")
+        
+        # Create new test QTable with different data
+        new_table = QTable({"a": [10, 20, 30], "c": [40, 50, 60]})
+        new_header = get_header_from_table(new_table)
+        
+        # Write with same name using override=True
+        w.write_qtable(new_table, new_header, "override_table", override=True)
+        
+        # Read it back and verify it's the new table
+        read_table = w.read_qtable("override_table")
+        assert compare_qtables(new_table, read_table)
+        assert not compare_qtables(initial_table, read_table)

@@ -1,17 +1,16 @@
 import shutil
-import pytest
 
+import pytest
 from astropy import units as u
 from astropy.table import QTable
 
 from exotools.io.fs_storage import FeatherStorage, EcsvStorage
 from exotools.utils.qtable_utils import get_header_from_table
-
 from .conftest import TEST_TMP_DIR
 from .utils.comparison import compare_qtables
 
-
 _TEST_DIR = TEST_TMP_DIR / "fs_test"
+_TEST_HDF5 = _TEST_DIR / "test.hdf5"
 
 
 @pytest.fixture(params=[FeatherStorage, EcsvStorage])
@@ -23,6 +22,7 @@ def storage_class(request):
 @pytest.fixture
 def storage_wrapper(storage_class):
     """Fixture that creates a storage wrapper instance for testing."""
+
     return storage_class(_TEST_DIR)
 
 
