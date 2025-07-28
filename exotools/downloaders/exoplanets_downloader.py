@@ -5,8 +5,10 @@ import numpy as np
 import pandas as pd
 from astropy.table import QTable, MaskedColumn
 
-from exotools.utils.qtable_utils import TableColumnInfo, QTableHeader, fix_unrecognized_units, override_units
+from exotools.utils.qtable_utils import TableColumnInfo, QTableHeader
 from exotools.utils.unit_mapper import UNIT_MAPPER
+
+from ._utils import fix_unrecognized_units, override_units
 from .dataset_downloader import DatasetDownloader
 from .tap_service import ExoService, TapService
 

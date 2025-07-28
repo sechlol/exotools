@@ -75,12 +75,13 @@ class FsStorage(BaseStorage, ABC):
 
         return self._read_qtable(table_path, header_path)
 
-    def read_qtable_header(self, header_path: Path) -> Optional[QTableHeader]:
-        if not header_path.exists():
-            return None
-
-        with open(header_path, "r") as file:
-            return RootQTableHeader.model_validate_json(file.read()).root
+    def read_qtable_header(self, table_name: str) -> Optional[QTableHeader]:
+        _, header_path = _get_qtable_paths(
+            file_path=self._root_path,
+            suffix=self._suffix,
+            file_name=table_name,
+        )
+        return _read_qtable_header(header_path)
 
 
 class FeatherStorage(FsStorage):
@@ -95,7 +96,7 @@ class FeatherStorage(FsStorage):
         col_names = table.colnames
 
         # Load header metadata
-        header = self.read_qtable_header(header_path)
+        header = _read_qtable_header(header_path)
         if not header:
             return table
 
@@ -147,3 +148,11 @@ def _write_qtable_header(header_path: Path, header: QTableHeader):
         # Store table unit info in json format
         with open(header_path, "w") as f:
             f.write(root_model.model_dump_json(indent=4))
+
+
+def _read_qtable_header(header_path: Path) -> Optional[QTableHeader]:
+    if not header_path.exists():
+        return None
+
+    with open(header_path, "r") as file:
+        return RootQTableHeader.model_validate_json(file.read()).root

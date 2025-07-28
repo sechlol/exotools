@@ -5,7 +5,7 @@ from astropy import units as u
 from astropy.table import QTable
 
 from exotools.io.fs_storage import FeatherStorage, EcsvStorage
-from exotools.utils.qtable_utils import get_header_from_table
+from exotools.utils.qtable_utils import QTableHeader, get_header_from_table
 from .conftest import TEST_TMP_DIR
 from .utils.comparison import compare_qtables
 
@@ -142,13 +142,16 @@ class TestFsStorage:
         read_table = w.read_qtable("test_stars")
         assert compare_qtables(test_table, read_table)
 
-    def test_write_read_qtable_full(self, storage_wrapper, all_test_qtables: dict[str, QTable]):
+    def test_write_read_qtable_full(
+        self, storage_wrapper, all_test_qtables_and_headers: dict[str, tuple[QTable, QTableHeader]]
+    ):
         w = storage_wrapper
-        for name, test_qtable in all_test_qtables.items():
-            header = get_header_from_table(test_qtable)
-            w.write_qtable(test_qtable, header, name)
+        for name, (test_qtable, test_header) in all_test_qtables_and_headers.items():
+            w.write_qtable(test_qtable, test_header, name)
             read_qtable = w.read_qtable(name)
+            read_header = w.read_qtable_header(name)
             assert compare_qtables(test_qtable, read_qtable)
+            assert test_header == read_header
 
     def test_read_qtable_nonexistent(self, storage_wrapper):
         w = storage_wrapper

@@ -3,7 +3,7 @@ from astropy import units as u
 from astropy.table import QTable
 
 from exotools.io.hdf5_storage import Hdf5Storage
-from exotools.utils.qtable_utils import get_header_from_table
+from exotools.utils.qtable_utils import get_header_from_table, QTableHeader
 from tests.conftest import TEST_TMP_DIR
 from tests.utils.comparison import compare_qtables
 
@@ -121,12 +121,15 @@ class TestHdf5Storage:
         read_table = w.read_qtable("test_stars")
         assert compare_qtables(test_table, read_table)
 
-    def test_write_read_qtable_full(self, storage_wrapper, all_test_qtables):
+    def test_write_read_qtable_full(
+        self, storage_wrapper, all_test_qtables_and_headers: dict[str, tuple[QTable, QTableHeader]]
+    ):
         w = storage_wrapper
-        for name, test_qtable in all_test_qtables.items():
-            header = get_header_from_table(test_qtable)
-            w.write_qtable(test_qtable, header, name)
+        for name, (test_qtable, test_header) in all_test_qtables_and_headers.items():
+            w.write_qtable(test_qtable, test_header, name)
             read_qtable = w.read_qtable(name)
+            read_header = w.read_qtable_header(name)
+            assert test_header == read_header
             assert compare_qtables(test_qtable, read_qtable)
 
     def test_read_qtable_nonexistent(self, storage_wrapper):
