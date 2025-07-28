@@ -3,7 +3,7 @@ from typing import Optional
 from astropy.table import QTable
 
 from .exo_db import ExoDB
-from .star_system.star_system import StarSystem
+from .star_system import StarSystem
 
 _ID_FIELD = "tic_id"
 

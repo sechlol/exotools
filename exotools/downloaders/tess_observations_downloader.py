@@ -6,8 +6,8 @@ from astropy.table import QTable
 from tqdm import tqdm
 
 from exotools.utils.observations_fix import Observations
-from .dataset_downloader import DatasetDownloader, iterate_chunks
 from exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
+from .dataset_downloader import DatasetDownloader, iterate_chunks
 
 
 class TessObservationsDownloader(DatasetDownloader):

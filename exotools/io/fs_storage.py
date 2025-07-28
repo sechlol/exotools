@@ -8,9 +8,10 @@ import pandas as pd
 from astropy import units as u
 from astropy.table import QTable, MaskedColumn
 
-from exotools.io.base_storage_wrapper import BaseStorage
 from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
 from exotools.utils.unit_mapper import UNIT_MAPPER
+
+from .base_storage import BaseStorage
 
 
 class FsStorage(BaseStorage, ABC):

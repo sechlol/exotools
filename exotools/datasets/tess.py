@@ -1,10 +1,8 @@
 from typing import Sequence, Optional
 
-from exotools.db.tic_db import TicDB
-from exotools.db.urls_db import TessMetaDB
-from exotools.downloaders.tess_catalog_downloader import TessCatalogDownloader
-from exotools.downloaders.tess_observations_downloader import TessObservationsDownloader
-from exotools.io.base_storage_wrapper import BaseStorage
+from exotools.db import TicDB, TessMetaDB
+from exotools.downloaders import TessCatalogDownloader, TessObservationsDownloader
+from exotools.io import BaseStorage
 
 
 class TessDataset:

@@ -1,10 +1,9 @@
 from pathlib import Path
 from typing import Optional
 
-from exotools.downloaders.lightcurve_downloader import LightcurveDownloader
-from exotools.db.lightcurve_db import LightcurveDB
-from exotools.db.urls_db import TessMetaDB
-from exotools.io.base_storage_wrapper import BaseStorage
+from exotools.db import TessMetaDB, LightcurveDB
+from exotools.downloaders import LightcurveDownloader
+from exotools.io import BaseStorage
 from exotools.utils.download import DownloadParams
 
 

@@ -2,9 +2,9 @@ from typing import Optional, Sequence
 
 from astropy.table import QTable
 
-from exotools.db.gaia_db import GaiaDB
-from exotools.downloaders.gaia_downloader import GaiaDownloader
-from exotools.io.base_storage_wrapper import BaseStorage
+from exotools.db import GaiaDB
+from exotools.downloaders import GaiaDownloader
+from exotools.io import BaseStorage
 
 
 class GaiaParametersDataset:

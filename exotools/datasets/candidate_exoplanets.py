@@ -2,10 +2,9 @@ from typing import Optional
 
 from astropy.table import QTable
 
-from exotools.db.exo_db import ExoDB
-from exotools.db.toi_db import CandidateDB
-from exotools.downloaders.toi_exoplanets_downloader import CandidateExoplanetsDownloader
-from exotools.io.base_storage_wrapper import BaseStorage
+from exotools.db import ExoDB, CandidateDB
+from exotools.downloaders import CandidateExoplanetsDownloader
+from exotools.io import BaseStorage
 
 
 class CandidateExoplanetsDataset:

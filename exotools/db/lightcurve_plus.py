@@ -6,7 +6,7 @@ from astropy.time import TimeDelta, Time
 from astropy.units import Quantity
 from lightkurve import LightCurve, FoldedLightCurve
 
-from .star_system.planet import Planet
+from .star_system import Planet
 
 
 class LightCurvePlus:

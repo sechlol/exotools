@@ -7,8 +7,8 @@ import numpy as np
 from astropy.io.misc.hdf5 import write_table_hdf5, read_table_hdf5
 from astropy.table import QTable
 
+from exotools.io import BaseStorage
 from exotools.utils.qtable_utils import RootQTableHeader, QTableHeader
-from .base_storage_wrapper import BaseStorage
 
 
 class Hdf5Storage(BaseStorage):
