@@ -26,7 +26,7 @@ def storage_wrapper(storage_class):
     return storage_class(_TEST_DIR)
 
 
-class TestFsWrapper:
+class TestFsStorage:
     def setup_method(self):
         """Create test directory before each test method"""
         _TEST_DIR.mkdir(parents=True, exist_ok=True)

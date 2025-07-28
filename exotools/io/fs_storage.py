@@ -8,12 +8,12 @@ import pandas as pd
 from astropy import units as u
 from astropy.table import QTable, MaskedColumn
 
-from exotools.io.base_storage_wrapper import StorageWrapper
+from exotools.io.base_storage_wrapper import BaseStorage
 from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
 from exotools.utils.unit_mapper import UNIT_MAPPER
 
 
-class FsStorage(StorageWrapper, ABC):
+class FsStorage(BaseStorage, ABC):
     def __init__(self, root_path: Path):
         self._root_path = root_path
 

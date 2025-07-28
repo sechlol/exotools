@@ -7,7 +7,7 @@ from astropy.table import QTable
 from exotools.utils.qtable_utils import QTableHeader
 
 
-class StorageWrapper(abc.ABC):
+class BaseStorage(abc.ABC):
     @abc.abstractmethod
     def root_path(self) -> Path:
         pass

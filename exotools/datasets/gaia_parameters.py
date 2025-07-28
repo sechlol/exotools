@@ -4,13 +4,13 @@ from astropy.table import QTable
 
 from exotools.db.gaia_db import GaiaDB
 from exotools.downloaders.gaia_downloader import GaiaDownloader
-from exotools.io.base_storage_wrapper import StorageWrapper
+from exotools.io.base_storage_wrapper import BaseStorage
 
 
 class GaiaParametersDataset:
     _DATASET_GAIA = "known_gaia_astro_parameters"
 
-    def __init__(self, storage: StorageWrapper):
+    def __init__(self, storage: BaseStorage):
         self._storage = storage
 
     def load_gaia_parameters_dataset(self) -> Optional[GaiaDB]:

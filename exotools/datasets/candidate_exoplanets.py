@@ -5,13 +5,13 @@ from astropy.table import QTable
 from exotools.db.exo_db import ExoDB
 from exotools.db.toi_db import CandidateDB
 from exotools.downloaders.toi_exoplanets_downloader import CandidateExoplanetsDownloader
-from exotools.io.base_storage_wrapper import StorageWrapper
+from exotools.io.base_storage_wrapper import BaseStorage
 
 
 class CandidateExoplanetsDataset:
     _DATASET_NAME_CANDIDATES = "candidate_exoplanets"
 
-    def __init__(self, storage: StorageWrapper):
+    def __init__(self, storage: BaseStorage):
         self._storage = storage
 
     def load_candidate_exoplanets_dataset(self) -> Optional[CandidateDB]:

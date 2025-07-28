@@ -4,7 +4,7 @@ from exotools.db.tic_db import TicDB
 from exotools.db.urls_db import TessMetaDB
 from exotools.downloaders.tess_catalog_downloader import TessCatalogDownloader
 from exotools.downloaders.tess_observations_downloader import TessObservationsDownloader
-from exotools.io.base_storage_wrapper import StorageWrapper
+from exotools.io.base_storage_wrapper import BaseStorage
 
 
 class TessDataset:
@@ -12,7 +12,7 @@ class TessDataset:
     _TIC_NAME = "tess_tic"
     _TIC_BY_ID_NAME = "tess_tic_by_id"
 
-    def __init__(self, storage: StorageWrapper, username: Optional[str] = None, password: Optional[str] = None):
+    def __init__(self, storage: BaseStorage, username: Optional[str] = None, password: Optional[str] = None):
         self._storage = storage
         self._catalog_downloader = TessCatalogDownloader(username, password) if username and password else None
 

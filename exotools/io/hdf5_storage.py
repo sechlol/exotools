@@ -3,16 +3,15 @@ from pathlib import Path
 from typing import Optional
 
 import h5py
-import pandas as pd
 import numpy as np
 from astropy.io.misc.hdf5 import write_table_hdf5, read_table_hdf5
 from astropy.table import QTable
 
 from exotools.utils.qtable_utils import RootQTableHeader, QTableHeader
-from .base_storage_wrapper import StorageWrapper
+from .base_storage_wrapper import BaseStorage
 
 
-class Hdf5Wrapper(StorageWrapper):
+class Hdf5Storage(BaseStorage):
     _JSON_GROUP = "json"
     _TABLE_GROUP = "table"
     _HEADER_GROUP = "header"
@@ -68,7 +67,7 @@ class Hdf5Wrapper(StorageWrapper):
         parent_path = f"{self._root_group_path}/{table_name}"
 
         # Preprocess the table to handle object dtypes
-        processed_table = self._preprocess_table_for_hdf5(table)
+        processed_table = _preprocess_table_for_hdf5(table)
 
         with h5py.File(self._hdf5_path, "a") as f:
             # Check if table exists
@@ -84,7 +83,7 @@ class Hdf5Wrapper(StorageWrapper):
 
             # Create parent group if needed
             f.require_group(parent_path)
-            
+
             # Create header dataset
             f.create_dataset(header_path, data=RootQTableHeader(root=header).model_dump_json())
 
@@ -98,40 +97,6 @@ class Hdf5Wrapper(StorageWrapper):
                 overwrite=True,  # Always use overwrite=True since we've already handled the override logic
                 serialize_meta=True,
             )
-
-    def _preprocess_table_for_hdf5(self, table: QTable) -> QTable:
-        """
-        Preprocess a QTable to make it compatible with HDF5 storage.
-        Handles object dtypes by converting them to serializable formats.
-        
-        Args:
-            table: The QTable to preprocess
-            
-        Returns:
-            A new QTable with HDF5-compatible dtypes
-        """
-        # Create a copy to avoid modifying the original
-        processed_table = table.copy()
-        
-        # Process each column
-        for col_name in processed_table.colnames:
-            col = processed_table[col_name]
-            
-            # Handle object dtypes
-            if col.dtype == np.dtype('O'):
-                # Convert to string if it contains string-like objects
-                if all(isinstance(x, (str, bytes, type(None))) for x in col):
-                    max_len = max((len(str(x)) for x in col if x is not None), default=1)
-                    processed_table[col_name] = [str(x) if x is not None else '' for x in col]
-                else:
-                    # For other object types, convert to JSON strings
-                    try:
-                        processed_table[col_name] = [json.dumps(x) if x is not None else '' for x in col]
-                    except (TypeError, ValueError):
-                        # If JSON serialization fails, convert to string representation
-                        processed_table[col_name] = [str(x) if x is not None else '' for x in col]
-        
-        return processed_table
 
     def read_qtable(self, table_name: str) -> Optional[QTable]:
         table_path = self._table_group(table_name)
@@ -164,28 +129,36 @@ class Hdf5Wrapper(StorageWrapper):
             return table
 
 
-def _convert_nullable_ints_to_float(df: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, str]]:
+def _preprocess_table_for_hdf5(table: QTable) -> QTable:
     """
-    Convert nullable integer columns to float, due to a bug in pandas not being able to write them to hdf5
-    https://github.com/pandas-dev/pandas/issues/26144
+    Preprocess a QTable to make it compatible with HDF5 storage.
+    Handles object dtypes by converting them to serializable formats.
+
+    Args:
+        table: The QTable to preprocess
+
+    Returns:
+        A new QTable with HDF5-compatible dtypes
     """
-    converted_columns = {}
+    # Create a copy to avoid modifying the original
+    processed_table = table.copy()
 
-    for col_name in df.columns:
-        dtype = df[col_name].dtype
+    # Process each column
+    for col_name in processed_table.colnames:
+        col = processed_table[col_name]
 
-        # Check if column has nullable integer dtype
-        if pd.api.types.is_extension_array_dtype(dtype) and "Int" in dtype.name:
-            if dtype.name == "Int64":
-                df[col_name] = df[col_name].astype("float64")
+        # Handle object dtypes
+        if col.dtype == np.dtype("O"):
+            # Convert to string if it contains string-like objects
+            if all(isinstance(x, (str, bytes, type(None))) for x in col):
+                max_len = max((len(str(x)) for x in col if x is not None), default=1)
+                processed_table[col_name] = [str(x) if x is not None else "" for x in col]
             else:
-                df[col_name] = df[col_name].astype("float32")
+                # For other object types, convert to JSON strings
+                try:
+                    processed_table[col_name] = [json.dumps(x) if x is not None else "" for x in col]
+                except (TypeError, ValueError):
+                    # If JSON serialization fails, convert to string representation
+                    processed_table[col_name] = [str(x) if x is not None else "" for x in col]
 
-            converted_columns[col_name] = dtype.name
-    return df, converted_columns
-
-
-def _convert_floats_to_nullable_int(df: pd.DataFrame, columns: dict[str, str]) -> pd.DataFrame:
-    for col_name, original_dtype in columns.items():
-        df[col_name] = df[col_name].astype(original_dtype)
-    return df
+    return processed_table

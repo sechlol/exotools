@@ -4,14 +4,14 @@ from typing import Optional
 from exotools.downloaders.lightcurve_downloader import LightcurveDownloader
 from exotools.db.lightcurve_db import LightcurveDB
 from exotools.db.urls_db import TessMetaDB
-from exotools.io.base_storage_wrapper import StorageWrapper
+from exotools.io.base_storage_wrapper import BaseStorage
 from exotools.utils.download import DownloadParams
 
 
 class LightcurveDataset:
     _DATASET_LIGHTCURVES = "lightcurves"
 
-    def __init__(self, storage: StorageWrapper, override_existing: bool = False, verbose: bool = False):
+    def __init__(self, storage: BaseStorage, override_existing: bool = False, verbose: bool = False):
         self._folder_path = storage.root_path / self._DATASET_LIGHTCURVES
         self._downloader = LightcurveDownloader(override_existing=override_existing, verbose=verbose)
 

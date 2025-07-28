@@ -2,7 +2,7 @@ import pytest
 from astropy import units as u
 from astropy.table import QTable
 
-from exotools.io.hdf5_storage import Hdf5Wrapper
+from exotools.io.hdf5_storage import Hdf5Storage
 from exotools.utils.qtable_utils import get_header_from_table
 from tests.conftest import TEST_TMP_DIR
 from tests.utils.comparison import compare_qtables
@@ -13,10 +13,10 @@ _TEST_FILE = TEST_TMP_DIR / "test.hdf5"
 @pytest.fixture
 def storage_wrapper():
     """Fixture that creates a storage wrapper instance for testing."""
-    return Hdf5Wrapper(_TEST_FILE)
+    return Hdf5Storage(_TEST_FILE)
 
 
-class TestHdf5Wrapper:
+class TestHdf5Storage:
     def setup_method(self):
         """Create test file before each test method"""
         _TEST_FILE.parent.mkdir(parents=True, exist_ok=True)

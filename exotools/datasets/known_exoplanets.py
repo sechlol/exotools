@@ -8,7 +8,7 @@ from exotools.db.gaia_db import GaiaDB
 from exotools.db.starsystem_db import StarSystemDB
 from exotools.datasets.gaia_parameters import GaiaParametersDataset
 from exotools.downloaders.exoplanets_downloader import KnownExoplanetsDownloader
-from exotools.io.base_storage_wrapper import StorageWrapper
+from exotools.io.base_storage_wrapper import BaseStorage
 
 from ._exoplanet_dataset_reducer import reduce_exoplanet_dataset
 
@@ -17,7 +17,7 @@ class KnownExoplanetsDataset:
     _DATASET_EXO = "known_exoplanets"
     _DATASET_EXO_REDUCED = "known_exoplanets_reduced"
 
-    def __init__(self, storage: StorageWrapper):
+    def __init__(self, storage: BaseStorage):
         self._storage = storage
         self._gaia_dataset = GaiaParametersDataset(storage)
 
@@ -56,7 +56,7 @@ class KnownExoplanetsDataset:
                     "calling download_known_exoplanets(with_gaia_star_data=True, store=True)."
                 )
                 return None
-                
+
             try:
                 exo_qtable = self._storage.read_qtable(table_name=self._DATASET_EXO)
             except ValueError:
