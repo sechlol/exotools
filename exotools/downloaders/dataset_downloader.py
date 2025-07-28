@@ -67,10 +67,6 @@ class DatasetDownloader(ABC):
         # Fetch metadata
         table_header = self._get_table_header(cleaned_table)
 
-        # Assign descriptions
-        for c in cleaned_table.columns:
-            cleaned_table[c].description = table_header[c].description if c in table_header else None
-
         return cleaned_table, table_header
 
     def download_by_id(self, ids: Sequence[int]) -> tuple[QTable, QTableHeader]:
