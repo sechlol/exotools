@@ -7,7 +7,8 @@ from astropy.table import QTable, MaskedColumn
 
 from exotools.utils.qtable_utils import TableColumnInfo, QTableHeader, fix_unrecognized_units, override_units
 from exotools.utils.unit_mapper import UNIT_MAPPER
-from . import ExoService, TapService, DatasetDownloader
+from .dataset_downloader import DatasetDownloader
+from .tap_service import ExoService, TapService
 
 
 def _get_error_parameters(parameters: list[str], include_original: Optional[bool] = False) -> list[str]:

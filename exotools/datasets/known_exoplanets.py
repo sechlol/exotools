@@ -4,7 +4,7 @@ import numpy as np
 from astropy.table import QTable
 
 from exotools.db import ExoDB, GaiaDB, StarSystemDB
-from exotools.datasets import GaiaParametersDataset
+from exotools.datasets.gaia_parameters import GaiaParametersDataset
 from exotools.downloaders import KnownExoplanetsDownloader
 from exotools.io import BaseStorage
 
