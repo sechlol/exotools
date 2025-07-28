@@ -32,6 +32,7 @@ UNIT_MAPPER = {
     "arc-sec/year": u.arcsec / u.yr,
     "cm/s**2": u.cm / u.s**2,
     "g/cm**3": u.g / u.cm**3,
+    "d": u.day,
     "day": u.day,
     "days": u.day,
     "degrees": u.deg,
@@ -43,6 +44,7 @@ UNIT_MAPPER = {
     "logLsun": u.dex(u.L_sun),
     "log(Lsun)": u.dex(u.L_sun),
     "log(Solar)": u.dex(u.L_sun),
+    "dex(solLum)": u.dex(u.L_sun),
     "mags": u.mag,
     "microas": u.uas,
     "uas": u.uas,
@@ -59,6 +61,7 @@ UNIT_MAPPER = {
     "Solar Radius": u.R_sun,
     "log10(cm/s**2)": u.dex(u.cm / u.s**2),
     "log(cm/s**2)": u.dex(u.cm / u.s**2),
+    "dex(cm / s2)": u.dex(u.cm / u.s**2),
     "dex": u.dex(None),
     "sexagesimal": None,
 }

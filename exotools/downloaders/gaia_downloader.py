@@ -19,7 +19,7 @@ class GaiaDownloader(DatasetDownloader):
         https://gea.esac.esa.int/archive/documentation/GDR3/Gaia_archive/chap_datamodel/sec_dm_astrophysical_parameter_tables/ssec_dm_astrophysical_parameters.html
     """
 
-    _parameters_table = "gaiadr3.astrophysical_parameters"
+    _parameters_tables = ["gaiadr3.astrophysical_parameters", "gaiadr3.gaia_source_lite"]
 
     def __init__(self):
         self._gaia_service = GaiaService()
@@ -56,14 +56,24 @@ class GaiaDownloader(DatasetDownloader):
         """
         Fetch column information from the TAP service, and select only the necessary ones
         """
-        all_info = self._gaia_service.get_field_info(self._parameters_table)
+        columns_info = {}
+        for table_name in self._parameters_tables:
+            all_info = self._gaia_service.get_field_info(table_name)
+            col_names = table.colnames
 
-        fields_info = {k: v for k, v in all_info.items() if k in table.columns}
+            for field_name, field_info in all_info.items():
+                if field_name in col_names:
+                    if field_info.unit == "'dex'":
+                        # There are annoying units saved as "'dex'" (with quotes), instead of "dex", need to fix
+                        field_info.unit = u.dex.name
+                    columns_info[field_name] = field_info
+
+        # columns_info = {k: v for k, v in all_info.items() if k in table.columns}
 
         # There is an annoying unit that is saved as "'dex'", with quotes
-        fields_info["mh_gspphot"].unit = u.dex.name
+        # columns_info["mh_gspphot"].unit = u.dex.name
 
-        return fields_info
+        return columns_info
 
     def _download(self, limit: Optional[int] = None) -> QTable:
         raise NotImplementedError("GaiaDownloader doesn't support this download method")

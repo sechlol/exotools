@@ -94,5 +94,47 @@
         "unit": "K",
         "dtype": "float",
         "time_info": null
+    },
+    "phot_g_mean_flux_over_error": {
+        "description": "G-band mean flux divided by its error",
+        "unit": null,
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_g_mean_mag": {
+        "description": "G-band mean magnitude",
+        "unit": "mag",
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_bp_mean_flux_over_error": {
+        "description": "Integrated BP mean flux divided by its error",
+        "unit": null,
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_bp_mean_mag": {
+        "description": "Integrated BP mean magnitude",
+        "unit": "mag",
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_rp_mean_flux_over_error": {
+        "description": "Integrated RP mean flux divided by its error",
+        "unit": null,
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_rp_mean_mag": {
+        "description": "Integrated RP mean magnitude",
+        "unit": "mag",
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_variable_flag": {
+        "description": "Photometric variability flag",
+        "unit": null,
+        "dtype": "char",
+        "time_info": null
     }
 }

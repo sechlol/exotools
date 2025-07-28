@@ -5,10 +5,12 @@ from pathlib import Path
 from typing import Optional
 
 import pandas as pd
+from astropy import units as u
 from astropy.table import QTable, MaskedColumn
 
 from exotools.io.base_storage_wrapper import StorageWrapper
 from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
+from exotools.utils.unit_mapper import UNIT_MAPPER
 
 
 class FsStorage(StorageWrapper, ABC):
@@ -86,12 +88,28 @@ class FeatherStorage(FsStorage):
         return ".feather"
 
     def _read_qtable(self, table_path: Path, header_path: Path) -> QTable:
-        # Read header information with column units
-        header = self.read_qtable_header(header_path)
-        units = {key: info.unit for key, info in header.items()} if header else None
-
+        # Load raw DataFrame without unit conversion
         df = pd.read_feather(table_path)
-        return QTable.from_pandas(df, units=units)
+        table = QTable.from_pandas(df)
+        col_names = table.colnames
+
+        # Load header metadata
+        header = self.read_qtable_header(header_path)
+        if not header:
+            return table
+
+        # Assign units after construction
+        for col, info in header.items():
+            if col not in col_names or info.unit is None:
+                continue
+
+            unit = UNIT_MAPPER.get(info.unit, u.Unit(info.unit))
+            if "dex" in info.unit:
+                table[col] = table[col].value * unit
+            else:
+                table[col].unit = unit
+
+        return table
 
     def _save_qtable(self, table: QTable, table_path: Path, override: bool):
         # Store table data in feather format

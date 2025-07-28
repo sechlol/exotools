@@ -5,9 +5,9 @@ import pandas as pd
 from astropy.table import QTable, MaskedColumn
 from astropy.units import Unit
 
-from exotools.utils.qtable_utils import TableColumnInfo, QTableHeader
+from exotools.utils.qtable_utils import TableColumnInfo, QTableHeader, fix_unrecognized_units, override_units
 from exotools.utils.unit_mapper import UNIT_MAPPER
-from .dataset_downloader import fix_unrecognized_units, override_units, DatasetDownloader
+from .dataset_downloader import DatasetDownloader
 from .tap_service import ExoService, TapService
 
 

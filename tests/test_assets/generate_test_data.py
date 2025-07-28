@@ -17,7 +17,12 @@ def generate_test_qtables():
     candidates = candidates_ds.download_candidate_exoplanets(limit=150, store=True)
     all_ids = np.concatenate([known.unique_ids, candidates.unique_ids])
     tess = tess_ds.download_observation_metadata(targets_tic_id=all_ids, store=True)
-    originals = [known, candidates, tess]
+
+    originals = [
+        known,
+        candidates,
+        tess,
+    ]
 
     # Load datasets
     loaded = [

@@ -5,6 +5,11 @@ from astropy.units import Quantity
 from astropy.utils.masked import Masked
 
 
+def _is_masked_column(col: Column) -> bool:
+    types = [MaskedColumn, Masked]
+    return any(isinstance(col, t) for t in types)
+
+
 def compare_qtables(expected_table: QTable, test_table: QTable) -> bool:
     """
     Compare two QTable objects for equality by checking:
@@ -47,8 +52,10 @@ def compare_qtables(expected_table: QTable, test_table: QTable) -> bool:
         expected_col = expected_table[col_name]
         test_col = test_table[col_name]
 
+        both_masked = _is_masked_column(expected_col) and _is_masked_column(test_col)
+
         # Check types match
-        if type(expected_col) != type(test_col):
+        if type(expected_col) != type(test_col) and not both_masked:
             is_masked_column = isinstance(expected_col, MaskedColumn) and isinstance(test_col, Column)
             is_masked_quantity = isinstance(expected_col, Masked) and isinstance(test_col, Quantity)
             if is_masked_column or is_masked_quantity:
@@ -124,7 +131,7 @@ def compare_qtables(expected_table: QTable, test_table: QTable) -> bool:
                     raise AssertionError(f"Mask values don't match for column '{col_name}'")
 
                 # Compare unmasked values
-                if hasattr(expected_col, "data") and hasattr(test_col, "data"):
+                if hasattr(expected_col, "value") and hasattr(test_col, "value"):
                     if not np.array_equal(expected_col.value, test_col.value, equal_nan=True):
                         raise AssertionError(f"Data values don't match for masked column '{col_name}'")
             else:
