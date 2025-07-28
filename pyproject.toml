@@ -31,6 +31,7 @@ dependencies = [
     "pyarrow==18.1.0",
     "h5py",
     "pydantic",
+    "oktopus",
     "lightkurve",
     "astropy",
     "astroquery",
