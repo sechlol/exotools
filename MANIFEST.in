@@ -1,6 +1,7 @@
 include LICENSE
 include README.md
 include pyproject.toml
-recursive-include src/exotools *.py
-recursive-include tests *.py *.ipynb
-global-exclude *.pyc __pycache__/* *.so .DS_Store
+include requirements.txt
+recursive-include exotools *.py
+recursive-include tests *.py *.json *.ecsv
+global-exclude *.pyc __pycache__/* *.so .DS_Store tmp/

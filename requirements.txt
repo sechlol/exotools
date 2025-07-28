@@ -10,6 +10,7 @@ astropy
 astroquery
 casjobs
 tqdm
+tabulate
 ipywidgets
 matplotlib
 ruff
