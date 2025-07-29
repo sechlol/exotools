@@ -2,7 +2,7 @@ from typing import Sequence, Optional
 
 from exotools.db import TicDB, TessMetaDB
 from exotools.downloaders import TessCatalogDownloader, TessObservationsDownloader
-from exotools.io import BaseStorage
+from exotools.io import BaseStorage, MemoryStorage
 
 
 class TessDataset:
@@ -10,8 +10,13 @@ class TessDataset:
     _TIC_NAME = "tess_tic"
     _TIC_BY_ID_NAME = "tess_tic_by_id"
 
-    def __init__(self, storage: BaseStorage, username: Optional[str] = None, password: Optional[str] = None):
-        self._storage = storage
+    def __init__(
+        self,
+        storage: Optional[BaseStorage] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+    ):
+        self._storage = storage or MemoryStorage()
         self._catalog_downloader = TessCatalogDownloader(username, password) if username and password else None
 
     def download_observation_metadata(self, targets_tic_id: Sequence[int], store: bool = True) -> TessMetaDB:

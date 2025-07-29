@@ -7,7 +7,7 @@ import numpy as np
 from astropy.table import QTable
 from tabulate import tabulate
 
-from exotools.io import Hdf5Storage, EcsvStorage, FeatherStorage
+from exotools.io import Hdf5Storage, EcsvStorage, FeatherStorage, MemoryStorage
 from exotools.utils.qtable_utils import QTableHeader
 from tests.conftest import load_all_test_qtables_and_headers
 
@@ -147,6 +147,7 @@ def main():
         "Hdf5Storage": Hdf5Storage,
         "EcsvStorage": EcsvStorage,
         "FeatherStorage": FeatherStorage,
+        "MemoryStorage": MemoryStorage,
     }
 
     results = collect_benchmark_results(storages, qtable_data, json_data)
