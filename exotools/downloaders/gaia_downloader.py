@@ -1,4 +1,4 @@
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Sequence
 
 import astropy.units as u
 from astropy.table import QTable, vstack
@@ -24,14 +24,14 @@ class GaiaDownloader(DatasetDownloader):
     def __init__(self):
         self._gaia_service = GaiaService()
 
-    def _download_by_id(self, ids: list[str]) -> QTable:
+    def _download_by_id(self, ids: list[str], columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
         # This is a hard limit imposed by the server. Synchronous queries are allowed up to 2000 results
         all_tables = []
         chunk_ids = list(iterate_chunks(ids, chunk_size=1000))
 
         for i, gaia_ids in tqdm(enumerate(chunk_ids), desc="Querying Gaia chunks", total=len(chunk_ids)):
             try:
-                query = _get_gaia_targets_data_query(gaia_object_ids=gaia_ids, from_dr2=True)
+                query = _get_gaia_targets_data_query(gaia_object_ids=gaia_ids, from_dr2=True, extra_columns=columns)
                 table = Gaia.launch_job(query).get_results()
                 all_tables.append(table)
             except Exception as e:
@@ -63,19 +63,14 @@ class GaiaDownloader(DatasetDownloader):
 
             for field_name, field_info in all_info.items():
                 if field_name in col_names:
+                    # There are annoying units saved as "'dex'" (with quotes), instead of "dex", need to fix
                     if field_info.unit == "'dex'":
-                        # There are annoying units saved as "'dex'" (with quotes), instead of "dex", need to fix
                         field_info.unit = u.dex.name
                     columns_info[field_name] = field_info
 
-        # columns_info = {k: v for k, v in all_info.items() if k in table.columns}
-
-        # There is an annoying unit that is saved as "'dex'", with quotes
-        # columns_info["mh_gspphot"].unit = u.dex.name
-
         return columns_info
 
-    def _download(self, limit: Optional[int] = None) -> QTable:
+    def _download(self, limit: Optional[int] = None, **kwargs) -> QTable:
         raise NotImplementedError("GaiaDownloader doesn't support this download method")
 
 
@@ -84,7 +79,7 @@ def _get_gaia_targets_data_query(
     from_dr2: bool = True,
     limit: Optional[int] = None,
     must_have_photometry_data: bool = False,
-    select_all_fields: bool = False,
+    extra_columns: Optional[Sequence[str]] = None,
 ) -> str:
     ids = [f"'{oid}'" for oid in gaia_object_ids]
     formatted_ids = f"({','.join(ids)})"
@@ -95,24 +90,22 @@ def _get_gaia_targets_data_query(
     if must_have_photometry_data:
         extra_conditions += " AND dr3.has_epoch_photometry = 'True'"
 
-    limit_clause = f"top {limit}" if limit else ""
+    extra_fields = ",".join(set(extra_columns or []))
 
-    if select_all_fields:
-        selection = f"SELECT {limit_clause} dr3.*, dr3_astro.* "
-    else:
-        selection = f"""SELECT {limit_clause} dr3.source_id,
-                  dr3.phot_g_mean_mag, dr3.phot_bp_mean_mag, dr3.phot_rp_mean_mag,  
-                  dr3.phot_g_mean_flux_over_error, dr3.phot_bp_mean_flux_over_error, dr3.phot_rp_mean_flux_over_error, 
-                  dr3.phot_variable_flag, 
-                  dr3_astro.teff_gspphot, teff_gspspec, teff_esphs, teff_espucd, teff_msc1, teff_msc2, 
-                  dr3_astro.mh_gspphot,
-                  dr3_astro.distance_gspphot, distance_msc,  
-                  mg_gspphot,  
-                  spectraltype_esphs,  
-                  age_flame,  
-                  mass_flame,  
-                  lum_flame,  
-                  radius_flame, radius_gspphot """
+    limit_clause = f"top {limit}" if limit else ""
+    selection = f"""SELECT {limit_clause} dr3.source_id,
+              dr3.phot_g_mean_mag, dr3.phot_bp_mean_mag, dr3.phot_rp_mean_mag,  
+              dr3.phot_g_mean_flux_over_error, dr3.phot_bp_mean_flux_over_error, dr3.phot_rp_mean_flux_over_error, 
+              dr3.phot_variable_flag, 
+              dr3_astro.teff_gspphot, teff_gspspec, teff_esphs, teff_espucd, teff_msc1, teff_msc2, 
+              dr3_astro.mh_gspphot,
+              dr3_astro.distance_gspphot, distance_msc,  
+              mg_gspphot,  
+              spectraltype_esphs,  
+              age_flame,  
+              mass_flame,  
+              lum_flame,  
+              radius_flame, radius_gspphot{', ' if extra_fields else ''} {extra_fields} """
     if from_dr2:
         query = (
             selection

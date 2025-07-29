@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Sequence
 
 import numpy as np
 from astropy.table import QTable
@@ -67,12 +67,13 @@ class KnownExoplanetsDataset:
 
     def download_known_exoplanets(
         self,
-        limit: Optional[int] = None,
         with_gaia_star_data: bool = False,
         store: bool = True,
+        limit: Optional[int] = None,
+        columns: Optional[Sequence[str]] = None,
     ) -> ExoDB:
         print("Preparing to download known exoplanets dataset...")
-        exo_qtable, exo_header = KnownExoplanetsDownloader().download(limit=limit)
+        exo_qtable, exo_header = KnownExoplanetsDownloader().download(limit=limit, columns=columns)
 
         if store:
             self._storage.write_qtable(table=exo_qtable, header=exo_header, table_name=self._DATASET_EXO, override=True)

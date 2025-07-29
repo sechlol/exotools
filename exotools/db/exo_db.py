@@ -10,6 +10,34 @@ _PARAMETER_JD = ["pl_tranmid"]
 
 
 class ExoDB(BaseDB):
+    minimal_columns = [
+        [
+            "tic_id",
+            "gaia_id",
+            "hostname",
+            "pl_name",
+            "pl_orbeccen",
+            "pl_orbsmax",
+            "pl_tranmid",
+            "pl_ratdor",
+            "pl_imppar",
+            "pl_orblper",
+            "pl_masse",
+            "pl_trandep",
+            "pl_dens",
+            "pl_orbincl",
+            "pl_rade",
+            "pl_orbper",
+            "pl_trandur",
+            "pl_ratror",
+            "st_mass",
+            "st_rad",
+            "tran_flag",
+            "default_flag",
+            "disc_telescope",
+        ]
+    ]
+
     def __init__(self, exoplanets_dataset: QTable):
         super().__init__(exoplanets_dataset, id_field=_ID_FIELD)
 

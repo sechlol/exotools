@@ -25,9 +25,13 @@ class KnownExoplanetsDownloader(DatasetDownloader):
     Data source: Nasa Exoplanet Archive (table: Planetary Systems)
     https://exoplanetarchive.ipac.caltech.edu/docs/TAP/usingTAP.html
     https://exoplanetarchive.ipac.caltech.edu/docs/API_PS_columns.html
+
+    Some notes on ps table quickness:
+    https://decovar.dev/blog/2022/02/26/astronomy-databases-tap-adql/
     """
 
     _table_name = "ps"
+    _mandatory_fields = ["tic_id", "gaia_id"]
 
     # NOTE: the units of pl_tranmid and its boundaries are mistakenly labelled as "day". It should be "hours"
     #   see https://exoplanetarchive.ipac.caltech.edu/docs/API_PS_columns.html
@@ -36,15 +40,13 @@ class KnownExoplanetsDownloader(DatasetDownloader):
     def __init__(self):
         self._exo_service = ExoService()
 
-    def _download(self, limit: Optional[int] = None) -> QTable:
-        # There are some unnecessary fields that cause troubles when saving the DF, we should remove them
-        fields = ",".join([f for f in self._exo_service.get_field_names(self._table_name) if not f.endswith("str")])
-
+    def _download(self, limit: Optional[int] = None, columns: Optional[Sequence[str]] = None) -> QTable:
+        fields = self._get_fields_to_query(columns=columns)
         limit_clause = f"top {limit}" if limit else ""
         query_str = f"select {limit_clause} {fields} from {self._table_name}"
 
-        print(f"Querying {self._exo_service.url} (synchronous)...")
-        dataset = self._exo_service.query(query_str, sync=True)
+        print(f"Querying {self._exo_service.url}...")
+        dataset = self._exo_service.query(query_str)
         n_planets = len(pd.unique(dataset["pl_name"]))
         n_records = len(dataset)
 
@@ -61,30 +63,32 @@ class KnownExoplanetsDownloader(DatasetDownloader):
     def _get_table_header(self, table: QTable) -> QTableHeader:
         return _get_fixed_table_header(table=table, table_name=self._table_name, tap_service=self._exo_service)
 
-    def _download_by_id(self, ids: Sequence[int]) -> QTable:
-        raise NotImplementedError("KnownExoplanetsDownloader does not support this download method")
+    def _download_by_id(self, ids: Sequence[int], **kwargs) -> QTable:
+        raise NotImplementedError("KnownExoplanetsDownloader does not support download_by_id() method")
+
+    def _get_fields_to_query(self, columns: Optional[Sequence[str]] = None) -> str:
+        if not columns:
+            # There are some unnecessary fields that cause troubles when saving the DF, we should remove them
+            fields = [f for f in self._exo_service.get_field_names(self._table_name) if not f.endswith("str")]
+        else:
+            col_set = set(columns)
+            col_set.update(self._mandatory_fields)
+            fields = list(col_set)
+
+        return ",".join(fields)
 
 
 def _get_fixed_table_header(table: QTable, table_name: str, tap_service: TapService) -> QTableHeader:
     descriptions = tap_service.get_field_descriptions(table_name)
-    header = {}
-    for c in table.columns:
-        if c in descriptions:
-            dtype = table[c].dtype.str if hasattr(table[c], "dtype") and table[c].dtype is not None else None
-            unit = str(table[c].unit) if hasattr(table[c], "unit") and table[c].unit is not None else None
-            header[c] = TableColumnInfo(unit=unit, dtype=dtype, description=descriptions[c])
-
-    return header
-    header = {
+    return {
         c: TableColumnInfo(
-            unit=table[c].unit.name if hasattr(table[c], "unit") and table[c].unit is not None else None,
-            dtype=table[c].dtype.name if hasattr(table[c], "dtype") and table[c].dtype is not None else None,
+            unit=str(table[c].unit) if hasattr(table[c], "unit") and table[c].unit is not None else None,
+            dtype=table[c].dtype.str if hasattr(table[c], "dtype") and table[c].dtype is not None else None,
             description=descriptions[c],
         )
         for c in table.columns
         if c in descriptions
     }
-    return header
 
 
 def _parse_ids(table: QTable):

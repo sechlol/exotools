@@ -22,6 +22,7 @@ class TessCatalogDownloader(DatasetDownloader):
 
     _catalog = "TESS_v82"
     _units_override = {"ra": u.deg, "dec": u.deg}
+    _mandatory_fields = {"ra", "dec", "priority"}
 
     def __init__(
         self,
@@ -80,27 +81,29 @@ class TessCatalogDownloader(DatasetDownloader):
         )
         return header
 
-    def _download_by_id(self, ids: Sequence[int]) -> QTable:
+    def _download_by_id(self, ids: Sequence[int], columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
         # Bigger chunk size will cause a server error, because the query becomes too big
         chunk_size = 400
         all_tables = []
         chunks = list(iterate_chunks(ids=ids, chunk_size=chunk_size))
 
+        fields = ",".join(list(self._mandatory_fields | set(columns or [])))
         for i, ids in enumerate(chunks):
             print(f"Query chunk {i + 1}/{len(chunks)}")
             formatted_ids = ",".join([f"'{tid}'" for tid in ids])
 
-            query = f"""select id as tic_id, gaia as gaia_id, priority, ra, dec 
+            query = f"""select id as tic_id, gaia as gaia_id, {fields} 
                         from dbo.CatalogRecord 
                         where gaia is not null and id IN ({formatted_ids})"""
-            table = self._tic_service.query(query_string=query, sync=True)
+            table = self._tic_service.query(query_string=query)
             all_tables.append(table)
 
         return QTable(vstack(all_tables))
 
-    def _download(self, limit: Optional[int] = None) -> QTable:
+    def _download(self, limit: Optional[int] = None, columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
         limit_clause = f"top {limit}" if limit else ""
-        query = f"""select {limit_clause} id as tic_id, gaia as gaia_id, priority, ra, dec 
+        fields = ",".join(list(self._mandatory_fields | set(columns or [])))
+        query = f"""select {limit_clause} id as tic_id, gaia as gaia_id, {fields} 
                 from dbo.CatalogRecord 
                 where gaia is not null 
                     and priority > {self._priority_threshold} 

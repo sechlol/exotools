@@ -10,7 +10,7 @@ _DEFAULT_FILENAME = "dataset"
 
 class DatasetDownloader(ABC):
     @abstractmethod
-    def _download(self, limit: Optional[int] = None) -> QTable:
+    def _download(self, limit: Optional[int] = None, **kwargs) -> QTable:
         """
         Download data from the dataset.
 
@@ -23,7 +23,7 @@ class DatasetDownloader(ABC):
         pass
 
     @abstractmethod
-    def _download_by_id(self, ids: Sequence[int]) -> QTable:
+    def _download_by_id(self, ids: Sequence[int], **kwargs) -> QTable:
         """
         Download data from the dataset, filtering by certain IDs.
 
@@ -46,7 +46,7 @@ class DatasetDownloader(ABC):
         """
         pass
 
-    def download(self, limit: Optional[int] = None) -> tuple[QTable, QTableHeader]:
+    def download(self, limit: Optional[int] = None, **kwargs) -> tuple[QTable, QTableHeader]:
         """
         Download data from the dataset and store it.
 
@@ -59,7 +59,7 @@ class DatasetDownloader(ABC):
         """
 
         # Download
-        raw_data = self._download(limit=limit)
+        raw_data = self._download(limit=limit, kwargs=kwargs)
 
         # Fix table units
         cleaned_table = self._clean_and_fix(raw_data)
@@ -69,7 +69,7 @@ class DatasetDownloader(ABC):
 
         return cleaned_table, table_header
 
-    def download_by_id(self, ids: Sequence[int]) -> tuple[QTable, QTableHeader]:
+    def download_by_id(self, ids: Sequence[int], **kwargs) -> tuple[QTable, QTableHeader]:
         """
         Download data from the dataset by selecting fields by ID.
 
@@ -81,7 +81,7 @@ class DatasetDownloader(ABC):
             QTable: Downloaded data as a QTable.
         """
         # Download
-        raw_data = self._download_by_id(ids=ids)
+        raw_data = self._download_by_id(ids=ids, kwargs=kwargs)
 
         # Fix table units
         cleaned_table = self._clean_and_fix(raw_data)

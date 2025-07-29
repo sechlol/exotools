@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -11,18 +11,20 @@ from .dataset_downloader import DatasetDownloader, iterate_chunks
 
 
 class TessObservationsDownloader(DatasetDownloader):
-    def _download(self, limit: Optional[int] = None) -> QTable:
+    _mandatory_columns = {"target_name", "sequence_number", "dataURL", "t_obs_release", "t_min", "t_max", "obsid"}
+
+    def _download(self, limit: Optional[int] = None, **kwargs) -> QTable:
         raise NotImplementedError("TessObservationsDownloader does not implement this download method")
 
-    def _download_by_id(self, ids: list[int]) -> QTable:
+    def _download_by_id(self, ids: list[int], columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
         all_data = []
         chunk_ids = list(iterate_chunks(ids, chunk_size=2000))
         n = len(chunk_ids)
-
+        columns = self._mandatory_columns | set(columns or [])
         for i, tic_ids in tqdm(enumerate(chunk_ids), desc="Querying TESS observations", total=n):
             try:
                 chunk_data: pd.DataFrame = Observations.query_criteria_columns_async(
-                    columns=["target_name", "sequence_number", "dataURL", "t_obs_release", "t_min", "t_max", "obsid"],
+                    columns=list(columns),
                     provenance_name="SPOC",
                     filters="TESS",
                     project="TESS",
