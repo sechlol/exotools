@@ -1,11 +1,12 @@
 from pathlib import Path
-from typing import Optional, Self
+from typing import Optional
 
 import numpy as np
 from astropy.io import fits
 from astropy.table import QTable
 from astropy.time import Time
 from lightkurve import LightCurve, LightCurveCollection
+from typing_extensions import Self
 
 from .base_db import BaseDB
 from .lightcurve_plus import LightCurvePlus

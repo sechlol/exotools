@@ -1,10 +1,11 @@
 from math import ceil
-from typing import Any, Optional, Self
+from typing import Any, Optional
 
 import numpy as np
 from astropy.time import Time, TimeDelta
 from astropy.units import Quantity
 from lightkurve import FoldedLightCurve, LightCurve
+from typing_extensions import Self
 
 from .star_system import Planet
 
@@ -64,7 +65,7 @@ class LightCurvePlus:
             time=self.time_x, period=planet.orbital_period.central.value, midpoint=self._get_aligned_midpoint(planet)
         )
 
-    def shift_time(self, shift: Quantity | float) -> Self:
+    def shift_time(self, shift: float | Quantity) -> Self:
         delta = TimeDelta(shift, format=self.lc.time.format, scale=self.lc.time.scale)
         self._time_shift += delta
         self.lc.time += delta

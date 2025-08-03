@@ -1,6 +1,7 @@
-from typing import Optional, Self
+from typing import Optional
 
 from astropy.table import QTable
+from typing_extensions import Self
 
 from .exo_db import ExoDB
 from .star_system import StarSystem
