@@ -31,8 +31,8 @@
 #   meta: !!omap
 #   - {_votable_string_dtype: char}
 #   subtype: json
-# - {name: tic_id, datatype: int64, description: TIC ID}
-# - {name: default_flag, datatype: int32, description: Default Parameter Set}
+# - {name: tic_id, datatype: int64}
+# - {name: default_flag, datatype: int32}
 # - name: pl_refname
 #   datatype: string
 #   description: Planetary Parameter Reference
@@ -57,7 +57,7 @@
 #   meta: !!omap
 #   - {_votable_string_dtype: char}
 #   subtype: json
-# - {name: disc_year, datatype: int32, description: Discovery Year}
+# - {name: disc_year, datatype: int32}
 # - name: discoverymethod
 #   datatype: string
 #   description: Discovery Method
@@ -103,139 +103,139 @@
 # - {name: pl_orbper, unit: d, datatype: float64}
 # - {name: pl_orbpererr1, unit: d, datatype: float64}
 # - {name: pl_orbpererr2, unit: d, datatype: float64}
-# - {name: pl_orbperlim, datatype: int32, description: Orbital Period Limit Flag}
+# - {name: pl_orbperlim, datatype: int32}
 # - {name: pl_orbperlim.mask, datatype: bool}
 # - {name: pl_orblpererr1, unit: deg, datatype: float64}
 # - {name: pl_orblper, unit: deg, datatype: float64}
 # - {name: pl_orblpererr2, unit: deg, datatype: float64}
-# - {name: pl_orblperlim, datatype: int32, description: Argument of Periastron Limit Flag}
+# - {name: pl_orblperlim, datatype: int32}
 # - {name: pl_orblperlim.mask, datatype: bool}
 # - {name: pl_orbsmax, unit: AU, datatype: float64}
 # - {name: pl_orbsmaxerr1, unit: AU, datatype: float64}
 # - {name: pl_orbsmaxerr2, unit: AU, datatype: float64}
-# - {name: pl_orbsmaxlim, datatype: int32, description: Orbit Semi-Major Axis Limit Flag}
+# - {name: pl_orbsmaxlim, datatype: int32}
 # - {name: pl_orbsmaxlim.mask, datatype: bool}
 # - {name: pl_orbincl, unit: deg, datatype: float64}
 # - {name: pl_orbinclerr1, unit: deg, datatype: float64}
 # - {name: pl_orbinclerr2, unit: deg, datatype: float64}
-# - {name: pl_orbincllim, datatype: int32, description: Inclination Limit Flag}
+# - {name: pl_orbincllim, datatype: int32}
 # - {name: pl_orbincllim.mask, datatype: bool}
 # - {name: pl_orbtper, unit: d, datatype: float64}
 # - {name: pl_orbtpererr1, unit: d, datatype: float64}
 # - {name: pl_orbtpererr2, unit: d, datatype: float64}
-# - {name: pl_orbtperlim, datatype: int32, description: Epoch of Periastron Limit Flag}
+# - {name: pl_orbtperlim, datatype: int32}
 # - {name: pl_orbtperlim.mask, datatype: bool}
-# - {name: pl_orbeccen, datatype: float64, description: Eccentricity}
+# - {name: pl_orbeccen, datatype: float64}
 # - {name: pl_orbeccen.mask, datatype: bool}
-# - {name: pl_orbeccenerr1, datatype: float64, description: Eccentricity Upper Unc.}
+# - {name: pl_orbeccenerr1, datatype: float64}
 # - {name: pl_orbeccenerr1.mask, datatype: bool}
-# - {name: pl_orbeccenerr2, datatype: float64, description: Eccentricity Lower Unc.}
+# - {name: pl_orbeccenerr2, datatype: float64}
 # - {name: pl_orbeccenerr2.mask, datatype: bool}
-# - {name: pl_orbeccenlim, datatype: int32, description: Eccentricity Limit Flag}
+# - {name: pl_orbeccenlim, datatype: int32}
 # - {name: pl_orbeccenlim.mask, datatype: bool}
 # - {name: pl_eqt, unit: K, datatype: float64}
 # - {name: pl_eqterr1, unit: K, datatype: float64}
 # - {name: pl_eqterr2, unit: K, datatype: float64}
-# - {name: pl_eqtlim, datatype: int32, description: Equilibrium Temperature Limit Flag}
+# - {name: pl_eqtlim, datatype: int32}
 # - {name: pl_eqtlim.mask, datatype: bool}
 # - {name: pl_occdep, unit: '%', datatype: float64}
 # - {name: pl_occdeperr1, unit: '%', datatype: float64}
 # - {name: pl_occdeperr2, unit: '%', datatype: float64}
-# - {name: pl_occdeplim, datatype: int32, description: Occultation Depth Limit Flag}
+# - {name: pl_occdeplim, datatype: int32}
 # - {name: pl_occdeplim.mask, datatype: bool}
 # - {name: pl_insol, unit: solLum / AU2, datatype: float64}
 # - {name: pl_insolerr1, unit: solLum / AU2, datatype: float64}
 # - {name: pl_insolerr2, unit: solLum / AU2, datatype: float64}
-# - {name: pl_insollim, datatype: int32, description: Insolation Flux Limit Flag}
+# - {name: pl_insollim, datatype: int32}
 # - {name: pl_insollim.mask, datatype: bool}
 # - {name: pl_dens, unit: g / cm3, datatype: float64}
 # - {name: pl_denserr1, unit: g / cm3, datatype: float64}
 # - {name: pl_denserr2, unit: g / cm3, datatype: float64}
-# - {name: pl_denslim, datatype: int32, description: Planet Density Limit Flag}
+# - {name: pl_denslim, datatype: int32}
 # - {name: pl_denslim.mask, datatype: bool}
 # - {name: pl_trandep, unit: '%', datatype: float64}
 # - {name: pl_trandeperr1, unit: '%', datatype: float64}
 # - {name: pl_trandeperr2, unit: '%', datatype: float64}
-# - {name: pl_trandeplim, datatype: int32, description: Transit Depth Limit Flag}
+# - {name: pl_trandeplim, datatype: int32}
 # - {name: pl_trandeplim.mask, datatype: bool}
 # - {name: pl_tranmid, unit: d, datatype: float64}
 # - {name: pl_tranmiderr1, unit: d, datatype: float64}
 # - {name: pl_tranmiderr2, unit: d, datatype: float64}
-# - {name: pl_tranmidlim, datatype: int32, description: Transit Midpoint Limit Flag}
+# - {name: pl_tranmidlim, datatype: int32}
 # - {name: pl_tranmidlim.mask, datatype: bool}
 # - {name: pl_trandur, unit: h, datatype: float64}
 # - {name: pl_trandurerr1, unit: h, datatype: float64}
 # - {name: pl_trandurerr2, unit: h, datatype: float64}
-# - {name: pl_trandurlim, datatype: int32, description: Transit Duration Limit Flag}
+# - {name: pl_trandurlim, datatype: int32}
 # - {name: pl_trandurlim.mask, datatype: bool}
 # - {name: pl_rvamp, unit: m / s, datatype: float64}
 # - {name: pl_rvamperr1, unit: m / s, datatype: float64}
 # - {name: pl_rvamperr2, unit: m / s, datatype: float64}
-# - {name: pl_rvamplim, datatype: int32, description: Radial Velocity Amplitude Limit Flag}
+# - {name: pl_rvamplim, datatype: int32}
 # - {name: pl_rvamplim.mask, datatype: bool}
 # - {name: pl_radj, unit: jupiterRad, datatype: float64}
 # - {name: pl_radjerr1, unit: jupiterRad, datatype: float64}
 # - {name: pl_radjerr2, unit: jupiterRad, datatype: float64}
-# - {name: pl_radjlim, datatype: int32, description: Planet Radius Limit Flag}
+# - {name: pl_radjlim, datatype: int32}
 # - {name: pl_radjlim.mask, datatype: bool}
 # - {name: pl_rade, unit: earthRad, datatype: float64}
 # - {name: pl_radeerr1, unit: earthRad, datatype: float64}
 # - {name: pl_radeerr2, unit: earthRad, datatype: float64}
-# - {name: pl_radelim, datatype: int32, description: Planet Radius Limit Flag}
+# - {name: pl_radelim, datatype: int32}
 # - {name: pl_radelim.mask, datatype: bool}
-# - {name: pl_ratror, datatype: float64, description: Ratio of Planet to Stellar Radius}
+# - {name: pl_ratror, datatype: float64}
 # - {name: pl_ratror.mask, datatype: bool}
-# - {name: pl_ratrorerr1, datatype: float64, description: Ratio of Planet to Stellar Radius Upper Unc.}
+# - {name: pl_ratrorerr1, datatype: float64}
 # - {name: pl_ratrorerr1.mask, datatype: bool}
-# - {name: pl_ratrorerr2, datatype: float64, description: Ratio of Planet to Stellar Radius Lower Unc.}
+# - {name: pl_ratrorerr2, datatype: float64}
 # - {name: pl_ratrorerr2.mask, datatype: bool}
-# - {name: pl_ratrorlim, datatype: int32, description: Ratio of Planet to Stellar Radius Limit Flag}
+# - {name: pl_ratrorlim, datatype: int32}
 # - {name: pl_ratrorlim.mask, datatype: bool}
-# - {name: pl_ratdor, datatype: float64, description: Ratio of Semi-Major Axis to Stellar Radius}
+# - {name: pl_ratdor, datatype: float64}
 # - {name: pl_ratdor.mask, datatype: bool}
-# - {name: pl_ratdorerr1, datatype: float64, description: Ratio of Semi-Major Axis to Stellar Radius Upper Unc.}
+# - {name: pl_ratdorerr1, datatype: float64}
 # - {name: pl_ratdorerr1.mask, datatype: bool}
-# - {name: pl_ratdorerr2, datatype: float64, description: Ratio of Semi-Major Axis to Stellar Radius Lower Unc.}
+# - {name: pl_ratdorerr2, datatype: float64}
 # - {name: pl_ratdorerr2.mask, datatype: bool}
-# - {name: pl_ratdorlim, datatype: int32, description: Ratio of Semi-Major Axis to Stellar Radius Limit Flag}
+# - {name: pl_ratdorlim, datatype: int32}
 # - {name: pl_ratdorlim.mask, datatype: bool}
-# - {name: pl_imppar, datatype: float64, description: Impact Parameter}
+# - {name: pl_imppar, datatype: float64}
 # - {name: pl_imppar.mask, datatype: bool}
-# - {name: pl_impparerr1, datatype: float64, description: Impact Parameter Upper Unc.}
+# - {name: pl_impparerr1, datatype: float64}
 # - {name: pl_impparerr1.mask, datatype: bool}
-# - {name: pl_impparerr2, datatype: float64, description: Impact Parameter Lower Unc.}
+# - {name: pl_impparerr2, datatype: float64}
 # - {name: pl_impparerr2.mask, datatype: bool}
-# - {name: pl_impparlim, datatype: int32, description: Impact Parameter Limit Flag}
+# - {name: pl_impparlim, datatype: int32}
 # - {name: pl_impparlim.mask, datatype: bool}
 # - {name: pl_cmassj, unit: jupiterMass, datatype: float64}
 # - {name: pl_cmassjerr1, unit: jupiterMass, datatype: float64}
 # - {name: pl_cmassjerr2, unit: jupiterMass, datatype: float64}
-# - {name: pl_cmassjlim, datatype: int32, description: 'Planet Mass*sin(i)/sin(i) [Jupiter Mass] Limit Flag'}
+# - {name: pl_cmassjlim, datatype: int32}
 # - {name: pl_cmassjlim.mask, datatype: bool}
 # - {name: pl_cmasse, unit: earthMass, datatype: float64}
 # - {name: pl_cmasseerr1, unit: earthMass, datatype: float64}
 # - {name: pl_cmasseerr2, unit: earthMass, datatype: float64}
-# - {name: pl_cmasselim, datatype: int32, description: 'Planet Mass*sin(i)/sin(i) [Earth Mass] Limit Flag'}
+# - {name: pl_cmasselim, datatype: int32}
 # - {name: pl_cmasselim.mask, datatype: bool}
 # - {name: pl_massj, unit: jupiterMass, datatype: float64}
 # - {name: pl_massjerr1, unit: jupiterMass, datatype: float64}
 # - {name: pl_massjerr2, unit: jupiterMass, datatype: float64}
-# - {name: pl_massjlim, datatype: int32, description: 'Planet Mass [Jupiter Mass] Limit Flag'}
+# - {name: pl_massjlim, datatype: int32}
 # - {name: pl_massjlim.mask, datatype: bool}
 # - {name: pl_masse, unit: earthMass, datatype: float64}
 # - {name: pl_masseerr1, unit: earthMass, datatype: float64}
 # - {name: pl_masseerr2, unit: earthMass, datatype: float64}
-# - {name: pl_masselim, datatype: int32, description: 'Planet Mass [Earth Mass] Limit Flag'}
+# - {name: pl_masselim, datatype: int32}
 # - {name: pl_masselim.mask, datatype: bool}
 # - {name: pl_bmassj, unit: jupiterMass, datatype: float64}
 # - {name: pl_bmassjerr1, unit: jupiterMass, datatype: float64}
 # - {name: pl_bmassjerr2, unit: jupiterMass, datatype: float64}
-# - {name: pl_bmassjlim, datatype: int32, description: 'Planet Mass or Mass*sin(i) [Jupiter Mass] Limit Flag'}
+# - {name: pl_bmassjlim, datatype: int32}
 # - {name: pl_bmassjlim.mask, datatype: bool}
 # - {name: pl_bmasse, unit: earthMass, datatype: float64}
 # - {name: pl_bmasseerr1, unit: earthMass, datatype: float64}
 # - {name: pl_bmasseerr2, unit: earthMass, datatype: float64}
-# - {name: pl_bmasselim, datatype: int32, description: 'Planet Mass or Mass*sin(i) [Earth Mass] Limit Flag'}
+# - {name: pl_bmasselim, datatype: int32}
 # - {name: pl_bmasselim.mask, datatype: bool}
 # - name: pl_bmassprov
 #   datatype: string
@@ -246,89 +246,89 @@
 # - {name: pl_msinij, unit: jupiterMass, datatype: float64}
 # - {name: pl_msinijerr1, unit: jupiterMass, datatype: float64}
 # - {name: pl_msinijerr2, unit: jupiterMass, datatype: float64}
-# - {name: pl_msinijlim, datatype: int32, description: 'Planet Mass*sin(i) [Jupiter Mass] Limit Flag'}
+# - {name: pl_msinijlim, datatype: int32}
 # - {name: pl_msinijlim.mask, datatype: bool}
 # - {name: pl_msinie, unit: earthMass, datatype: float64}
 # - {name: pl_msinieerr1, unit: earthMass, datatype: float64}
 # - {name: pl_msinieerr2, unit: earthMass, datatype: float64}
-# - {name: pl_msinielim, datatype: int32, description: 'Planet Mass*sin(i) [Earth Mass] Limit Flag'}
+# - {name: pl_msinielim, datatype: int32}
 # - {name: pl_msinielim.mask, datatype: bool}
 # - {name: st_teff, unit: K, datatype: float64}
 # - {name: st_tefferr1, unit: K, datatype: float64}
 # - {name: st_tefferr2, unit: K, datatype: float64}
-# - {name: st_tefflim, datatype: int32, description: Stellar Effective Temperature Limit Flag}
+# - {name: st_tefflim, datatype: int32}
 # - {name: st_tefflim.mask, datatype: bool}
 # - {name: st_met, unit: dex, datatype: float64}
 # - {name: st_meterr1, unit: dex, datatype: float64}
 # - {name: st_meterr2, unit: dex, datatype: float64}
-# - {name: st_metlim, datatype: int32, description: Stellar Metallicity Limit Flag}
+# - {name: st_metlim, datatype: int32}
 # - {name: st_metlim.mask, datatype: bool}
 # - {name: st_radv, unit: km / s, datatype: float64}
 # - {name: st_radverr1, unit: km / s, datatype: float64}
 # - {name: st_radverr2, unit: km / s, datatype: float64}
-# - {name: st_radvlim, datatype: int32, description: Systemic Radial Velocity Limit Flag}
+# - {name: st_radvlim, datatype: int32}
 # - {name: st_radvlim.mask, datatype: bool}
 # - {name: st_vsin, unit: km / s, datatype: float64}
 # - {name: st_vsinerr1, unit: km / s, datatype: float64}
 # - {name: st_vsinerr2, unit: km / s, datatype: float64}
-# - {name: st_vsinlim, datatype: int32, description: Stellar Rotational Velocity Limit Flag}
+# - {name: st_vsinlim, datatype: int32}
 # - {name: st_vsinlim.mask, datatype: bool}
 # - {name: st_lum, unit: dex(solLum), datatype: float64}
 # - {name: st_lumerr1, unit: dex(solLum), datatype: float64}
 # - {name: st_lumerr2, unit: dex(solLum), datatype: float64}
-# - {name: st_lumlim, datatype: int32, description: Stellar Luminosity Limit Flag}
+# - {name: st_lumlim, datatype: int32}
 # - {name: st_lumlim.mask, datatype: bool}
 # - {name: st_logg, unit: dex(cm / s2), datatype: float64}
 # - {name: st_loggerr1, unit: dex(cm / s2), datatype: float64}
 # - {name: st_loggerr2, unit: dex(cm / s2), datatype: float64}
-# - {name: st_logglim, datatype: int32, description: Stellar Surface Gravity Limit Flag}
+# - {name: st_logglim, datatype: int32}
 # - {name: st_logglim.mask, datatype: bool}
 # - {name: st_age, unit: Gyr, datatype: float64}
 # - {name: st_ageerr1, unit: Gyr, datatype: float64}
 # - {name: st_ageerr2, unit: Gyr, datatype: float64}
-# - {name: st_agelim, datatype: int32, description: Stellar Age Limit Flag}
+# - {name: st_agelim, datatype: int32}
 # - {name: st_agelim.mask, datatype: bool}
 # - {name: st_mass, unit: solMass, datatype: float64}
 # - {name: st_masserr1, unit: solMass, datatype: float64}
 # - {name: st_masserr2, unit: solMass, datatype: float64}
-# - {name: st_masslim, datatype: int32, description: Stellar Mass Limit Flag}
+# - {name: st_masslim, datatype: int32}
 # - {name: st_masslim.mask, datatype: bool}
 # - {name: st_dens, unit: g / cm3, datatype: float64}
 # - {name: st_denserr1, unit: g / cm3, datatype: float64}
 # - {name: st_denserr2, unit: g / cm3, datatype: float64}
-# - {name: st_denslim, datatype: int32, description: Stellar Density Limit Flag}
+# - {name: st_denslim, datatype: int32}
 # - {name: st_denslim.mask, datatype: bool}
 # - {name: st_rad, unit: Rsun, datatype: float64}
 # - {name: st_raderr1, unit: Rsun, datatype: float64}
 # - {name: st_raderr2, unit: Rsun, datatype: float64}
-# - {name: st_radlim, datatype: int32, description: Stellar Radius Limit Flag}
+# - {name: st_radlim, datatype: int32}
 # - {name: st_radlim.mask, datatype: bool}
-# - {name: ttv_flag, datatype: int32, description: Data show Transit Timing Variations}
-# - {name: ptv_flag, datatype: int32, description: Detected by Pulsation Timing Variations}
-# - {name: tran_flag, datatype: int32, description: Detected by Transits}
-# - {name: rv_flag, datatype: int32, description: Detected by Radial Velocity Variations}
-# - {name: ast_flag, datatype: int32, description: Detected by Astrometric Variations}
-# - {name: obm_flag, datatype: int32, description: Detected by Orbital Brightness Modulations}
-# - {name: micro_flag, datatype: int32, description: Detected by Microlensing}
-# - {name: etv_flag, datatype: int32, description: Detected by Eclipse Timing Variations}
-# - {name: ima_flag, datatype: int32, description: Detected by Imaging}
-# - {name: pul_flag, datatype: int32, description: Detected by Pulsar Timing Variations}
+# - {name: ttv_flag, datatype: int32}
+# - {name: ptv_flag, datatype: int32}
+# - {name: tran_flag, datatype: int32}
+# - {name: rv_flag, datatype: int32}
+# - {name: ast_flag, datatype: int32}
+# - {name: obm_flag, datatype: int32}
+# - {name: micro_flag, datatype: int32}
+# - {name: etv_flag, datatype: int32}
+# - {name: ima_flag, datatype: int32}
+# - {name: pul_flag, datatype: int32}
 # - name: soltype
 #   datatype: string
 #   description: Solution Type
 #   meta: !!omap
 #   - {_votable_string_dtype: char}
 #   subtype: json
-# - {name: sy_snum, datatype: int32, description: Number of Stars}
-# - {name: sy_pnum, datatype: int32, description: Number of Planets}
-# - {name: sy_mnum, datatype: int32, description: Number of Moons}
-# - {name: st_nphot, datatype: int32, description: Number of Photometry Time Series}
-# - {name: st_nrvc, datatype: int32, description: Number of Radial Velocity Time Series}
-# - {name: st_nspec, datatype: int32, description: Number of Stellar Spectra Measurements}
-# - {name: pl_nnotes, datatype: int32, description: Number of Notes}
-# - {name: pl_ntranspec, datatype: int32, description: Number of Transmission Spectra}
-# - {name: pl_nespec, datatype: int32, description: Number of Eclipse Spectra}
-# - {name: pl_ndispec, datatype: int32, description: Number of Direct Imaging Spectra}
+# - {name: sy_snum, datatype: int32}
+# - {name: sy_pnum, datatype: int32}
+# - {name: sy_mnum, datatype: int32}
+# - {name: st_nphot, datatype: int32}
+# - {name: st_nrvc, datatype: int32}
+# - {name: st_nspec, datatype: int32}
+# - {name: pl_nnotes, datatype: int32}
+# - {name: pl_ntranspec, datatype: int32}
+# - {name: pl_nespec, datatype: int32}
+# - {name: pl_ndispec, datatype: int32}
 # - {name: sy_pm, unit: mas / yr, datatype: float64}
 # - {name: sy_pmerr1, unit: mas / yr, datatype: float64}
 # - {name: sy_pmerr2, unit: mas / yr, datatype: float64}
@@ -392,7 +392,7 @@
 # - {name: sy_tmag, unit: mag, datatype: float64}
 # - {name: sy_tmagerr1, unit: mag, datatype: float64}
 # - {name: sy_tmagerr2, unit: mag, datatype: float64}
-# - {name: pl_controv_flag, datatype: int32, description: Controversial Flag}
+# - {name: pl_controv_flag, datatype: int32}
 # - name: pl_tsystemref
 #   datatype: string
 #   description: Time Reference Frame and Standard
@@ -417,24 +417,24 @@
 # - {name: st_rotp, unit: d, datatype: float64}
 # - {name: st_rotperr1, unit: d, datatype: float64}
 # - {name: st_rotperr2, unit: d, datatype: float64}
-# - {name: st_rotplim, datatype: int32, description: Stellar Rotational Period Limit Flag}
+# - {name: st_rotplim, datatype: int32}
 # - {name: st_rotplim.mask, datatype: bool}
 # - {name: pl_projobliq, unit: deg, datatype: float64}
 # - {name: pl_projobliqerr1, unit: deg, datatype: float64}
 # - {name: pl_projobliqerr2, unit: deg, datatype: float64}
-# - {name: pl_projobliqlim, datatype: int32, description: Projected Obliquity Limit Flag}
+# - {name: pl_projobliqlim, datatype: int32}
 # - {name: pl_projobliqlim.mask, datatype: bool}
-# - {name: x, datatype: float64, description: Spatial Coordinate X}
+# - {name: x, datatype: float64}
 # - {name: pl_trueobliq, unit: deg, datatype: float64}
 # - {name: pl_trueobliqerr1, unit: deg, datatype: float64}
-# - {name: y, datatype: float64, description: Spatial Coordinate Y}
-# - {name: z, datatype: float64, description: Spatial Coordinate Z}
+# - {name: y, datatype: float64}
+# - {name: z, datatype: float64}
 # - {name: pl_trueobliqerr2, unit: deg, datatype: float64}
-# - {name: htm20, datatype: int32, description: Spatial Index}
-# - {name: pl_trueobliqlim, datatype: int32, description: True Obliquity Limit Flag}
+# - {name: htm20, datatype: int32}
+# - {name: pl_trueobliqlim, datatype: int32}
 # - {name: pl_trueobliqlim.mask, datatype: bool}
-# - {name: gaia_id, datatype: int64, description: GAIA ID}
-# - {name: cb_flag, datatype: int32, description: Circumbinary Flag}
+# - {name: gaia_id, datatype: int64}
+# - {name: cb_flag, datatype: int32}
 # - {name: sy_icmag, unit: mag, datatype: float64}
 # - {name: sy_icmagerr1, unit: mag, datatype: float64}
 # - {name: sy_icmagerr2, unit: mag, datatype: float64}
@@ -456,7 +456,7 @@
 #   meta: !!omap
 #   - {_votable_string_dtype: char}
 #   subtype: json
-# - {name: dkin_flag, datatype: int32, description: Detected by Disk Kinematics}
+# - {name: dkin_flag, datatype: int32}
 # meta: !!omap
 # - __serialized_columns__:
 #     ast_flag:
