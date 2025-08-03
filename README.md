@@ -1,9 +1,13 @@
 # ExoTools
 
+
 <div style="text-align:center">
   <img src="img/exotools_horizontal.png" alt="exotools logo" width="500"/>
 </div>
 
+[![Tests](https://github.com/sechlol/exotools/actions/workflows/tests.yml/badge.svg)](https://github.com/sechlol/exotools/actions/workflows/tests.yml)
+[![Lint](https://github.com/sechlol/exotools/actions/workflows/lint.yml/badge.svg)](https://github.com/sechlol/exotools/actions/workflows/lint.yml)
+[![codecov](https://codecov.io/gh/sechlol/exotools/branch/main/graph/badge.svg)](https://codecov.io/gh/sechlol/exotools)
 
 
 Python tools for working with exoplanet data from various sources including NASA's Exoplanet Archive, TESS, and Gaia.
