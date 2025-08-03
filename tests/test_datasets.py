@@ -193,7 +193,7 @@ class TestDatasets:
         lc_obs_ids = list(lightcurve_test_paths.keys())
         tess_qtable, tess_header = tess_observations_test_data
 
-        # limit tess_qtable to only test IDs
+        # Limit tess_qtable to only test IDs
         tess_qtable = tess_qtable[np.isin(tess_qtable["obs_id"], lc_obs_ids)]
 
         # Mock the LightcurveDownloader

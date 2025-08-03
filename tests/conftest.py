@@ -47,10 +47,11 @@ def load_all_test_qtables() -> dict[str, QTable]:
 
 def load_all_test_lightcurves() -> dict[str, LightCurve]:
     all_data = {}
-    for path, dirs, files in TEST_ASSETS_LC.walk():
+    for path, dirs, files in os.walk(TEST_ASSETS_LC):
         for file_name in files:
             if ".fits" in file_name:
-                all_data[file_name.removesuffix(".fits")] = load_lightcurve(path / file_name)
+                file_path = Path(path) / file_name
+                all_data[file_name.removesuffix(".fits")] = load_lightcurve(file_path)
 
     return all_data
 
@@ -108,24 +109,10 @@ def lightcurve_test_paths() -> dict[int, Path]:
     path_map = {}
 
     # Iterate through TIC ID directories
-    for path, dirs, files in TEST_ASSETS_LC.walk():
+    for path, dirs, files in os.walk(TEST_ASSETS_LC):
         for file in files:
             if ".fits" in file:
                 obs_id = int(file.removesuffix(".fits"))
-                path_map[obs_id] = path / file
+                path_map[obs_id] = Path(path) / file
 
     return path_map
-
-
-@pytest.fixture(scope="module")
-def lightcurve_test_data(lightcurve_test_paths) -> dict[int, dict[int, LightCurve]]:
-    """Test data for lightcurve dataset, organized by TIC ID and observation ID"""
-    lc_data = {}
-
-    for tic_id, paths in lightcurve_test_paths.items():
-        lc_data[tic_id] = {}
-        for path in paths:
-            obs_id = int(path.stem)
-            lc_data[tic_id][obs_id] = load_lightcurve(path)
-
-    return lc_data
