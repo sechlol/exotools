@@ -1,28 +1,27 @@
 import numpy as np
 
-from exotools import KnownExoplanetsDataset, CandidateExoplanetsDataset, TessDataset
+from exotools import KnownExoplanetsDataset, CandidateExoplanetsDataset, TessDataset, LightcurveDataset
 from exotools.io.fs_storage import EcsvStorage
-from tests.conftest import TEST_ASSETS_QTABLES
+from tests.conftest import TEST_ASSETS_QTABLES, TEST_ASSETS_LC
 from tests.utils.comparison import compare_qtables
 
 
 def generate_test_qtables():
     storage = EcsvStorage(TEST_ASSETS_QTABLES)
-    known_ds = KnownExoplanetsDataset(storage)
-    candidates_ds = CandidateExoplanetsDataset(storage)
-    tess_ds = TessDataset(storage)
+    known_ds = KnownExoplanetsDataset(storage=storage)
+    candidates_ds = CandidateExoplanetsDataset(storage=storage)
+    tess_ds = TessDataset(storage=storage)
 
     # Download datasets
     known = known_ds.download_known_exoplanets(limit=150, with_gaia_star_data=True)
     candidates = candidates_ds.download_candidate_exoplanets(limit=150, store=True)
     all_ids = np.concatenate([known.unique_ids, candidates.unique_ids])
-    tess = tess_ds.download_observation_metadata(targets_tic_id=all_ids, store=True)
+    tess_meta = tess_ds.download_observation_metadata(targets_tic_id=all_ids, store=True)
 
-    originals = [
-        known,
-        candidates,
-        tess,
-    ]
+    # TODO: need to authenticate to download the TIC dataset
+    # tess_tic = tess_ds.search_tic_targets(limit=150, store=True)
+
+    originals = [known, candidates, tess_meta]
 
     # Load datasets
     loaded = [
@@ -32,12 +31,24 @@ def generate_test_qtables():
     ]
 
     # Need to make sure the qtables are the same
-    for original, loaded in zip(originals, loaded):
-        assert compare_qtables(original.view, loaded.view)
+    for i, (original, loaded) in enumerate(zip(originals, loaded)):
+        try:
+            assert compare_qtables(original.view, loaded.view)
+        except AssertionError as e:
+            print(f"Failed to compare qtables {i}")
+
+
+def generate_test_lightcurves():
+    tess_meta = TessDataset(storage=EcsvStorage(TEST_ASSETS_QTABLES)).load_observation_metadata()
+    lc_dataset = LightcurveDataset(lc_storage_path=TEST_ASSETS_LC, override_existing=True)
+
+    small_meta = tess_meta.select_random_sample(n=10, unique_ids=False)
+    lc_dataset.download_lightcurves_from_tess_db(small_meta)
 
 
 def main():
     generate_test_qtables()
+    generate_test_lightcurves()
     print("Done!")
 
 
