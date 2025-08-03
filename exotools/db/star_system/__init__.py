@@ -7,7 +7,7 @@ from .uncertain_data import UncertainValue, UncertainDataSource
 
 __all__ = [
     "Star",
-    "Planet", 
+    "Planet",
     "StarSystem",
     "UncertainValue",
     "UncertainDataSource",

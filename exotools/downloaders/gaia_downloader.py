@@ -85,7 +85,7 @@ def _get_gaia_targets_data_query(
     formatted_ids = f"({','.join(ids)})"
 
     # I'm looking for single stars
-    extra_conditions = "AND dr3.non_single_star = 0 " "AND dr3_astro.classprob_dsc_combmod_star > 0.99"
+    extra_conditions = "AND dr3.non_single_star = 0 AND dr3_astro.classprob_dsc_combmod_star > 0.99"
 
     if must_have_photometry_data:
         extra_conditions += " AND dr3.has_epoch_photometry = 'True'"
@@ -105,7 +105,7 @@ def _get_gaia_targets_data_query(
               age_flame,  
               mass_flame,  
               lum_flame,  
-              radius_flame, radius_gspphot{', ' if extra_fields else ''} {extra_fields} """
+              radius_flame, radius_gspphot{", " if extra_fields else ""} {extra_fields} """
     if from_dr2:
         query = (
             selection

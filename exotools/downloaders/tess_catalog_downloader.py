@@ -77,7 +77,7 @@ class TessCatalogDownloader(DatasetDownloader):
         header["ra"].description = "Star right ascension [deg]"
         header["dec"].description = "Star declination [deg]"
         header["priority"].description = (
-            "Higher priority is assigned to the TESS team to targets that are " "likely to host planets"
+            "Higher priority is assigned to the TESS team to targets that are likely to host planets"
         )
         return header
 
@@ -137,13 +137,13 @@ class TessCatalogDownloader(DatasetDownloader):
             return None
 
         buffer_csv = BytesIO()
-        self._log(f"Downloading output")
+        self._log("Downloading output")
         self._casjob_api.request_and_get_output(temp_table, outtype="CSV", outfn=buffer_csv)
-        self._log(f"Downloaded {(buffer_csv.getbuffer().nbytes / 10 ** 6):.2f} MB of data")
+        self._log(f"Downloaded {(buffer_csv.getbuffer().nbytes / 10**6):.2f} MB of data")
 
         # Cleanup result table
         try:
-            self._log(f"Cleanup remote data")
+            self._log("Cleanup remote data")
             self._casjob_api.drop_table(temp_table)
         except Exception as e:
             print("Exception raised in query_ctl_casjob():", repr(e))

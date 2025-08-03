@@ -43,7 +43,7 @@ class CandidateExoplanetsDownloader(DatasetDownloader):
         limit_clause = f"top {limit}" if limit else ""
         query_str = f"select {limit_clause} {fields} from {self._table_name}"
 
-        print(f"Downloading Candidate exoplanets...")
+        print("Downloading Candidate exoplanets...")
         dataset = self._exo_service.query(query_str)
         n_unique = len(pd.unique(dataset["toi"]))
 

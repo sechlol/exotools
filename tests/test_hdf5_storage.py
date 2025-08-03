@@ -139,7 +139,7 @@ class TestHdf5Storage:
         try:
             w.read_qtable("nonexistent_table")
             assert False, "Expected FileNotFoundError was not raised"
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             assert True
 
     def test_read_qtable_header(self, storage_wrapper):

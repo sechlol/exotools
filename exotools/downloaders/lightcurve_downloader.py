@@ -83,11 +83,11 @@ def _download_lightcurve_data(
     try:
         return to_download.download_all()
     except HTTPError as http_e:
-        _logger.error(f"Server timeout while downloading lightcurve")
+        _logger.error("Server timeout while downloading lightcurve")
         _logger.error(repr(http_e))
         return None
     except lk.search.SearchError as se:
-        _logger.error(f"Search error while downloading lightcurve")
+        _logger.error("Search error while downloading lightcurve")
         _logger.error(repr(se))
         return None
 

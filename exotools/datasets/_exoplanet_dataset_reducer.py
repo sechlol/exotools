@@ -90,7 +90,7 @@ def reduce_exoplanet_dataset(exo_db: ExoDB) -> tuple[QTable, QTableHeader]:
     # Assign units to reduced dataset and convert to QTable
     reduced_header = get_empty_table_header(reduced_table)
     reduced_header["pl_valid_flag"] = TableColumnInfo(
-        unit=None, description="True if the planet has all the " "parameters to determine transit events"
+        unit=None, description="True if the planet has all the parameters to determine transit events"
     )
 
     return reduced_table, reduced_header

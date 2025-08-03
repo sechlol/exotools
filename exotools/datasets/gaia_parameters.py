@@ -24,7 +24,7 @@ class GaiaParametersDataset:
             gaia_qtable = self._storage.read_qtable(table_name=self._DATASET_GAIA)
             return self._create_gaia_db(gaia_qtable)
         except ValueError:
-            print("Gaia dataset not found. You need to download it first by " "calling download_gaia_parameters().")
+            print("Gaia dataset not found. You need to download it first by calling download_gaia_parameters().")
             return None
 
     def download_gaia_parameters(self, gaia_ids: Sequence[int], store: bool = True) -> GaiaDB:
