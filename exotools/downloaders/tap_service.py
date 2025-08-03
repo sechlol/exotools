@@ -1,4 +1,4 @@
-from typing import Optional, Iterable, Iterator
+from typing import Iterable, Iterator, Optional
 
 import pyvo as vo
 from astropy.table import QTable, vstack
@@ -80,8 +80,6 @@ class TapService:
 
         total_chunks = (total_records + self.MAX_CHUNK_SIZE - 1) // self.MAX_CHUNK_SIZE
         for offset in tqdm(range(0, total_records, self.MAX_CHUNK_SIZE), total=total_chunks, desc="Downloading chunks"):
-            fff = query.format(offset=offset)
-            print(fff)
             yield self.query(query.format(offset=offset))
 
     def query_chunks(

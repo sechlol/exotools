@@ -1,7 +1,6 @@
 import astropy.units as u
 import numpy as np
 
-
 # https://astroquery.readthedocs.io/en/latest/_modules/astroquery/ipac/nexsci/nasa_exoplanet_archive/core.html
 UNIT_MAPPER = {
     "--": None,

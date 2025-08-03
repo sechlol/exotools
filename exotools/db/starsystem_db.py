@@ -1,6 +1,7 @@
 from typing import Optional
 
 from astropy.table import QTable
+from typing_extensions import Self
 
 from .exo_db import ExoDB
 from .star_system import StarSystem
@@ -12,10 +13,10 @@ class StarSystemDB(ExoDB):
     def __init__(self, transit_dataset: QTable):
         super().__init__(transit_dataset)
 
-    def _factory(self, dataset: QTable) -> "StarSystemDB":
+    def _factory(self, dataset: QTable) -> Self:
         return StarSystemDB(dataset)
 
-    def get_valid_planets(self) -> "StarSystemDB":
+    def get_valid_planets(self) -> Self:
         return StarSystemDB(self.view[self.view["pl_valid_flag"]])
 
     def get_star_system_from_star_name(self, star_name: str) -> Optional[StarSystem]:

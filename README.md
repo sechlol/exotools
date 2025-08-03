@@ -33,6 +33,7 @@ pip install exotools
   - HDF5 (single file, hierarchical storage)
   - ECSV (human-readable, portable)
   - Feather (fast and efficient)
+  - Memory (fastest, transient storage)
 - **High-Level APIs**:
   - Unified interface for accessing different data sources
   - Object-oriented representation of star systems
@@ -42,14 +43,17 @@ pip install exotools
 
 ```python
 from exotools import KnownExoplanetsDataset
-from exotools.io import EcsvStorage
+from exotools.io import FeatherStorage
 
 # Download and store exoplanets from NASA Exoplanet Archive
-storage = EcsvStorage(root_path="path/to/your/dataset")
+storage = FeatherStorage(root_path="./exo")
 exo_dataset = KnownExoplanetsDataset(storage=storage)
+
+# Download and store exoplanets from the NASA Exoplanet Archive Planetary Systems table (ps)
+# As a test, only downloads the first 10 rows and stores it to disk.
 exo_db = exo_dataset.download_known_exoplanets(limit=10, store=True)
 
-# Load existing dataset from disk
+# Alternatively, if the dataset already exists on disk, load the dataset from disk
 exo_db = exo_dataset.load_known_exoplanets_dataset()
 
 # Access data via high-level API

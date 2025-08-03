@@ -1,7 +1,8 @@
 import numpy as np
 from astropy.table import QTable
+from typing_extensions import Self
 
-from .base_db import BaseDB, NAN_VALUE
+from .base_db import NAN_VALUE, BaseDB
 
 _ID_FIELD = "tic_id"
 
@@ -27,10 +28,10 @@ class TessMetaDB(BaseDB):
     def obs_id(self):
         return self.view["obs_id"].value
 
-    def _factory(self, dataset: QTable) -> "TessMetaDB":
+    def _factory(self, dataset: QTable) -> Self:
         return TessMetaDB(dataset)
 
-    def select_by_obs_id(self, other_obs_id: np.ndarray) -> "TessMetaDB":
+    def select_by_obs_id(self, other_obs_id: np.ndarray) -> Self:
         masked_ds = self.view[self.view["obs_id"] != NAN_VALUE]
         selection = np.isin(masked_ds["obs_id"], other_obs_id)
         return self._factory(masked_ds[selection])

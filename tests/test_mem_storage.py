@@ -3,7 +3,7 @@ from astropy import units as u
 from astropy.table import QTable
 
 from exotools.io.memory_storage import MemoryStorage
-from exotools.utils.qtable_utils import get_header_from_table, QTableHeader
+from exotools.utils.qtable_utils import QTableHeader, get_header_from_table
 from tests.utils.comparison import compare_qtables
 
 
@@ -22,7 +22,7 @@ def another_storage_wrapper():
 class TestMemoryStorage:
     def setup_method(self):
         """Clear class memory before each test method"""
-        MemoryStorage._memory = {}
+        MemoryStorage.clear()
 
     def test_read_and_write_json(self, storage_wrapper):
         w = storage_wrapper

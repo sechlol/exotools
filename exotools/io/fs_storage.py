@@ -6,7 +6,7 @@ from typing import Optional
 
 import pandas as pd
 from astropy import units as u
-from astropy.table import QTable, MaskedColumn
+from astropy.table import MaskedColumn, QTable
 
 from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
 from exotools.utils.unit_mapper import UNIT_MAPPER

@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "exotools"
-version = "0.1.2"
+version = "0.0.2"
 description = "Tools for working with exoplanet data"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
 authors = [
-    {name = "Christian", email = "astro.sech@gmail.com"}
+    {name = "Christian Cardin", email = "astro.sech@gmail.com"}
 ]
 classifiers = [
     "Programming Language :: Python :: 3",

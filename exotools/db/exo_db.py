@@ -1,9 +1,14 @@
+import logging
+
 import astropy.units as u
 import numpy as np
 from astropy.table import QTable, join
 from astropy.time import Time
+from typing_extensions import Self
 
 from .base_db import BaseDB
+
+logger = logging.getLogger(__name__)
 
 _ID_FIELD = "tic_id"
 _PARAMETER_JD = ["pl_tranmid"]
@@ -49,24 +54,24 @@ class ExoDB(BaseDB):
     def gaia_ids(self) -> np.ndarray:
         return self.view["gaia_id"].value
 
-    def _factory(self, dataset: QTable) -> "ExoDB":
+    def _factory(self, dataset: QTable) -> Self:
         return ExoDB(dataset)
 
     def get_star_names(self) -> list[str]:
         return np.unique(self.view["hostname"]).tolist()
 
-    def get_default_records(self) -> "ExoDB":
+    def get_default_records(self) -> Self:
         return self._factory(self.view[self.view["default_flag"] == 1])
 
-    def get_tess_planets(self) -> "ExoDB":
+    def get_tess_planets(self) -> Self:
         condition = np.char.find(self.view["disc_telescope"], "TESS") != -1
         return self._factory(self.view[condition])
 
-    def get_kepler_planets(self) -> "ExoDB":
+    def get_kepler_planets(self) -> Self:
         condition = np.char.find(self.view["disc_telescope"], "Kepler") != -1
         return self._factory(self.view[condition])
 
-    def get_transiting_planets(self, kepler_or_tess_only: bool = False) -> "ExoDB":
+    def get_transiting_planets(self, kepler_or_tess_only: bool = False) -> Self:
         condition = self.view["tran_flag"] == 1
         if kepler_or_tess_only:
             telescope_condition = np.char.find(self.view["disc_telescope"], "TESS") != -1
@@ -118,7 +123,7 @@ class ExoDB(BaseDB):
                 dataset[f"{c}_upper"] = dataset[c] + dataset[f"{c}err1"]
                 dataset[f"{c}_lower"] = dataset[c] + dataset[f"{c}err2"]
             except ValueError:
-                print(f"Could not compute bounds for {c}")
+                logger.error(f"Could not compute bounds for {c}")
 
     @staticmethod
     def convert_time_columns(dataset: QTable):

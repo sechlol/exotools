@@ -1,7 +1,8 @@
+import logging
 from typing import Optional, Sequence
 
-import pandas as pd
 import astropy.units as u
+import pandas as pd
 from astropy.table import QTable
 
 from exotools.utils.qtable_utils import QTableHeader
@@ -9,8 +10,10 @@ from exotools.utils.unit_mapper import UNIT_MAPPER
 
 from ._utils import fix_unrecognized_units, override_units
 from .dataset_downloader import DatasetDownloader
-from .exoplanets_downloader import _get_fixed_table_header, _get_error_parameters
+from .exoplanets_downloader import _get_error_parameters, _get_fixed_table_header
 from .tap_service import ExoService
+
+logger = logging.getLogger(__name__)
 
 
 class CandidateExoplanetsDownloader(DatasetDownloader):
@@ -32,7 +35,7 @@ class CandidateExoplanetsDownloader(DatasetDownloader):
     def __init__(self):
         self._exo_service = ExoService()
 
-    def _download(self, limit: Optional[int] = None, columns: Optional[Sequence[str]] = None) -> QTable:
+    def _download(self, limit: Optional[int] = None, columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
         if columns:
             columns = set(columns)
             columns.add(self._index_col)
@@ -43,11 +46,11 @@ class CandidateExoplanetsDownloader(DatasetDownloader):
         limit_clause = f"top {limit}" if limit else ""
         query_str = f"select {limit_clause} {fields} from {self._table_name}"
 
-        print("Downloading Candidate exoplanets...")
+        logger.info("Downloading Candidate exoplanets...")
         dataset = self._exo_service.query(query_str)
         n_unique = len(pd.unique(dataset["toi"]))
 
-        print(f"DONE! Collected {n_unique} unique candidates, for a total of {len(dataset)} records.")
+        logger.info(f"DONE! Collected {n_unique} unique candidates, for a total of {len(dataset)} records.")
         return dataset
 
     def _clean_and_fix(self, table: QTable) -> QTable:

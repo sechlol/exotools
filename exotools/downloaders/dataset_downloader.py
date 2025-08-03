@@ -1,5 +1,5 @@
-from abc import abstractmethod, ABC
-from typing import Optional, Iterator, Sequence
+from abc import ABC, abstractmethod
+from typing import Iterator, Optional, Sequence
 
 from astropy.table import QTable
 

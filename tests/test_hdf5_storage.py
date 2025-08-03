@@ -3,7 +3,7 @@ from astropy import units as u
 from astropy.table import QTable
 
 from exotools.io.hdf5_storage import Hdf5Storage
-from exotools.utils.qtable_utils import get_header_from_table, QTableHeader
+from exotools.utils.qtable_utils import QTableHeader, get_header_from_table
 from tests.conftest import TEST_TMP_DIR
 from tests.utils.comparison import compare_qtables
 

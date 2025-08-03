@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
 from astropy.table import QTable
+from typing_extensions import Self
 
 NAN_VALUE = -1
 
@@ -19,7 +20,7 @@ class BaseDB(ABC):
         return len(self.view)
 
     @abstractmethod
-    def _factory(self, dataset: QTable) -> "BaseDB":
+    def _factory(self, dataset: QTable) -> Self:
         pass
 
     @property
@@ -50,20 +51,20 @@ class BaseDB(ABC):
         """
         return np.isin(self.view[field_name], other_values)
 
-    def select_by_id(self, other_ids: np.ndarray) -> "BaseDB":
+    def select_by_id(self, other_ids: np.ndarray) -> Self:
         """
         Match ids and returns data
         """
         matching_ids = self.match_ids(other_ids)
         return self._factory(self._masked_ds[matching_ids])
 
-    def select_by_mask(self, bit_mask: np.ndarray) -> "BaseDB":
+    def select_by_mask(self, bit_mask: np.ndarray) -> Self:
         """
         Returns data that matches the mask
         """
         return self._factory(self._ds[bit_mask])
 
-    def select_random_sample(self, n: int, unique_ids: bool = True) -> "BaseDB":
+    def select_random_sample(self, n: int, unique_ids: bool = True) -> Self:
         if unique_ids:
             return self.select_by_id(np.random.choice(self.unique_ids, size=n, replace=False))
 
@@ -71,4 +72,6 @@ class BaseDB(ABC):
         return self._factory(self.view[random_indices])
 
     def to_pandas(self) -> pd.DataFrame:
+        if len(self.view) == 0:
+            return pd.DataFrame()
         return self.view.to_pandas().reset_index()

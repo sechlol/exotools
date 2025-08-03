@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, Sequence
 
 import numpy as np
@@ -7,7 +8,10 @@ from tqdm import tqdm
 
 from exotools.utils.observations_fix import Observations
 from exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
+
 from .dataset_downloader import DatasetDownloader, iterate_chunks
+
+logger = logging.getLogger(__name__)
 
 
 class TessObservationsDownloader(DatasetDownloader):
@@ -34,7 +38,7 @@ class TessObservationsDownloader(DatasetDownloader):
                 )
                 all_data.append(chunk_data)
             except Exception as e:
-                print(f"Exception generated while downloading URLs data for index i={i}")
+                logger.error(f"Exception generated while downloading URLs data for index i={i}")
                 raise e
 
         all_data = (

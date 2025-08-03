@@ -4,8 +4,9 @@ import pytest
 from astropy import units as u
 from astropy.table import QTable
 
-from exotools.io.fs_storage import FeatherStorage, EcsvStorage
+from exotools.io.fs_storage import EcsvStorage, FeatherStorage
 from exotools.utils.qtable_utils import QTableHeader, get_header_from_table
+
 from .conftest import TEST_TMP_DIR
 from .utils.comparison import compare_qtables
 

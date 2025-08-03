@@ -1,30 +1,36 @@
-from typing import Sequence, Optional
+import logging
+from typing import Optional, Sequence
 
-from exotools.db import TicDB, TessMetaDB
+from exotools.datasets.base_dataset import BaseDataset
+from exotools.db import TessMetaDB, TicDB
 from exotools.downloaders import TessCatalogDownloader, TessObservationsDownloader
-from exotools.io import BaseStorage, MemoryStorage
+from exotools.io import BaseStorage
+
+logger = logging.getLogger(__name__)
 
 
-class TessDataset:
-    _OBSERVATIONS_NAME = "tess_observations"
-    _TIC_NAME = "tess_tic"
-    _TIC_BY_ID_NAME = "tess_tic_by_id"
+class TessDataset(BaseDataset):
+    _DATASET_TESS = "tess"
 
     def __init__(
         self,
+        dataset_tag: Optional[str] = None,
         storage: Optional[BaseStorage] = None,
         username: Optional[str] = None,
         password: Optional[str] = None,
     ):
-        self._storage = storage or MemoryStorage()
+        super().__init__(dataset_name=self._DATASET_TESS, dataset_tag=dataset_tag, storage=storage)
         self._catalog_downloader = TessCatalogDownloader(username, password) if username and password else None
+        self._observations_name = self.name + "_observations"
+        self._tic_name = self.name + "_tic"
+        self._tic_by_id_name = self.name + "_tic_by_id"
 
     def download_observation_metadata(self, targets_tic_id: Sequence[int], store: bool = True) -> TessMetaDB:
-        print(f"Preparing to download TESS observation list for {len(targets_tic_id)} objects...")
+        logger.info(f"Preparing to download TESS observation list for {len(targets_tic_id)} objects...")
         meta_qtable, meta_header = TessObservationsDownloader().download_by_id(targets_tic_id)
 
         if store:
-            self._storage.write_qtable(meta_qtable, meta_header, self._OBSERVATIONS_NAME, override=True)
+            self._storage.write_qtable(meta_qtable, meta_header, self._observations_name, override=True)
 
         return TessMetaDB(meta_dataset=meta_qtable)
 
@@ -45,7 +51,7 @@ class TessDataset:
         catalog_qtable, catalog_header = self._catalog_downloader.download(limit=limit)
 
         if store:
-            self._storage.write_qtable(catalog_qtable, catalog_header, self._TIC_NAME, override=True)
+            self._storage.write_qtable(catalog_qtable, catalog_header, self._tic_name, override=True)
 
         return TicDB(dataset=catalog_qtable)
 
@@ -55,15 +61,15 @@ class TessDataset:
         catalog_qtable, catalog_header = self._catalog_downloader.download_by_id(tic_ids)
 
         if store:
-            self._storage.write_qtable(catalog_qtable, catalog_header, self._TIC_BY_ID_NAME, override=True)
+            self._storage.write_qtable(catalog_qtable, catalog_header, self._tic_by_id_name, override=True)
 
         return TicDB(dataset=catalog_qtable)
 
     def load_observation_metadata(self) -> Optional[TessMetaDB]:
         try:
-            meta_qtable = self._storage.read_qtable(table_name=self._OBSERVATIONS_NAME)
+            meta_qtable = self._storage.read_qtable(table_name=self._observations_name)
         except ValueError:
-            print(
+            logger.error(
                 "Stored TIC dataset not found. You need to download it first by "
                 "calling download_tic_targets(store=True)."
             )
@@ -73,9 +79,9 @@ class TessDataset:
 
     def load_tic_target_dataset(self) -> Optional[TicDB]:
         try:
-            tic_qtable = self._storage.read_qtable(table_name=self._TIC_NAME)
+            tic_qtable = self._storage.read_qtable(table_name=self._tic_name)
         except ValueError:
-            print(
+            logger.error(
                 "Stored TIC dataset not found. You need to download it first by "
                 "calling download_tic_targets(store=True)."
             )
@@ -85,9 +91,9 @@ class TessDataset:
 
     def load_tic_target_dataset_by_id(self) -> Optional[TicDB]:
         try:
-            tic_qtable = self._storage.read_qtable(table_name=self._TIC_BY_ID_NAME)
+            tic_qtable = self._storage.read_qtable(table_name=self._tic_by_id_name)
         except ValueError:
-            print(
+            logger.error(
                 "Stored TIC dataset not found. You need to download it first by "
                 "calling download_tic_targets(store=True)."
             )

@@ -111,3 +111,7 @@ class MemoryStorage(BaseStorage):
 
         # Return a deep copy of the stored header
         return copy.deepcopy(self._memory[header_key])
+
+    @classmethod
+    def clear(cls):
+        cls._memory.clear()

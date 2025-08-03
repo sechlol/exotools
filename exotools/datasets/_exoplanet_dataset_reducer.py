@@ -3,7 +3,7 @@ import pandas as pd
 from astropy.table import QTable
 
 from exotools.db import ExoDB
-from exotools.utils.qtable_utils import get_empty_table_header, TableColumnInfo, QTableHeader
+from exotools.utils.qtable_utils import QTableHeader, TableColumnInfo, get_empty_table_header
 
 
 def _get_subset_df(table: QTable) -> pd.DataFrame:

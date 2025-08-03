@@ -15,7 +15,7 @@ from tqdm.auto import tqdm
 from exotools.utils.download import DownloadParams
 from exotools.utils.observations_fix import Observations
 
-_logger = logging.Logger("LightcurveDownloader")
+logger = logging.Logger(__name__)
 
 
 class LightcurveDownloader:
@@ -39,24 +39,21 @@ class LightcurveDownloader:
         if status == "COMPLETE":
             return download_path
 
-        print(f"Error downloading {download_args.url}: {message}")
+        logger.error(f"Error downloading {download_args.url}: {message}")
         return None
 
     def download_fits_multiple(self, download_args: Sequence[DownloadParams]) -> list[Path]:
-        return [x for param in tqdm(download_args) if (x := self.download_one_lc(param)) is not None]
+        return [result for param in tqdm(download_args) if (result := self.download_one_lc(param)) is not None]
 
     def download_fits_parallel(self, download_args: Sequence[DownloadParams]) -> list[Path]:
         """tid, obs_id, url"""
         parallel_iterator = Parallel(n_jobs=os.cpu_count() - 1, return_as="generator_unordered")
-        return [
-            result
-            for result in tqdm(
-                parallel_iterator(delayed(self.download_one_lc)(x) for x in download_args),
-                total=len(download_args),
-                desc="Downloading FITS files",
-            )
-            if result is not None
-        ]
+        tqdm_iterator = tqdm(
+            parallel_iterator(delayed(self.download_one_lc)(x) for x in download_args),
+            total=len(download_args),
+            desc="Downloading FITS files",
+        )
+        return [r for r in tqdm_iterator if r is not None]
 
 
 def search_available_lightcurve_data(star_name: str, exp_time_s: int = 120) -> Optional[lk.LightCurveCollection]:
@@ -83,12 +80,12 @@ def _download_lightcurve_data(
     try:
         return to_download.download_all()
     except HTTPError as http_e:
-        _logger.error("Server timeout while downloading lightcurve")
-        _logger.error(repr(http_e))
+        logger.error("Server timeout while downloading lightcurve")
+        logger.error(repr(http_e))
         return None
     except lk.search.SearchError as se:
-        _logger.error("Search error while downloading lightcurve")
-        _logger.error(repr(se))
+        logger.error("Search error while downloading lightcurve")
+        logger.error(repr(se))
         return None
 
 
@@ -100,8 +97,8 @@ def _search_mast_target(target_name: str, verbose=False) -> lk.SearchResult:
     results = lk.search_lightcurve(target_name)
 
     if verbose:
-        print(f"### Search Result for target: '{target_name}' ###")
+        logger.info(f"### Search Result for target: '{target_name}' ###")
         for i, r in enumerate(results):
-            print(i, r, r.exptime[0])
+            logger.info(f"{i}: {r}, {r.exptime[0]}")
 
     return results

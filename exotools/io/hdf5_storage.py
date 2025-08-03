@@ -1,14 +1,17 @@
 import json
+import logging
 from pathlib import Path
 from typing import Optional
 
 import h5py
 import numpy as np
-from astropy.io.misc.hdf5 import write_table_hdf5, read_table_hdf5
+from astropy.io.misc.hdf5 import read_table_hdf5, write_table_hdf5
 from astropy.table import QTable
 
 from exotools.io import BaseStorage
-from exotools.utils.qtable_utils import RootQTableHeader, QTableHeader
+from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
+
+logger = logging.getLogger(__name__)
 
 
 class Hdf5Storage(BaseStorage):
@@ -39,7 +42,7 @@ class Hdf5Storage(BaseStorage):
         with h5py.File(self._hdf5_path, "a") as f:
             if group_path in f:
                 if override:
-                    print("WARNING: overwriting a dataset will not free memory on disk")
+                    logger.warning("WARNING: overwriting a dataset will not free memory on disk")
                     del f[group_path]
                 else:
                     raise ValueError(
@@ -73,7 +76,7 @@ class Hdf5Storage(BaseStorage):
             # Check if table exists
             if parent_path in f:
                 if override:
-                    print("WARNING: overwriting a dataset will not free memory on disk")
+                    logger.warning("WARNING: overwriting a dataset will not free memory on disk")
                     # Delete the entire group containing the table and header
                     del f[parent_path]
                 else:

@@ -1,11 +1,5 @@
 {
-    "sequence_number": {
-        "description": "---",
-        "unit": null,
-        "dtype": null,
-        "time_info": null
-    },
-    "dataURL": {
+    "obs_id": {
         "description": "---",
         "unit": null,
         "dtype": null,
@@ -17,7 +11,7 @@
         "dtype": null,
         "time_info": null
     },
-    "t_min": {
+    "dataURL": {
         "description": "---",
         "unit": null,
         "dtype": null,
@@ -29,7 +23,13 @@
         "dtype": null,
         "time_info": null
     },
-    "obs_id": {
+    "sequence_number": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "t_min": {
         "description": "---",
         "unit": null,
         "dtype": null,
