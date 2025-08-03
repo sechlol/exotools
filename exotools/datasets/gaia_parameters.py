@@ -2,16 +2,17 @@ from typing import Optional, Sequence
 
 from astropy.table import QTable
 
+from exotools.datasets.base_dataset import BaseDataset
 from exotools.db import GaiaDB
 from exotools.downloaders import GaiaDownloader
-from exotools.io import BaseStorage, MemoryStorage
+from exotools.io import BaseStorage
 
 
-class GaiaParametersDataset:
-    _DATASET_GAIA = "known_gaia_astro_parameters"
+class GaiaParametersDataset(BaseDataset):
+    _DATASET_GAIA = "gaia"
 
-    def __init__(self, storage: Optional[BaseStorage] = None):
-        self._storage = storage or MemoryStorage()
+    def __init__(self, dataset_tag: Optional[str] = None, storage: Optional[BaseStorage] = None):
+        super().__init__(dataset_name=self._DATASET_GAIA, dataset_tag=dataset_tag, storage=storage)
 
     def load_gaia_parameters_dataset(self) -> Optional[GaiaDB]:
         """
@@ -21,7 +22,7 @@ class GaiaParametersDataset:
             GaiaDB: Database containing Gaia parameters, or None if not found.
         """
         try:
-            gaia_qtable = self._storage.read_qtable(table_name=self._DATASET_GAIA)
+            gaia_qtable = self._storage.read_qtable(table_name=self.name)
             return self._create_gaia_db(gaia_qtable)
         except ValueError:
             print("Gaia dataset not found. You need to download it first by calling download_gaia_parameters().")
@@ -45,7 +46,7 @@ class GaiaParametersDataset:
             self._storage.write_qtable(
                 table=gaia_qtable,
                 header=gaia_header,
-                table_name=self._DATASET_GAIA,
+                table_name=self.name,
                 override=True,
             )
 

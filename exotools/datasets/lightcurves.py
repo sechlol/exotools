@@ -1,16 +1,24 @@
 from pathlib import Path
 from typing import Optional
 
+from exotools.datasets.base_dataset import BaseDataset
 from exotools.db import TessMetaDB, LightcurveDB
 from exotools.downloaders import LightcurveDownloader
 from exotools.utils.download import DownloadParams
 
 
-class LightcurveDataset:
+class LightcurveDataset(BaseDataset):
     _DATASET_LIGHTCURVES = "lightcurves"
 
-    def __init__(self, lc_storage_path: Path, override_existing: bool = False, verbose: bool = False):
-        self._folder_path = lc_storage_path / self._DATASET_LIGHTCURVES
+    def __init__(
+        self,
+        lc_storage_path: Path,
+        dataset_tag: Optional[str] = None,
+        override_existing: bool = False,
+        verbose: bool = False,
+    ):
+        super().__init__(dataset_name=self._DATASET_LIGHTCURVES, dataset_tag=dataset_tag, storage=None)
+        self._folder_path = lc_storage_path / self.name
         self._downloader = LightcurveDownloader(override_existing=override_existing, verbose=verbose)
 
     def download_lightcurves_from_tess_db(self, tess_db: TessMetaDB) -> Optional[LightcurveDB]:
@@ -42,9 +50,13 @@ def _get_file_paths_in_subfolder(
     file_extension: Optional[str] = None,
     match_name: Optional[str] = None,
 ) -> dict[int, list[Path]]:
-    subfolder_dict = {}
     if not file_extension and not match_name:
         raise ValueError("At least one between file_extension and match_name should be given")
+
+    if not parent_path.exists():
+        return {}
+
+    subfolder_dict = {}
     pattern = match_name if match_name else f"*.{file_extension}"
 
     # Iterate over each subfolder

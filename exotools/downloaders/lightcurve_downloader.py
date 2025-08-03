@@ -43,20 +43,17 @@ class LightcurveDownloader:
         return None
 
     def download_fits_multiple(self, download_args: Sequence[DownloadParams]) -> list[Path]:
-        return [x for param in tqdm(download_args) if (x := self.download_one_lc(param)) is not None]
+        return [result for param in tqdm(download_args) if (result := self.download_one_lc(param)) is not None]
 
     def download_fits_parallel(self, download_args: Sequence[DownloadParams]) -> list[Path]:
         """tid, obs_id, url"""
         parallel_iterator = Parallel(n_jobs=os.cpu_count() - 1, return_as="generator_unordered")
-        return [
-            result
-            for result in tqdm(
-                parallel_iterator(delayed(self.download_one_lc)(x) for x in download_args),
-                total=len(download_args),
-                desc="Downloading FITS files",
-            )
-            if result is not None
-        ]
+        tqdm_iterator = tqdm(
+            parallel_iterator(delayed(self.download_one_lc)(x) for x in download_args),
+            total=len(download_args),
+            desc="Downloading FITS files",
+        )
+        return [r for r in tqdm_iterator if r is not None]
 
 
 def search_available_lightcurve_data(star_name: str, exp_time_s: int = 120) -> Optional[lk.LightCurveCollection]:

@@ -33,6 +33,7 @@ class TessCatalogDownloader(DatasetDownloader):
         verbose_log: bool = False,
     ):
         """
+        TODO: write docs for parmeters
         This class uses CasJobs interface to query the service, you need to create an account at
         https://mastweb.stsci.edu/mcasjobs/CreateAccount.aspx and provide the username and password
         """
@@ -76,9 +77,9 @@ class TessCatalogDownloader(DatasetDownloader):
         header["gaia_id"].description = "Star GAIA id [int64]"
         header["ra"].description = "Star right ascension [deg]"
         header["dec"].description = "Star declination [deg]"
-        header["priority"].description = (
-            "Higher priority is assigned to the TESS team to targets that are likely to host planets"
-        )
+        header[
+            "priority"
+        ].description = "Higher priority is assigned to the TESS team to targets that are likely to host planets"
         return header
 
     def _download_by_id(self, ids: Sequence[int], columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:

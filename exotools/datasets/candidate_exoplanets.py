@@ -2,20 +2,21 @@ from typing import Optional
 
 from astropy.table import QTable
 
+from exotools.datasets.base_dataset import BaseDataset
 from exotools.db import ExoDB, CandidateDB
 from exotools.downloaders import CandidateExoplanetsDownloader
-from exotools.io import BaseStorage, MemoryStorage
+from exotools.io import BaseStorage
 
 
-class CandidateExoplanetsDataset:
+class CandidateExoplanetsDataset(BaseDataset):
     _DATASET_NAME_CANDIDATES = "candidate_exoplanets"
 
-    def __init__(self, storage: Optional[BaseStorage] = None):
-        self._storage = storage or MemoryStorage()
+    def __init__(self, dataset_tag: Optional[str] = None, storage: Optional[BaseStorage] = None):
+        super().__init__(dataset_name=self._DATASET_NAME_CANDIDATES, dataset_tag=dataset_tag, storage=storage)
 
     def load_candidate_exoplanets_dataset(self) -> Optional[CandidateDB]:
         try:
-            candidate_qtable = self._storage.read_qtable(table_name=self._DATASET_NAME_CANDIDATES)
+            candidate_qtable = self._storage.read_qtable(table_name=self.name)
         except ValueError:
             print(
                 "Candidate Exoplanets dataset not found. "
@@ -33,7 +34,7 @@ class CandidateExoplanetsDataset:
             self._storage.write_qtable(
                 table=candidate_qtable,
                 header=candidate_header,
-                table_name=self._DATASET_NAME_CANDIDATES,
+                table_name=self.name,
             )
 
         return _create_candidate_db(candidate_qtable)
