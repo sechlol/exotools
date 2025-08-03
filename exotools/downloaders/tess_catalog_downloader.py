@@ -4,12 +4,16 @@ from typing import Optional, Sequence
 import astropy.units as u
 from astropy.table import QTable, vstack
 from casjobs import CasJobs
+import logging
+from tqdm import tqdm
 
 from exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
 
 from ._utils import override_units
 from .dataset_downloader import DatasetDownloader, iterate_chunks
 from .tap_service import TicService
+
+logger = logging.getLogger(__name__)
 
 
 class TessCatalogDownloader(DatasetDownloader):
@@ -89,8 +93,7 @@ class TessCatalogDownloader(DatasetDownloader):
         chunks = list(iterate_chunks(ids=ids, chunk_size=chunk_size))
 
         fields = ",".join(list(self._mandatory_fields | set(columns or [])))
-        for i, ids in enumerate(chunks):
-            print(f"Query chunk {i + 1}/{len(chunks)}")
+        for i, ids in tqdm(enumerate(chunks), desc="Querying TIC chunks", total=len(chunks)):
             formatted_ids = ",".join([f"'{tid}'" for tid in ids])
 
             query = f"""select id as tic_id, gaia as gaia_id, {fields} 
@@ -110,7 +113,7 @@ class TessCatalogDownloader(DatasetDownloader):
                     and priority > {self._priority_threshold} 
                     and mass between {self._star_mass_range[0]} and {self._star_mass_range[1]}"""
         result = self._query_ctl_casjob(catalog=self._catalog, query=query, estimated_minutes=1)
-        self._log(f"DONE. Collected {len(result)} stars.")
+        logger.info(f"DONE. Collected {len(result)} stars.")
 
         return result
 
@@ -131,23 +134,23 @@ class TessCatalogDownloader(DatasetDownloader):
         cas_query = f"select * into mydb.{temp_table} from ({query}) as subquery"
         self._log(cas_query)
         job_id = self._casjob_api.submit(cas_query, context=catalog, task_name="python_api", estimate=estimated_minutes)
-        self._log(f"Started Casjob {job_id}")
+        logger.info(f"Started Casjob {job_id}")
         status_code, status_name = self._casjob_api.monitor(job_id)
         self._log(f"Job {job_id} ended with status {status_code}: {status_name}")
         if status_code != 5:
             return None
 
         buffer_csv = BytesIO()
-        self._log("Downloading output")
+        logger.info("Downloading output")
         self._casjob_api.request_and_get_output(temp_table, outtype="CSV", outfn=buffer_csv)
-        self._log(f"Downloaded {(buffer_csv.getbuffer().nbytes / 10**6):.2f} MB of data")
+        logger.info(f"Downloaded {(buffer_csv.getbuffer().nbytes / 10**6):.2f} MB of data")
 
         # Cleanup result table
         try:
             self._log("Cleanup remote data")
             self._casjob_api.drop_table(temp_table)
         except Exception as e:
-            print("Exception raised in query_ctl_casjob():", repr(e))
+            logger.error("Exception raised in query_ctl_casjob():", repr(e))
             # We already got the result, and don't want to block here
             pass
 
@@ -156,4 +159,6 @@ class TessCatalogDownloader(DatasetDownloader):
 
     def _log(self, message: str):
         if self._verbose_log:
-            print(message)
+            logger.info(message)
+        else:
+            logger.trace(message)

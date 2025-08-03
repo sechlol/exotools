@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Self
+from typing_extensions import Self
 
 import numpy as np
 import pandas as pd
@@ -72,4 +72,6 @@ class BaseDB(ABC):
         return self._factory(self.view[random_indices])
 
     def to_pandas(self) -> pd.DataFrame:
+        if len(self.view) == 0:
+            return pd.DataFrame()
         return self.view.to_pandas().reset_index()

@@ -1,6 +1,6 @@
 """ExoTools - Tools for working with exoplanet data."""
 
-__version__ = "0.1.0"
+__version__ = "0.0.2"
 
 from .db.star_system import Star, Planet, StarSystem, UncertainValue, UncertainDataSource
 from exotools.datasets.known_exoplanets import KnownExoplanetsDataset
@@ -20,6 +20,7 @@ from .db import (
 )
 
 from .utils.download import DownloadParams
+
 
 __all__ = [
     # Main dataset classes

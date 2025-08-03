@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 from time import perf_counter
 from typing import Any
+import logging
 
 import numpy as np
 from astropy.table import QTable
@@ -13,6 +14,8 @@ from tests.conftest import load_all_test_qtables_and_headers
 
 NUM_ITERATIONS = 5
 TARGET_ROWS = 10_000
+
+logger = logging.getLogger(__name__)
 
 
 def bootstrap_qtable(qtable: QTable, rows: int) -> QTable:
@@ -44,7 +47,7 @@ def load_and_prepare_data(target_rows: int) -> dict[str, tuple[QTable, QTableHea
     raw_data = load_all_test_qtables_and_headers()
     augmented_data = {}
     for name, (qtable, header) in raw_data.items():
-        print(f"Augmenting {name}")
+        logger.info(f"Augmenting {name}")
         augmented_data[name] = (bootstrap_qtable(qtable, target_rows), header)
     return augmented_data
 
@@ -60,7 +63,6 @@ def run_benchmark(
         "write_json": 0.0,
         "read_json": 0.0,
     }
-
     for _ in range(NUM_ITERATIONS):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "storage"
@@ -102,7 +104,7 @@ def collect_benchmark_results(
 ) -> dict[str, dict[str, float]]:
     results = {}
     for name, cls in storages.items():
-        print(f"Running benchmark for {name}")
+        logger.info(f"Running benchmark for {name}")
         results[name] = run_benchmark(cls, data, json_data)
 
     return results
@@ -118,8 +120,8 @@ def display_results(all_results: dict[str, dict[str, float]]) -> None:
             val = all_results[storage][op]
             row.append(f"{val:.6f}" if not np.isnan(val) else "")
         table.append(row)
-    print("\nResults (seconds per operation):")
-    print(tabulate(table, headers=headers, tablefmt="github"))
+    logger.info("Results (seconds per operation):")
+    logger.info("\n" + tabulate(table, headers=headers, tablefmt="github"))
 
 
 def display_relative_results(all_results: dict[str, dict[str, float]]) -> None:
@@ -134,13 +136,13 @@ def display_relative_results(all_results: dict[str, dict[str, float]]) -> None:
             rel = val / min_val if not np.isnan(val) and min_val != 0 else ""
             row.append(f"{rel:.2f}" if rel != "" else "")
         table.append(row)
-    print("\nRelative Performance (lower is better, 1.0 = fastest):")
-    print(tabulate(table, headers=headers, tablefmt="github"))
+    logger.info("Relative Performance (lower is better, 1.0 = fastest):")
+    logger.info("\n" + tabulate(table, headers=headers, tablefmt="github"))
 
 
 def main():
     qtable_data = load_and_prepare_data(TARGET_ROWS)
-    print("Preparing json data...")
+    logger.info("Preparing json data...")
     json_data = generate_sample_json(TARGET_ROWS)
 
     storages = {

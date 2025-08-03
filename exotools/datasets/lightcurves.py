@@ -1,10 +1,13 @@
 from pathlib import Path
 from typing import Optional
+import logging
 
 from exotools.datasets.base_dataset import BaseDataset
 from exotools.db import TessMetaDB, LightcurveDB
 from exotools.downloaders import LightcurveDownloader
 from exotools.utils.download import DownloadParams
+
+logger = logging.getLogger(__name__)
 
 
 class LightcurveDataset(BaseDataset):
@@ -30,9 +33,9 @@ class LightcurveDataset(BaseDataset):
             for row in tess_db.view
         ]
 
-        print(f"Downloading {len(download_params)} lightcurves")
+        logger.info(f"Downloading {len(download_params)} lightcurves")
         downloaded_paths = self._downloader.download_fits_parallel(download_params)
-        print(f"Downloaded {len(downloaded_paths)} lightcurves")
+        logger.info(f"Downloaded {len(downloaded_paths)} lightcurves")
 
         return self.load_lightcurve_dataset()
 

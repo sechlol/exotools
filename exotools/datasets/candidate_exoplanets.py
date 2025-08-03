@@ -1,11 +1,13 @@
 from typing import Optional
+import logging
 
 from astropy.table import QTable
-
 from exotools.datasets.base_dataset import BaseDataset
 from exotools.db import ExoDB, CandidateDB
 from exotools.downloaders import CandidateExoplanetsDownloader
 from exotools.io import BaseStorage
+
+logger = logging.getLogger(__name__)
 
 
 class CandidateExoplanetsDataset(BaseDataset):
@@ -18,7 +20,7 @@ class CandidateExoplanetsDataset(BaseDataset):
         try:
             candidate_qtable = self._storage.read_qtable(table_name=self.name)
         except ValueError:
-            print(
+            logger.error(
                 "Candidate Exoplanets dataset not found. "
                 "You need to download it first by calling download_candidate_exoplanets(store=True)."
             )
@@ -27,7 +29,7 @@ class CandidateExoplanetsDataset(BaseDataset):
         return _create_candidate_db(candidate_dataset=candidate_qtable)
 
     def download_candidate_exoplanets(self, limit: Optional[int] = None, store: bool = True) -> CandidateDB:
-        print("Preparing to download candidate exoplanets dataset...")
+        logger.info("Preparing to download candidate exoplanets dataset...")
         candidate_qtable, candidate_header = CandidateExoplanetsDownloader().download(limit=limit)
 
         if store:

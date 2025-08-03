@@ -1,4 +1,5 @@
-from typing import Self
+from typing_extensions import Self
+import logging
 
 import astropy.units as u
 import numpy as np
@@ -6,6 +7,8 @@ from astropy.table import QTable, join
 from astropy.time import Time
 
 from .base_db import BaseDB
+
+logger = logging.getLogger(__name__)
 
 _ID_FIELD = "tic_id"
 _PARAMETER_JD = ["pl_tranmid"]
@@ -120,7 +123,7 @@ class ExoDB(BaseDB):
                 dataset[f"{c}_upper"] = dataset[c] + dataset[f"{c}err1"]
                 dataset[f"{c}_lower"] = dataset[c] + dataset[f"{c}err2"]
             except ValueError:
-                print(f"Could not compute bounds for {c}")
+                logger.error(f"Could not compute bounds for {c}")
 
     @staticmethod
     def convert_time_columns(dataset: QTable):

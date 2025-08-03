@@ -3,14 +3,17 @@ from typing import Optional, Sequence
 import astropy.units as u
 import numpy as np
 import pandas as pd
-from astropy.table import QTable, MaskedColumn
+import logging
 
+from astropy.table import QTable, MaskedColumn
 from exotools.utils.qtable_utils import TableColumnInfo, QTableHeader
 from exotools.utils.unit_mapper import UNIT_MAPPER
 
 from ._utils import fix_unrecognized_units, override_units
 from .dataset_downloader import DatasetDownloader
 from .tap_service import ExoService, TapService
+
+logger = logging.getLogger(__name__)
 
 
 def _get_error_parameters(parameters: list[str], include_original: Optional[bool] = False) -> list[str]:
@@ -45,12 +48,12 @@ class KnownExoplanetsDownloader(DatasetDownloader):
         limit_clause = f"top {limit}" if limit else ""
         query_str = f"select {limit_clause} {fields} from {self._table_name}"
 
-        print(f"Querying {self._exo_service.url}...")
+        logger.info(f"Querying {self._exo_service.url}...")
         dataset = self._exo_service.query(query_str)
         n_planets = len(pd.unique(dataset["pl_name"]))
         n_records = len(dataset)
 
-        print(f"DONE! Collected {n_planets} unique planets, for a total of {n_records} records.")
+        logger.info(f"DONE! Collected {n_planets} unique planets, for a total of {n_records} records.")
         return dataset
 
     def _clean_and_fix(self, table: QTable) -> QTable:

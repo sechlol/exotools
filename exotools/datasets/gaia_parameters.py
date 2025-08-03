@@ -1,11 +1,13 @@
 from typing import Optional, Sequence
+import logging
 
 from astropy.table import QTable
-
 from exotools.datasets.base_dataset import BaseDataset
 from exotools.db import GaiaDB
 from exotools.downloaders import GaiaDownloader
 from exotools.io import BaseStorage
+
+logger = logging.getLogger(__name__)
 
 
 class GaiaParametersDataset(BaseDataset):
@@ -25,7 +27,7 @@ class GaiaParametersDataset(BaseDataset):
             gaia_qtable = self._storage.read_qtable(table_name=self.name)
             return self._create_gaia_db(gaia_qtable)
         except ValueError:
-            print("Gaia dataset not found. You need to download it first by calling download_gaia_parameters().")
+            logger.error("Gaia dataset not found. You need to download it first by calling download_gaia_parameters().")
             return None
 
     def download_gaia_parameters(self, gaia_ids: Sequence[int], store: bool = True) -> GaiaDB:
@@ -39,9 +41,10 @@ class GaiaParametersDataset(BaseDataset):
         Returns:
             GaiaDB: Database containing the downloaded Gaia parameters.
         """
-        print(f"Preparing to download Gaia DR3 data for {len(gaia_ids)} stars...")
-
+        logger.info(f"Preparing to download Gaia DR3 data for {len(gaia_ids)} stars...")
         gaia_qtable, gaia_header = GaiaDownloader().download_by_id(ids=gaia_ids)
+        logger.info(f"Downloaded {len(gaia_qtable)} stars")
+
         if store:
             self._storage.write_qtable(
                 table=gaia_qtable,

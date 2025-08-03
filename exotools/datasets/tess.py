@@ -1,9 +1,12 @@
 from typing import Sequence, Optional
+import logging
 
 from exotools.datasets.base_dataset import BaseDataset
 from exotools.db import TicDB, TessMetaDB
 from exotools.downloaders import TessCatalogDownloader, TessObservationsDownloader
 from exotools.io import BaseStorage
+
+logger = logging.getLogger(__name__)
 
 
 class TessDataset(BaseDataset):
@@ -23,7 +26,7 @@ class TessDataset(BaseDataset):
         self._tic_by_id_name = self.name + "_tic_by_id"
 
     def download_observation_metadata(self, targets_tic_id: Sequence[int], store: bool = True) -> TessMetaDB:
-        print(f"Preparing to download TESS observation list for {len(targets_tic_id)} objects...")
+        logger.info(f"Preparing to download TESS observation list for {len(targets_tic_id)} objects...")
         meta_qtable, meta_header = TessObservationsDownloader().download_by_id(targets_tic_id)
 
         if store:
@@ -66,7 +69,7 @@ class TessDataset(BaseDataset):
         try:
             meta_qtable = self._storage.read_qtable(table_name=self._observations_name)
         except ValueError:
-            print(
+            logger.error(
                 "Stored TIC dataset not found. You need to download it first by "
                 "calling download_tic_targets(store=True)."
             )
@@ -78,7 +81,7 @@ class TessDataset(BaseDataset):
         try:
             tic_qtable = self._storage.read_qtable(table_name=self._tic_name)
         except ValueError:
-            print(
+            logger.error(
                 "Stored TIC dataset not found. You need to download it first by "
                 "calling download_tic_targets(store=True)."
             )
@@ -90,7 +93,7 @@ class TessDataset(BaseDataset):
         try:
             tic_qtable = self._storage.read_qtable(table_name=self._tic_by_id_name)
         except ValueError:
-            print(
+            logger.error(
                 "Stored TIC dataset not found. You need to download it first by "
                 "calling download_tic_targets(store=True)."
             )

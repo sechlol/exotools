@@ -3,6 +3,7 @@ from typing import Optional, Sequence
 import pandas as pd
 import astropy.units as u
 from astropy.table import QTable
+import logging
 
 from exotools.utils.qtable_utils import QTableHeader
 from exotools.utils.unit_mapper import UNIT_MAPPER
@@ -11,6 +12,8 @@ from ._utils import fix_unrecognized_units, override_units
 from .dataset_downloader import DatasetDownloader
 from .exoplanets_downloader import _get_fixed_table_header, _get_error_parameters
 from .tap_service import ExoService
+
+logger = logging.getLogger(__name__)
 
 
 class CandidateExoplanetsDownloader(DatasetDownloader):
@@ -43,11 +46,11 @@ class CandidateExoplanetsDownloader(DatasetDownloader):
         limit_clause = f"top {limit}" if limit else ""
         query_str = f"select {limit_clause} {fields} from {self._table_name}"
 
-        print("Downloading Candidate exoplanets...")
+        logger.info("Downloading Candidate exoplanets...")
         dataset = self._exo_service.query(query_str)
         n_unique = len(pd.unique(dataset["toi"]))
 
-        print(f"DONE! Collected {n_unique} unique candidates, for a total of {len(dataset)} records.")
+        logger.info(f"DONE! Collected {n_unique} unique candidates, for a total of {len(dataset)} records.")
         return dataset
 
     def _clean_and_fix(self, table: QTable) -> QTable:

@@ -1,9 +1,12 @@
 import numpy as np
+import logging
 
 from exotools import KnownExoplanetsDataset, CandidateExoplanetsDataset, TessDataset, LightcurveDataset
 from exotools.io.fs_storage import EcsvStorage
 from tests.conftest import TEST_ASSETS_QTABLES, TEST_ASSETS_LC
 from tests.utils.comparison import compare_qtables
+
+logger = logging.getLogger(__name__)
 
 
 def generate_test_qtables():
@@ -35,7 +38,7 @@ def generate_test_qtables():
         try:
             assert compare_qtables(original.view, loaded.view)
         except AssertionError as e:
-            print(f"Failed to compare qtables {i}: {repr(e)}")
+            logger.error(f"Failed to compare qtables {i}: {repr(e)}")
 
 
 def generate_test_lightcurves():
@@ -49,7 +52,7 @@ def generate_test_lightcurves():
 def main():
     generate_test_qtables()
     generate_test_lightcurves()
-    print("Done!")
+    logger.info("Done!")
 
 
 if __name__ == "__main__":

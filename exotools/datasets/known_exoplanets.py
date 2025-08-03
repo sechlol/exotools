@@ -1,14 +1,17 @@
 from typing import Optional, Sequence
 
+import logging
 import numpy as np
-from astropy.table import QTable
 
+from astropy.table import QTable
 from exotools.datasets.gaia_parameters import GaiaParametersDataset
 from exotools.db import ExoDB, GaiaDB, StarSystemDB
 from exotools.downloaders import KnownExoplanetsDownloader
 from exotools.io import BaseStorage
 from ._exoplanet_dataset_reducer import reduce_exoplanet_dataset
 from .base_dataset import BaseDataset
+
+logger = logging.getLogger(__name__)
 
 
 class KnownExoplanetsDataset(BaseDataset):
@@ -22,17 +25,13 @@ class KnownExoplanetsDataset(BaseDataset):
     def load_known_exoplanets_dataset(self, with_gaia_star_data: bool = False) -> Optional[ExoDB]:
         gaia_db = None
         if with_gaia_star_data:
-            gaia_db = self._gaia_dataset.load_gaia_parameters_dataset()
+            gaia_db = self.load_gaia_dataset_of_known_exoplanets()
             if gaia_db is None:
-                print(
-                    "Gaia dataset not found. You need to download it first by "
-                    "calling download_known_exoplanets(with_gaia_star_data=True, store=True)."
-                )
                 return None
         try:
             exo_qtable = self._storage.read_qtable(table_name=self.name)
         except ValueError:
-            print(
+            logger.error(
                 "Known Exoplanets dataset not found. "
                 "You need to download it first by calling download_known_exoplanets(store=True)."
             )
@@ -47,24 +46,29 @@ class KnownExoplanetsDataset(BaseDataset):
             return _create_star_system_db(reduced_exo_dataset)
         except ValueError:
             # If it doesn't exist, compute it from the full datasets
-            gaia_db = self._gaia_dataset.load_gaia_parameters_dataset()
+            gaia_db = self.load_gaia_dataset_of_known_exoplanets()
             if gaia_db is None:
-                print(
-                    "Gaia dataset not found. You need to download it first by "
-                    "calling download_known_exoplanets(with_gaia_star_data=True, store=True)."
-                )
                 return None
 
             try:
                 exo_qtable = self._storage.read_qtable(table_name=self.name)
             except ValueError:
-                print(
+                logger.error(
                     "Known Exoplanets dataset not found. "
                     "You need to download it first by calling download_known_exoplanets(store=True)."
                 )
                 return None
 
             return self._create_star_system_db_from_scratch(exo_dataset=exo_qtable, gaia_db=gaia_db)
+
+    def load_gaia_dataset_of_known_exoplanets(self) -> Optional[GaiaDB]:
+        gaia_db = self._gaia_dataset.load_gaia_parameters_dataset()
+        if gaia_db is None:
+            logger.error(
+                "Gaia dataset not found. You need to download it first by "
+                "calling download_known_exoplanets(with_gaia_star_data=True, store=True)."
+            )
+        return gaia_db
 
     def download_known_exoplanets(
         self,
@@ -73,7 +77,7 @@ class KnownExoplanetsDataset(BaseDataset):
         limit: Optional[int] = None,
         columns: Optional[Sequence[str]] = None,
     ) -> ExoDB:
-        print("Preparing to download known exoplanets dataset...")
+        logger.info("Preparing to download known exoplanets dataset...")
         exo_qtable, exo_header = KnownExoplanetsDownloader().download(limit=limit, columns=columns)
 
         if store:

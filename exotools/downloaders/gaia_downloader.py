@@ -3,11 +3,14 @@ from typing import Optional, Iterable, Sequence
 import astropy.units as u
 from astropy.table import QTable, vstack
 from astroquery.gaia import Gaia
+import logging
 from tqdm import tqdm
 
 from exotools.utils.qtable_utils import QTableHeader
 from .dataset_downloader import DatasetDownloader, iterate_chunks
 from .tap_service import GaiaService
+
+logger = logging.getLogger(__name__)
 
 
 class GaiaDownloader(DatasetDownloader):
@@ -35,7 +38,7 @@ class GaiaDownloader(DatasetDownloader):
                 table = Gaia.launch_job(query).get_results()
                 all_tables.append(table)
             except Exception as e:
-                print(f"Exception generated while downloading Gaia data for index i={i}")
+                logger.error(f"Exception generated while downloading Gaia data for index i={i}")
                 raise e
         return QTable(vstack(all_tables))
 

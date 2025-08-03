@@ -1,10 +1,10 @@
 import contextlib
 import io
-import logging
 import os
 import sys
 from pathlib import Path
 from typing import Optional, Sequence
+import logging
 
 import lightkurve as lk
 import numpy as np
@@ -15,7 +15,7 @@ from tqdm.auto import tqdm
 from exotools.utils.download import DownloadParams
 from exotools.utils.observations_fix import Observations
 
-_logger = logging.Logger("LightcurveDownloader")
+logger = logging.Logger(__name__)
 
 
 class LightcurveDownloader:
@@ -39,7 +39,7 @@ class LightcurveDownloader:
         if status == "COMPLETE":
             return download_path
 
-        print(f"Error downloading {download_args.url}: {message}")
+        logger.error(f"Error downloading {download_args.url}: {message}")
         return None
 
     def download_fits_multiple(self, download_args: Sequence[DownloadParams]) -> list[Path]:
@@ -80,12 +80,12 @@ def _download_lightcurve_data(
     try:
         return to_download.download_all()
     except HTTPError as http_e:
-        _logger.error("Server timeout while downloading lightcurve")
-        _logger.error(repr(http_e))
+        logger.error("Server timeout while downloading lightcurve")
+        logger.error(repr(http_e))
         return None
     except lk.search.SearchError as se:
-        _logger.error("Search error while downloading lightcurve")
-        _logger.error(repr(se))
+        logger.error("Search error while downloading lightcurve")
+        logger.error(repr(se))
         return None
 
 
@@ -97,8 +97,8 @@ def _search_mast_target(target_name: str, verbose=False) -> lk.SearchResult:
     results = lk.search_lightcurve(target_name)
 
     if verbose:
-        print(f"### Search Result for target: '{target_name}' ###")
+        logger.info(f"### Search Result for target: '{target_name}' ###")
         for i, r in enumerate(results):
-            print(i, r, r.exptime[0])
+            logger.info(f"{i}: {r}, {r.exptime[0]}")
 
     return results

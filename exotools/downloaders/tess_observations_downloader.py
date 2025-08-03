@@ -2,6 +2,8 @@ from typing import Optional, Sequence
 
 import numpy as np
 import pandas as pd
+import logging
+
 from astropy.table import QTable
 from tqdm import tqdm
 
@@ -34,7 +36,7 @@ class TessObservationsDownloader(DatasetDownloader):
                 )
                 all_data.append(chunk_data)
             except Exception as e:
-                print(f"Exception generated while downloading URLs data for index i={i}")
+                logger.error(f"Exception generated while downloading URLs data for index i={i}")
                 raise e
 
         all_data = (
