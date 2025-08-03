@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
 authors = [
-    {name = "Christian", email = "astro.sech@gmail.com"}
+    {name = "Christian Cardin", email = "astro.sech@gmail.com"}
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
