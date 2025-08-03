@@ -1,5 +1,5 @@
 from math import ceil
-from typing import Any, Optional
+from typing import Any, Optional, Self
 
 import numpy as np
 from astropy.time import TimeDelta, Time
@@ -46,10 +46,10 @@ class LightCurvePlus:
     def to_numpy(self) -> np.ndarray:
         return np.array([self.time_x, self.flux_y]).T
 
-    def remove_outliers(self) -> "LightCurvePlus":
+    def remove_outliers(self) -> Self:
         return LightCurvePlus(self.lc.remove_outliers())
 
-    def normalize(self) -> "LightCurvePlus":
+    def normalize(self) -> Self:
         return LightCurvePlus(self.lc.normalize())
 
     def get_first_transit_value(self, planet: Planet) -> Time:
@@ -64,13 +64,13 @@ class LightCurvePlus:
             time=self.time_x, period=planet.orbital_period.central.value, midpoint=self._get_aligned_midpoint(planet)
         )
 
-    def shift_time(self, shift: Quantity | float) -> "LightCurvePlus":
+    def shift_time(self, shift: Quantity | float) -> Self:
         delta = TimeDelta(shift, format=self.lc.time.format, scale=self.lc.time.scale)
         self._time_shift += delta
         self.lc.time += delta
         return self
 
-    def start_at_zero(self) -> "LightCurvePlus":
+    def start_at_zero(self) -> Self:
         return self.shift_time(shift=-self.lc.time[0].value)
 
     def get_transit_phase(self, planet: Planet) -> np.ndarray:
@@ -116,7 +116,7 @@ class LightCurvePlus:
             normalize_phase=normalize_time,
         )
 
-    def copy_with_flux(self, flux: np.ndarray) -> "LightCurvePlus":
+    def copy_with_flux(self, flux: np.ndarray) -> Self:
         lc = copy_lightcurve(self.lc, with_flux=flux)
         return LightCurvePlus(lc)
 
@@ -145,7 +145,7 @@ class LightCurvePlus:
             return LightCurvePlus(lightcurve=self.lc + other.lc)
         return LightCurvePlus(lightcurve=self.lc + other)
 
-    def __getitem__(self, index) -> "LightCurvePlus":
+    def __getitem__(self, index) -> Self:
         return LightCurvePlus(self.lc[index])
 
 

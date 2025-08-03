@@ -1,3 +1,5 @@
+from typing import Self
+
 import numpy as np
 from astropy.table import QTable
 
@@ -7,7 +9,7 @@ _ID_FIELD = "gaia_id"
 
 
 class GaiaDB(BaseDB):
-    def _factory(self, dataset: QTable) -> "BaseDB":
+    def _factory(self, dataset: QTable) -> Self:
         return GaiaDB(dataset)
 
     def __init__(self, gaia_dataset: QTable):

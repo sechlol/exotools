@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Self
 
 import numpy as np
 from astropy.io import fits
@@ -32,10 +32,10 @@ class LightcurveDB(BaseDB):
     def unique_obs_ids(self) -> np.ndarray:
         return np.unique(self.view["obs_id"].value)
 
-    def _factory(self, dataset: QTable) -> "LightcurveDB":
+    def _factory(self, dataset: QTable) -> Self:
         return LightcurveDB(dataset)
 
-    def select_by_tic_ids(self, tic_ids: np.ndarray) -> "LightcurveDB":
+    def select_by_tic_ids(self, tic_ids: np.ndarray) -> Self:
         return self.select_by_mask(np.isin(self.view["tic_id"], tic_ids))
 
     def load_by_tic(self, tic_id: int, start_time_at_zero: bool = False) -> Optional[list[LightCurvePlus]]:
