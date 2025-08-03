@@ -40,7 +40,7 @@ class KnownExoplanetsDownloader(DatasetDownloader):
     def __init__(self):
         self._exo_service = ExoService()
 
-    def _download(self, limit: Optional[int] = None, columns: Optional[Sequence[str]] = None) -> QTable:
+    def _download(self, limit: Optional[int] = None, columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
         fields = self._get_fields_to_query(columns=columns)
         limit_clause = f"top {limit}" if limit else ""
         query_str = f"select {limit_clause} {fields} from {self._table_name}"

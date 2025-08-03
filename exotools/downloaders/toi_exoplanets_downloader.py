@@ -32,7 +32,7 @@ class CandidateExoplanetsDownloader(DatasetDownloader):
     def __init__(self):
         self._exo_service = ExoService()
 
-    def _download(self, limit: Optional[int] = None, columns: Optional[Sequence[str]] = None) -> QTable:
+    def _download(self, limit: Optional[int] = None, columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
         if columns:
             columns = set(columns)
             columns.add(self._index_col)
