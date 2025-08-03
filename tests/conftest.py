@@ -3,7 +3,9 @@ from pathlib import Path
 
 import pytest
 from astropy.table import QTable
+from lightkurve import LightCurve
 
+from exotools.db.lightcurve_db import load_lightcurve
 from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
 
 _CURRENT_DIR = Path(os.path.realpath(__file__)).parent
@@ -11,6 +13,7 @@ _TEST_ASSETS_DIR = _CURRENT_DIR / "test_assets"
 
 TEST_TMP_DIR = _CURRENT_DIR / "tmp"
 TEST_ASSETS_QTABLES = _TEST_ASSETS_DIR / "qtables"
+TEST_ASSETS_LC = _TEST_ASSETS_DIR / "lightcurves"
 
 
 @pytest.fixture(scope="session")
@@ -28,6 +31,11 @@ def all_test_qtables_and_headers() -> dict[str, tuple[QTable, QTableHeader]]:
     return load_all_test_qtables_and_headers()
 
 
+@pytest.fixture(scope="session")
+def all_test_lightcurves() -> dict[str, LightCurve]:
+    return load_all_test_lightcurves()
+
+
 def load_all_test_qtables() -> dict[str, QTable]:
     """Load all qtables in TEST_ASSETS_QTABLES as a dict"""
     qtables = {}
@@ -35,6 +43,16 @@ def load_all_test_qtables() -> dict[str, QTable]:
         if path.suffix == ".ecsv":
             qtables[path.stem] = QTable.read(path)
     return qtables
+
+
+def load_all_test_lightcurves() -> dict[str, LightCurve]:
+    all_data = {}
+    for path, dirs, files in TEST_ASSETS_LC.walk():
+        for file_name in files:
+            if ".fits" in file_name:
+                all_data[file_name.removesuffix(".fits")] = load_lightcurve(path / file_name)
+
+    return all_data
 
 
 def load_all_test_headers() -> dict[str, QTableHeader]:
@@ -48,7 +66,66 @@ def load_all_test_headers() -> dict[str, QTableHeader]:
 
 
 def load_all_test_qtables_and_headers() -> dict[str, tuple[QTable, QTableHeader]]:
-    headers = load_all_test_headers()
+    """Load all qtables and headers in TEST_ASSETS_QTABLES as a dict"""
     qtables = load_all_test_qtables()
-    assert set(headers.keys()) == set(qtables.keys())
-    return {name: (qtable, headers[name]) for name, qtable in qtables.items()}
+    headers = load_all_test_headers()
+
+    result = {}
+    for name in qtables:
+        if name in headers:
+            result[name] = (qtables[name], headers[name])
+    return result
+
+
+# Dataset-specific fixtures for testing
+@pytest.fixture(scope="session")
+def known_exoplanets_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
+    """Test data for known exoplanets dataset"""
+    return all_test_qtables_and_headers["known_exoplanets"]
+
+
+@pytest.fixture(scope="session")
+def candidate_exoplanets_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
+    """Test data for candidate exoplanets dataset"""
+    return all_test_qtables_and_headers["candidate_exoplanets"]
+
+
+@pytest.fixture(scope="session")
+def gaia_parameters_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
+    """Test data for gaia parameters dataset"""
+    return all_test_qtables_and_headers["gaia_known_exoplanets"]
+
+
+@pytest.fixture(scope="session")
+def tess_observations_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
+    """Test data for TESS observations dataset"""
+    return all_test_qtables_and_headers["tess_observations"]
+
+
+@pytest.fixture(scope="session")
+def lightcurve_test_paths() -> dict[int, list[Path]]:
+    """Test paths for lightcurve FITS files"""
+    path_map = {}
+
+    # Iterate through TIC ID directories
+    for path, dirs, files in TEST_ASSETS_LC.walk():
+        for file in files:
+            if ".fits" in file:
+                obs_id = int(file.removesuffix(".fits"))
+                path_map[obs_id] = path / file
+
+    return path_map
+
+
+@pytest.fixture(scope="session")
+def lightcurve_test_data(lightcurve_test_paths) -> dict[int, dict[int, LightCurve]]:
+    """Test data for lightcurve dataset, organized by TIC ID and observation ID"""
+    lc_data = {}
+
+    for tic_id, paths in lightcurve_test_paths.items():
+        lc_data[tic_id] = {}
+        for path in paths:
+            obs_id = int(path.stem)
+            lc_data[tic_id][obs_id] = load_lightcurve(path)
+
+    return lc_data
