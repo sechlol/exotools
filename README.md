@@ -1,10 +1,10 @@
-from exotools.datasets import GaiaParametersDataset
+# ExoTools
 
-# exotools
-
-<p align="center">
+<div style="text-align:center">
   <img src="img/exotools_horizontal.png" alt="exotools logo" width="500"/>
-</p>
+</div>
+
+
 
 Python tools for working with exoplanet data from various sources including NASA's Exoplanet Archive, TESS, and Gaia.
 
