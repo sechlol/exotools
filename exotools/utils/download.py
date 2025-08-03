@@ -5,3 +5,7 @@ from dataclasses import dataclass
 class DownloadParams:
     url: str
     download_path: str
+
+
+class Test:
+    pass
