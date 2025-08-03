@@ -1,10 +1,10 @@
+import logging
 from io import BytesIO
 from typing import Optional, Sequence
 
 import astropy.units as u
 from astropy.table import QTable, vstack
 from casjobs import CasJobs
-import logging
 from tqdm import tqdm
 
 from exotools.utils.qtable_utils import QTableHeader, get_empty_table_header

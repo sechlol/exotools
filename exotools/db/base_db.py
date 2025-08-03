@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from typing_extensions import Self
 
 import numpy as np
 import pandas as pd
 from astropy.table import QTable
+from typing_extensions import Self
 
 NAN_VALUE = -1
 

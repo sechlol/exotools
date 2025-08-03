@@ -1,15 +1,15 @@
 import json
+import logging
 from pathlib import Path
 from typing import Optional
 
 import h5py
 import numpy as np
-from astropy.io.misc.hdf5 import write_table_hdf5, read_table_hdf5
+from astropy.io.misc.hdf5 import read_table_hdf5, write_table_hdf5
 from astropy.table import QTable
-import logging
 
 from exotools.io import BaseStorage
-from exotools.utils.qtable_utils import RootQTableHeader, QTableHeader
+from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
 
 logger = logging.getLogger(__name__)
 

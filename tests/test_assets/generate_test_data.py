@@ -1,9 +1,10 @@
-import numpy as np
 import logging
 
-from exotools import KnownExoplanetsDataset, CandidateExoplanetsDataset, TessDataset, LightcurveDataset
+import numpy as np
+
+from exotools import CandidateExoplanetsDataset, KnownExoplanetsDataset, LightcurveDataset, TessDataset
 from exotools.io.fs_storage import EcsvStorage
-from tests.conftest import TEST_ASSETS_QTABLES, TEST_ASSETS_LC
+from tests.conftest import TEST_ASSETS_LC, TEST_ASSETS_QTABLES
 from tests.utils.comparison import compare_qtables
 
 logger = logging.getLogger(__name__)

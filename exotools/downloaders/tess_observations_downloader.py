@@ -1,14 +1,14 @@
+import logging
 from typing import Optional, Sequence
 
 import numpy as np
 import pandas as pd
-import logging
-
 from astropy.table import QTable
 from tqdm import tqdm
 
 from exotools.utils.observations_fix import Observations
 from exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
+
 from .dataset_downloader import DatasetDownloader, iterate_chunks
 
 logger = logging.getLogger(__name__)

@@ -1,9 +1,8 @@
-from typing_extensions import Self
-
 import numpy as np
 from astropy.table import QTable
+from typing_extensions import Self
 
-from .base_db import BaseDB, NAN_VALUE
+from .base_db import NAN_VALUE, BaseDB
 
 _ID_FIELD = "tic_id"
 

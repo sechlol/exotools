@@ -1,7 +1,8 @@
-from typing import Optional, Sequence
 import logging
+from typing import Optional, Sequence
 
 from astropy.table import QTable
+
 from exotools.datasets.base_dataset import BaseDataset
 from exotools.db import GaiaDB
 from exotools.downloaders import GaiaDownloader

@@ -1,9 +1,10 @@
-from typing import Optional
 import logging
+from typing import Optional
 
 from astropy.table import QTable
+
 from exotools.datasets.base_dataset import BaseDataset
-from exotools.db import ExoDB, CandidateDB
+from exotools.db import CandidateDB, ExoDB
 from exotools.downloaders import CandidateExoplanetsDownloader
 from exotools.io import BaseStorage
 

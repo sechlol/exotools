@@ -1,12 +1,12 @@
+import logging
 from typing import Optional, Sequence
 
 import astropy.units as u
 import numpy as np
 import pandas as pd
-import logging
+from astropy.table import MaskedColumn, QTable
 
-from astropy.table import QTable, MaskedColumn
-from exotools.utils.qtable_utils import TableColumnInfo, QTableHeader
+from exotools.utils.qtable_utils import QTableHeader, TableColumnInfo
 from exotools.utils.unit_mapper import UNIT_MAPPER
 
 from ._utils import fix_unrecognized_units, override_units

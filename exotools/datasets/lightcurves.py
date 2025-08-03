@@ -1,9 +1,9 @@
+import logging
 from pathlib import Path
 from typing import Optional
-import logging
 
 from exotools.datasets.base_dataset import BaseDataset
-from exotools.db import TessMetaDB, LightcurveDB
+from exotools.db import LightcurveDB, TessMetaDB
 from exotools.downloaders import LightcurveDownloader
 from exotools.utils.download import DownloadParams
 

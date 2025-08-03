@@ -1,12 +1,13 @@
-from typing import Optional, Iterable, Sequence
+import logging
+from typing import Iterable, Optional, Sequence
 
 import astropy.units as u
 from astropy.table import QTable, vstack
 from astroquery.gaia import Gaia
-import logging
 from tqdm import tqdm
 
 from exotools.utils.qtable_utils import QTableHeader
+
 from .dataset_downloader import DatasetDownloader, iterate_chunks
 from .tap_service import GaiaService
 

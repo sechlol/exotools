@@ -1,13 +1,14 @@
+import logging
 from typing import Optional, Sequence
 
-import logging
 import numpy as np
-
 from astropy.table import QTable
+
 from exotools.datasets.gaia_parameters import GaiaParametersDataset
 from exotools.db import ExoDB, GaiaDB, StarSystemDB
 from exotools.downloaders import KnownExoplanetsDownloader
 from exotools.io import BaseStorage
+
 from ._exoplanet_dataset_reducer import reduce_exoplanet_dataset
 from .base_dataset import BaseDataset
 

@@ -1,10 +1,10 @@
 import contextlib
 import io
+import logging
 import os
 import sys
 from pathlib import Path
 from typing import Optional, Sequence
-import logging
 
 import lightkurve as lk
 import numpy as np

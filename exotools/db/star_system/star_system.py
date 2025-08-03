@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, List, Dict
+from typing import Optional
 
 import numpy as np
 from astropy.table import QTable
@@ -16,8 +16,8 @@ class StarSystem:
         self._ds = data
         self._tic_id = self._ds["tic_id"][0]
 
-        planets_name: List[str] = np.unique(self._ds["pl_name"]).tolist()
-        self._planets: Dict[str, Planet] = {name: _get_planet_from_table(self._ds, name) for name in planets_name}
+        planets_name: list[str] = np.unique(self._ds["pl_name"]).tolist()
+        self._planets: dict[str, Planet] = {name: _get_planet_from_table(self._ds, name) for name in planets_name}
         self._star = _get_star_from_table(self._ds, star_name)
 
         # Assumes there is only one row per planet
@@ -43,11 +43,11 @@ class StarSystem:
         return len(self._planets)
 
     @property
-    def planets_name(self) -> List[str]:
+    def planets_name(self) -> list[str]:
         return list(self._planets.keys())
 
     @property
-    def planets(self) -> List[Planet]:
+    def planets(self) -> list[Planet]:
         return list(self._planets.values())
 
     @property

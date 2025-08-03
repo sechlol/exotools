@@ -1,6 +1,6 @@
+from astropy.table import QTable
 from typing_extensions import Self
 
-from astropy.table import QTable
 from .base_db import BaseDB
 
 _ID_FIELD = "tic_id"

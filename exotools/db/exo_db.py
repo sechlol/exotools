@@ -1,10 +1,10 @@
-from typing_extensions import Self
 import logging
 
 import astropy.units as u
 import numpy as np
 from astropy.table import QTable, join
 from astropy.time import Time
+from typing_extensions import Self
 
 from .base_db import BaseDB
 

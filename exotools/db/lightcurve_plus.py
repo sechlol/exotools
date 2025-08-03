@@ -2,9 +2,9 @@ from math import ceil
 from typing import Any, Optional, Self
 
 import numpy as np
-from astropy.time import TimeDelta, Time
+from astropy.time import Time, TimeDelta
 from astropy.units import Quantity
-from lightkurve import LightCurve, FoldedLightCurve
+from lightkurve import FoldedLightCurve, LightCurve
 
 from .star_system import Planet
 

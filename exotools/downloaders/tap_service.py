@@ -1,4 +1,4 @@
-from typing import Optional, Iterable, Iterator
+from typing import Iterable, Iterator, Optional
 
 import pyvo as vo
 from astropy.table import QTable, vstack

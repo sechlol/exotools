@@ -1,5 +1,5 @@
 import numpy as np
-from astropy.table import QTable, MaskedColumn, Column
+from astropy.table import Column, MaskedColumn, QTable
 from astropy.time import Time
 from astropy.units import Quantity
 from astropy.utils.masked import Masked

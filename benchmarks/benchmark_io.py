@@ -1,14 +1,14 @@
+import logging
 import tempfile
 from pathlib import Path
 from time import perf_counter
 from typing import Any
-import logging
 
 import numpy as np
 from astropy.table import QTable
 from tabulate import tabulate
 
-from exotools.io import Hdf5Storage, EcsvStorage, FeatherStorage, MemoryStorage
+from exotools.io import EcsvStorage, FeatherStorage, Hdf5Storage, MemoryStorage
 from exotools.utils.qtable_utils import QTableHeader
 from tests.conftest import load_all_test_qtables_and_headers
 

@@ -1,8 +1,8 @@
-from typing import Sequence, Optional
 import logging
+from typing import Optional, Sequence
 
 from exotools.datasets.base_dataset import BaseDataset
-from exotools.db import TicDB, TessMetaDB
+from exotools.db import TessMetaDB, TicDB
 from exotools.downloaders import TessCatalogDownloader, TessObservationsDownloader
 from exotools.io import BaseStorage
 

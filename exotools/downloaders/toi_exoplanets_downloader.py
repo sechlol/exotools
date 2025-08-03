@@ -1,16 +1,16 @@
+import logging
 from typing import Optional, Sequence
 
-import pandas as pd
 import astropy.units as u
+import pandas as pd
 from astropy.table import QTable
-import logging
 
 from exotools.utils.qtable_utils import QTableHeader
 from exotools.utils.unit_mapper import UNIT_MAPPER
 
 from ._utils import fix_unrecognized_units, override_units
 from .dataset_downloader import DatasetDownloader
-from .exoplanets_downloader import _get_fixed_table_header, _get_error_parameters
+from .exoplanets_downloader import _get_error_parameters, _get_fixed_table_header
 from .tap_service import ExoService
 
 logger = logging.getLogger(__name__)

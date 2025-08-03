@@ -1,13 +1,13 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 
 from exotools.datasets import (
-    KnownExoplanetsDataset,
     CandidateExoplanetsDataset,
-    TessDataset,
     GaiaParametersDataset,
+    KnownExoplanetsDataset,
     LightcurveDataset,
+    TessDataset,
 )
 from exotools.io import MemoryStorage
 from tests.conftest import TEST_ASSETS_LC
