@@ -55,7 +55,7 @@ def compare_qtables(expected_table: QTable, test_table: QTable) -> bool:
         both_masked = _is_masked_column(expected_col) and _is_masked_column(test_col)
 
         # Check types match
-        if type(expected_col) != type(test_col) and not both_masked:
+        if type(expected_col) is not type(test_col) and not both_masked:
             is_masked_column = isinstance(expected_col, MaskedColumn) and isinstance(test_col, Column)
             is_masked_quantity = isinstance(expected_col, Masked) and isinstance(test_col, Quantity)
             if is_masked_column or is_masked_quantity:

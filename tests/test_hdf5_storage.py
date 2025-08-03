@@ -88,7 +88,7 @@ class TestHdf5Storage:
         w = storage_wrapper
 
         # Try to read non-existent file
-        with pytest.raises(Exception) as excinfo:
+        with pytest.raises(Exception):
             w.read_json("nonexistent")
 
         # Check that an appropriate error is raised

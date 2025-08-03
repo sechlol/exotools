@@ -151,7 +151,6 @@ def _preprocess_table_for_hdf5(table: QTable) -> QTable:
         if col.dtype == np.dtype("O"):
             # Convert to string if it contains string-like objects
             if all(isinstance(x, (str, bytes, type(None))) for x in col):
-                max_len = max((len(str(x)) for x in col if x is not None), default=1)
                 processed_table[col_name] = [str(x) if x is not None else "" for x in col]
             else:
                 # For other object types, convert to JSON strings

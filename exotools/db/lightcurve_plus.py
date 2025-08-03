@@ -157,14 +157,12 @@ def _convert_time_to_jd(lc: LightCurve) -> LightCurve:
     if lc.time.scale != "tdb":
         raise ValueError(f"Time scale {lc.time.scale} unknown/unsupported.")
 
-    match lc.time.format:
-        case "jd":
-            return lc
-        case "btjd":
-            new_t = _btjd_to_jd_time(lc.time)
-            return LightCurve(time=new_t, flux=lc.flux, flux_err=lc.flux_err, meta=lc.meta)
-        case _:
-            raise ValueError(f"Unknown time format: {lc.time.format}")
+    if lc.time.format == "jd":
+        return lc
+    elif lc.time.format == "btjd":
+        new_t = _btjd_to_jd_time(lc.time)
+        return LightCurve(time=new_t, flux=lc.flux, flux_err=lc.flux_err, meta=lc.meta)
+    raise ValueError(f"Time format {lc.time.format} unknown/unsupported.")
 
 
 def copy_lightcurve(lightcurve: LightCurve, with_flux: Optional[np.ndarray] = None) -> LightCurve:
