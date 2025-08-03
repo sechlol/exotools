@@ -35,7 +35,7 @@ def generate_test_qtables():
         try:
             assert compare_qtables(original.view, loaded.view)
         except AssertionError as e:
-            print(f"Failed to compare qtables {i}")
+            print(f"Failed to compare qtables {i}: {repr(e)}")
 
 
 def generate_test_lightcurves():
