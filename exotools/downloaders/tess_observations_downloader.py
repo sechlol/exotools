@@ -11,6 +11,8 @@ from exotools.utils.observations_fix import Observations
 from exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
 from .dataset_downloader import DatasetDownloader, iterate_chunks
 
+logger = logging.getLogger(__name__)
+
 
 class TessObservationsDownloader(DatasetDownloader):
     _mandatory_columns = {"target_name", "sequence_number", "dataURL", "t_obs_release", "t_min", "t_max", "obsid"}

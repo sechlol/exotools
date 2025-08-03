@@ -96,8 +96,8 @@ class TessCatalogDownloader(DatasetDownloader):
         for i, ids in tqdm(enumerate(chunks), desc="Querying TIC chunks", total=len(chunks)):
             formatted_ids = ",".join([f"'{tid}'" for tid in ids])
 
-            query = f"""select id as tic_id, gaia as gaia_id, {fields} 
-                        from dbo.CatalogRecord 
+            query = f"""select id as tic_id, gaia as gaia_id, {fields}
+                        from dbo.CatalogRecord
                         where gaia is not null and id IN ({formatted_ids})"""
             table = self._tic_service.query(query_string=query)
             all_tables.append(table)
@@ -107,10 +107,10 @@ class TessCatalogDownloader(DatasetDownloader):
     def _download(self, limit: Optional[int] = None, columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
         limit_clause = f"top {limit}" if limit else ""
         fields = ",".join(list(self._mandatory_fields | set(columns or [])))
-        query = f"""select {limit_clause} id as tic_id, gaia as gaia_id, {fields} 
-                from dbo.CatalogRecord 
-                where gaia is not null 
-                    and priority > {self._priority_threshold} 
+        query = f"""select {limit_clause} id as tic_id, gaia as gaia_id, {fields}
+                from dbo.CatalogRecord
+                where gaia is not null
+                    and priority > {self._priority_threshold}
                     and mass between {self._star_mass_range[0]} and {self._star_mass_range[1]}"""
         result = self._query_ctl_casjob(catalog=self._catalog, query=query, estimated_minutes=1)
         logger.info(f"DONE. Collected {len(result)} stars.")

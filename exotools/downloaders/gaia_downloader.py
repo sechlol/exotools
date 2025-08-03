@@ -97,34 +97,34 @@ def _get_gaia_targets_data_query(
 
     limit_clause = f"top {limit}" if limit else ""
     selection = f"""SELECT {limit_clause} dr3.source_id,
-              dr3.phot_g_mean_mag, dr3.phot_bp_mean_mag, dr3.phot_rp_mean_mag,  
-              dr3.phot_g_mean_flux_over_error, dr3.phot_bp_mean_flux_over_error, dr3.phot_rp_mean_flux_over_error, 
-              dr3.phot_variable_flag, 
-              dr3_astro.teff_gspphot, teff_gspspec, teff_esphs, teff_espucd, teff_msc1, teff_msc2, 
+              dr3.phot_g_mean_mag, dr3.phot_bp_mean_mag, dr3.phot_rp_mean_mag,
+              dr3.phot_g_mean_flux_over_error, dr3.phot_bp_mean_flux_over_error, dr3.phot_rp_mean_flux_over_error,
+              dr3.phot_variable_flag,
+              dr3_astro.teff_gspphot, teff_gspspec, teff_esphs, teff_espucd, teff_msc1, teff_msc2,
               dr3_astro.mh_gspphot,
-              dr3_astro.distance_gspphot, distance_msc,  
-              mg_gspphot,  
-              spectraltype_esphs,  
-              age_flame,  
-              mass_flame,  
-              lum_flame,  
+              dr3_astro.distance_gspphot, distance_msc,
+              mg_gspphot,
+              spectraltype_esphs,
+              age_flame,
+              mass_flame,
+              lum_flame,
               radius_flame, radius_gspphot{", " if extra_fields else ""} {extra_fields} """
     if from_dr2:
         query = (
             selection
             + f"""
-                FROM gaiadr2.gaia_source AS dr2 
-                JOIN gaiadr3.dr2_neighbourhood AS dr3_n ON dr2.source_id = dr3_n.dr2_source_id 
-                JOIN gaiadr3.gaia_source_lite AS dr3 ON dr3.source_id = dr3_n.dr3_source_id 
-                JOIN gaiadr3.astrophysical_parameters AS dr3_astro ON dr3.source_id = dr3_astro.source_id 
+                FROM gaiadr2.gaia_source AS dr2
+                JOIN gaiadr3.dr2_neighbourhood AS dr3_n ON dr2.source_id = dr3_n.dr2_source_id
+                JOIN gaiadr3.gaia_source_lite AS dr3 ON dr3.source_id = dr3_n.dr3_source_id
+                JOIN gaiadr3.astrophysical_parameters AS dr3_astro ON dr3.source_id = dr3_astro.source_id
                 WHERE dr2.source_id IN {formatted_ids} {extra_conditions}"""
         )
     else:
         query = (
             selection
             + f"""
-                 FROM gaiadr3.gaia_source_lite as dr3 
-                 JOIN gaiadr3.astrophysical_parameters AS dr3_astro ON dr3.source_id = dr3_astro.source_id 
+                 FROM gaiadr3.gaia_source_lite as dr3
+                 JOIN gaiadr3.astrophysical_parameters AS dr3_astro ON dr3.source_id = dr3_astro.source_id
                  WHERE source_id in {formatted_ids} {extra_conditions}"""
         )
 
