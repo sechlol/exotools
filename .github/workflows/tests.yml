@@ -16,7 +16,7 @@ jobs:
         python-version: ['3.10', '3.11', '3.12', '3.13']
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
@@ -29,14 +29,13 @@ jobs:
         pip install pytest pytest-cov
         pip install -e .
         
-    - name: Test with pytest
-      run: |
-        pytest --cov=exotools tests/ --cov-report=xml
+    - name: Run tests and collect coverage
+      run: pytest --cov=exotools --cov-report=xml:coverage.xml tests/
         
     - name: Upload coverage reports to Codecov
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
       uses: codecov/codecov-action@v5
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        slug: sechlol/exotools
-        file: ./coverage.xml
-        fail_ci_if_error: false
+        files: ./coverage.xml
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
