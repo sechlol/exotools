@@ -16,22 +16,22 @@ TEST_ASSETS_QTABLES = _TEST_ASSETS_DIR / "qtables"
 TEST_ASSETS_LC = _TEST_ASSETS_DIR / "lightcurves"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def all_test_qtables() -> dict[str, QTable]:
     return load_all_test_qtables()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def all_test_headers() -> dict[str, QTableHeader]:
     return load_all_test_headers()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def all_test_qtables_and_headers() -> dict[str, tuple[QTable, QTableHeader]]:
     return load_all_test_qtables_and_headers()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def all_test_lightcurves() -> dict[str, LightCurve]:
     return load_all_test_lightcurves()
 
@@ -78,32 +78,32 @@ def load_all_test_qtables_and_headers() -> dict[str, tuple[QTable, QTableHeader]
 
 
 # Dataset-specific fixtures for testing
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def known_exoplanets_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
     """Test data for known exoplanets dataset"""
     return all_test_qtables_and_headers["known_exoplanets"]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def candidate_exoplanets_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
     """Test data for candidate exoplanets dataset"""
     return all_test_qtables_and_headers["candidate_exoplanets"]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def gaia_parameters_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
     """Test data for gaia parameters dataset"""
     return all_test_qtables_and_headers["gaia_known_exoplanets"]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def tess_observations_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
     """Test data for TESS observations dataset"""
     return all_test_qtables_and_headers["tess_observations"]
 
 
-@pytest.fixture(scope="session")
-def lightcurve_test_paths() -> dict[int, list[Path]]:
+@pytest.fixture(scope="module")
+def lightcurve_test_paths() -> dict[int, Path]:
     """Test paths for lightcurve FITS files"""
     path_map = {}
 
@@ -117,7 +117,7 @@ def lightcurve_test_paths() -> dict[int, list[Path]]:
     return path_map
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def lightcurve_test_data(lightcurve_test_paths) -> dict[int, dict[int, LightCurve]]:
     """Test data for lightcurve dataset, organized by TIC ID and observation ID"""
     lc_data = {}

@@ -22,7 +22,7 @@ def another_storage_wrapper():
 class TestMemoryStorage:
     def setup_method(self):
         """Clear class memory before each test method"""
-        MemoryStorage._memory = {}
+        MemoryStorage.clear()
 
     def test_read_and_write_json(self, storage_wrapper):
         w = storage_wrapper
