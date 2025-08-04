@@ -16,7 +16,7 @@ class CandidateDB(BaseDB):
 
     @property
     def tic_ids(self) -> np.ndarray:
-        return self._masked_ds["tic_id"].value
+        return self.view["tic_id"].value
 
     @property
     def unique_tic_ids(self) -> np.ndarray:

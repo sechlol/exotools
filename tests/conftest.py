@@ -5,15 +5,19 @@ import pytest
 from astropy.table import QTable
 from lightkurve import LightCurve
 
+from exotools import ExoDB
+from exotools.datasets._exoplanet_dataset_reducer import reduce_exoplanet_dataset
 from exotools.db.lightcurve_db import load_lightcurve
+from exotools.io import EcsvStorage
 from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
 
 _CURRENT_DIR = Path(os.path.realpath(__file__)).parent
-_TEST_ASSETS_DIR = _CURRENT_DIR / "test_assets"
+_TEST_ASSETS_DIR = _CURRENT_DIR / "assets"
 
 TEST_TMP_DIR = _CURRENT_DIR / "tmp"
 TEST_ASSETS_QTABLES = _TEST_ASSETS_DIR / "qtables"
 TEST_ASSETS_LC = _TEST_ASSETS_DIR / "lightcurves"
+_TEST_STORAGE = EcsvStorage(TEST_ASSETS_QTABLES)
 
 
 @pytest.fixture(scope="module")
@@ -41,7 +45,7 @@ def load_all_test_qtables() -> dict[str, QTable]:
     qtables = {}
     for path in TEST_ASSETS_QTABLES.iterdir():
         if path.suffix == ".ecsv":
-            qtables[path.stem] = QTable.read(path)
+            qtables[path.stem] = _TEST_STORAGE.read_qtable(path.stem)
     return qtables
 
 
@@ -94,13 +98,32 @@ def candidate_exoplanets_test_data(all_test_qtables_and_headers) -> tuple[QTable
 @pytest.fixture(scope="module")
 def gaia_parameters_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
     """Test data for gaia parameters dataset"""
-    return all_test_qtables_and_headers["gaia_known_exoplanets"]
+    return all_test_qtables_and_headers["gaia"]
 
 
 @pytest.fixture(scope="module")
 def tess_observations_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
     """Test data for TESS observations dataset"""
     return all_test_qtables_and_headers["tess_observations"]
+
+
+@pytest.fixture(scope="module")
+def tess_tic_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
+    """Test data for TESS observations dataset"""
+    return all_test_qtables_and_headers["tess_tic"]
+
+
+@pytest.fixture(scope="module")
+def tess_tic_by_id_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
+    """Test data for TESS observations dataset"""
+    return all_test_qtables_and_headers["tess_tic_by_id"]
+
+
+@pytest.fixture(scope="module")
+def star_system_test_data(known_exoplanets_test_data) -> tuple[QTable, QTableHeader]:
+    """Test data for StarSystem dataset"""
+    exo_db = ExoDB(exoplanets_dataset=known_exoplanets_test_data[0])
+    return reduce_exoplanet_dataset(exo_db)
 
 
 @pytest.fixture(scope="module")

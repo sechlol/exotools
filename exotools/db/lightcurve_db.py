@@ -45,7 +45,7 @@ class LightcurveDB(BaseDB):
         return LightcurveDB(dataset)
 
     def select_by_tic_ids(self, tic_ids: np.ndarray) -> Self:
-        return self.select_by_mask(np.isin(self.view["tic_id"], tic_ids))
+        return self.where(tic_id=tic_ids)
 
     def load_by_tic(self, tic_id: int, start_time_at_zero: bool = False) -> Optional[list[LightCurvePlus]]:
         paths = self.view[["path", "obs_id"]][self.view["tic_id"] == tic_id]

@@ -1,20 +1,28 @@
+import logging
 from abc import ABC, abstractmethod
+from typing import Sequence
 
 import numpy as np
 import pandas as pd
 from astropy.table import QTable
 from typing_extensions import Self
 
+logger = logging.getLogger(__name__)
+
 NAN_VALUE = -1
 
 
 class BaseDB(ABC):
     def __init__(self, dataset: QTable, id_field: str):
-        dataset.add_index(id_field)
+        if len(dataset.columns) == 0:
+            raise ValueError("Attempting to create BaseDB with empty column set.")
+
+        # An empty dataset with columns but no data is a valid dataset
+        if len(dataset) != 0:
+            dataset.add_index(id_field)
+
         self._ds = dataset
         self._id_column = id_field
-        self._id_mask = self._ds[self._id_column] != NAN_VALUE
-        self._masked_ds = self._ds[self._id_mask]
 
     def __len__(self):
         return len(self.view)
@@ -31,47 +39,36 @@ class BaseDB(ABC):
     def dataset_copy(self) -> QTable:
         return self._ds.copy()
 
-    @property
-    def ids(self) -> np.ndarray:
-        return self._masked_ds[self._id_column].value
+    def where(self, **kwargs) -> Self:
+        """
+        Filters the data by the given fields.
+        """
+        conditions = np.ones(len(self._ds), dtype=bool)
 
-    @property
-    def unique_ids(self) -> np.ndarray:
-        return np.unique(self.ids)
+        for field_name, value in kwargs.items():
+            if field_name in self._ds.colnames:
+                # Check if value is a sequence-like object (list, tuple, numpy array, etc.)
+                if isinstance(value, (Sequence, np.ndarray)) and not isinstance(value, (str, bytes)):
+                    conditions &= np.isin(self._ds[field_name], value)
+                else:
+                    conditions &= self._ds[field_name] == value
+        return self._factory(self._ds[conditions])
 
-    def match_ids(self, other_ids: np.ndarray) -> np.ndarray:
-        """
-        Get matching IDs from another id set
-        """
-        return np.isin(self.ids, other_ids)
-
-    def match_field(self, field_name: str, other_values: np.ndarray) -> np.ndarray:
-        """
-        Get matching IDs from another id set
-        """
-        return np.isin(self.view[field_name], other_values)
-
-    def select_by_id(self, other_ids: np.ndarray) -> Self:
-        """
-        Match ids and returns data
-        """
-        matching_ids = self.match_ids(other_ids)
-        return self._factory(self._masked_ds[matching_ids])
-
-    def select_by_mask(self, bit_mask: np.ndarray) -> Self:
+    def where_true(self, bit_mask: np.ndarray) -> Self:
         """
         Returns data that matches the mask
         """
         return self._factory(self._ds[bit_mask])
 
-    def select_random_sample(self, n: int, unique_ids: bool = True) -> Self:
-        if unique_ids:
-            return self.select_by_id(np.random.choice(self.unique_ids, size=n, replace=False))
+    def with_valid_ids(self) -> Self:
+        valid_id_mask = self._ds[self._id_column] != NAN_VALUE
+        return self.where_true(valid_id_mask)
 
-        random_indices = np.random.choice(len(self.view), size=n, replace=False)
-        return self._factory(self.view[random_indices])
+    def select_random_sample(self, n: int) -> Self:
+        random_indices = np.random.choice(len(self._ds), size=n, replace=False)
+        return self._factory(self._ds[random_indices])
 
     def to_pandas(self) -> pd.DataFrame:
-        if len(self.view) == 0:
+        if len(self._ds) == 0:
             return pd.DataFrame()
-        return self.view.to_pandas().reset_index()
+        return self._ds.to_pandas().reset_index()

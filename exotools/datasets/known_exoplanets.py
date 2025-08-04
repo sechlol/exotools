@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence
 
 import numpy as np
 from astropy.table import QTable
@@ -126,6 +126,7 @@ class KnownExoplanetsDataset(BaseDataset):
         store: bool = True,
         limit: Optional[int] = None,
         columns: Optional[Sequence[str]] = None,
+        where: Optional[dict[str, Any | list[Any]]] = None,
     ) -> ExoDB:
         """
         Download known exoplanets data from NASA Exoplanet Archive.
@@ -138,6 +139,7 @@ class KnownExoplanetsDataset(BaseDataset):
             store: Whether to store the downloaded data in the storage backend. Default is True.
             limit: Maximum number of exoplanets to retrieve. Default is None (no limit).
             columns: Specific columns to retrieve. Default is None (all available columns).
+            where: Additional filters to apply to the data.
 
         Returns:
             Database object containing the downloaded exoplanets data.
@@ -148,7 +150,7 @@ class KnownExoplanetsDataset(BaseDataset):
         """
         logger.info("Preparing to download known exoplanets dataset...")
         # TODO: some columns are mandatory for data processing, add an exception or add them as default
-        exo_qtable, exo_header = KnownExoplanetsDownloader().download(limit=limit, columns=columns)
+        exo_qtable, exo_header = KnownExoplanetsDownloader().download(limit=limit, columns=columns, where=where)
 
         if store:
             self._storage.write_qtable(table=exo_qtable, header=exo_header, table_name=self.name, override=True)

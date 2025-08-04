@@ -6,9 +6,8 @@ from astropy.table import QTable
 
 from exotools.io.fs_storage import EcsvStorage, FeatherStorage
 from exotools.utils.qtable_utils import QTableHeader, get_header_from_table
-
-from .conftest import TEST_TMP_DIR
-from .utils.comparison import compare_qtables
+from tests.conftest import TEST_TMP_DIR
+from tests.utils.comparison import compare_qtables
 
 _TEST_DIR = TEST_TMP_DIR / "fs_test"
 _TEST_HDF5 = _TEST_DIR / "test.hdf5"
@@ -151,8 +150,8 @@ class TestFsStorage:
             w.write_qtable(test_qtable, test_header, name)
             read_qtable = w.read_qtable(name)
             read_header = w.read_qtable_header(name)
-            assert compare_qtables(test_qtable, read_qtable)
-            assert test_header == read_header
+            assert compare_qtables(test_qtable, read_qtable), f"QTables do not match for {name}"
+            assert test_header == read_header, f"Headers do not match for {name}"
 
     def test_read_qtable_nonexistent(self, storage_wrapper):
         w = storage_wrapper

@@ -59,7 +59,7 @@ class DatasetDownloader(ABC):
         """
 
         # Download
-        raw_data = self._download(limit=limit, kwargs=kwargs)
+        raw_data = self._download(limit=limit, **kwargs)
 
         # Fix table units
         cleaned_table = self._clean_and_fix(raw_data)
@@ -81,7 +81,7 @@ class DatasetDownloader(ABC):
             QTable: Downloaded data as a QTable.
         """
         # Download
-        raw_data = self._download_by_id(ids=ids, kwargs=kwargs)
+        raw_data = self._download_by_id(ids=ids, **kwargs)
 
         # Fix table units
         cleaned_table = self._clean_and_fix(raw_data)
