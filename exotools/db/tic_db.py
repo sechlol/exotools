@@ -1,3 +1,4 @@
+import numpy as np
 from astropy.table import QTable
 from typing_extensions import Self
 
@@ -23,3 +24,19 @@ class TicDB(BaseDB):
 
     def _factory(self, dataset: QTable) -> Self:
         return TicDB(dataset)
+
+    @property
+    def tic_ids(self) -> np.ndarray:
+        return self.view["tic_id"].value
+
+    @property
+    def gaia_ids(self) -> np.ndarray:
+        return self.view["gaia_id"].value
+
+    @property
+    def unique_tic_ids(self) -> np.ndarray:
+        return np.unique(self.tic_ids)
+
+    @property
+    def unique_gaia_ids(self) -> np.ndarray:
+        return np.unique(self.gaia_ids)
