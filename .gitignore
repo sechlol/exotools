@@ -1,3 +1,5 @@
+tests/assets/lightcurves
+
 .DS_Store
 tmp/
 # Pyenv

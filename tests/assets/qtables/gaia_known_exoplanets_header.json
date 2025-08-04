@@ -1,0 +1,140 @@
+{
+    "teff_gspphot": {
+        "description": "Effective temperature from GSP-Phot Aeneas best library using BP/RP spectra",
+        "unit": "K",
+        "dtype": "float",
+        "time_info": null
+    },
+    "mh_gspphot": {
+        "description": "Iron abundance from GSP-Phot Aeneas best library using BP/RP spectra",
+        "unit": "dex",
+        "dtype": "float",
+        "time_info": null
+    },
+    "distance_gspphot": {
+        "description": "Distance from GSP-Phot Aeneas best library using BP/RP spectra",
+        "unit": "pc",
+        "dtype": "float",
+        "time_info": null
+    },
+    "mg_gspphot": {
+        "description": "Absolute magnitude $M_{\\rm G}$ from GSP-Phot Aeneas best library using BP/RP spectra",
+        "unit": "mag",
+        "dtype": "float",
+        "time_info": null
+    },
+    "radius_gspphot": {
+        "description": "Radius from GSP-Phot Aeneas best library using BP/RP spectra",
+        "unit": "solRad",
+        "dtype": "float",
+        "time_info": null
+    },
+    "teff_gspspec": {
+        "description": "Effective temperature from GSP-Spec MatisseGauguin using RVS spectra and Monte Carlo realisations",
+        "unit": "K",
+        "dtype": "float",
+        "time_info": null
+    },
+    "teff_esphs": {
+        "description": "Effective temperature from ESP-HS",
+        "unit": "K",
+        "dtype": "float",
+        "time_info": null
+    },
+    "spectraltype_esphs": {
+        "description": "Spectral type from ESP-ELS",
+        "unit": null,
+        "dtype": "char",
+        "time_info": null
+    },
+    "teff_espucd": {
+        "description": "Effective temperature estimate from ESP-UCD based on the RP spectrum",
+        "unit": "K",
+        "dtype": "float",
+        "time_info": null
+    },
+    "radius_flame": {
+        "description": "Radius of the star from FLAME using {\\tt teffGspphot} and {\\tt lumFlame}",
+        "unit": "solRad",
+        "dtype": "float",
+        "time_info": null
+    },
+    "lum_flame": {
+        "description": "Luminosity of the star from FLAME using G band magnitude, extinction ({\\tt agGspphot}),  parallax or distance, and a bolometric correction {\\tt bcFlame}",
+        "unit": "solLum",
+        "dtype": "float",
+        "time_info": null
+    },
+    "mass_flame": {
+        "description": "Mass of the star from FLAME using stellar models, {\\tt lumFlame}, and {\\tt teffGspphot}",
+        "unit": "solMass",
+        "dtype": "float",
+        "time_info": null
+    },
+    "age_flame": {
+        "description": "Age of the star from FLAME using stellar models, see {\\tt massFlame} for details",
+        "unit": "Gyr",
+        "dtype": "float",
+        "time_info": null
+    },
+    "distance_msc": {
+        "description": "Distance from MSC using BP/RP spectra and parallax",
+        "unit": "pc",
+        "dtype": "float",
+        "time_info": null
+    },
+    "teff_msc1": {
+        "description": "Effective temperature of the primary from MSC using BP/RP spectra and parallax",
+        "unit": "K",
+        "dtype": "float",
+        "time_info": null
+    },
+    "teff_msc2": {
+        "description": "Effective temperature of the secondary from MSC using BP/RP spectra and parallax",
+        "unit": "K",
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_g_mean_flux_over_error": {
+        "description": "G-band mean flux divided by its error",
+        "unit": null,
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_g_mean_mag": {
+        "description": "G-band mean magnitude",
+        "unit": "mag",
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_bp_mean_flux_over_error": {
+        "description": "Integrated BP mean flux divided by its error",
+        "unit": null,
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_bp_mean_mag": {
+        "description": "Integrated BP mean magnitude",
+        "unit": "mag",
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_rp_mean_flux_over_error": {
+        "description": "Integrated RP mean flux divided by its error",
+        "unit": null,
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_rp_mean_mag": {
+        "description": "Integrated RP mean magnitude",
+        "unit": "mag",
+        "dtype": "float",
+        "time_info": null
+    },
+    "phot_variable_flag": {
+        "description": "Photometric variability flag",
+        "unit": null,
+        "dtype": "char",
+        "time_info": null
+    }
+}

@@ -1,4 +1,16 @@
 {
+    "tic_id": {
+        "description": "TIC ID",
+        "unit": null,
+        "dtype": "<i8",
+        "time_info": null
+    },
+    "gaia_id": {
+        "description": "GAIA ID",
+        "unit": null,
+        "dtype": "<i8",
+        "time_info": null
+    },
     "pl_name": {
         "description": "Planet Name",
         "unit": null,
@@ -27,12 +39,6 @@
         "description": "HIP ID",
         "unit": null,
         "dtype": "|O",
-        "time_info": null
-    },
-    "tic_id": {
-        "description": "TIC ID",
-        "unit": null,
-        "dtype": "<i8",
         "time_info": null
     },
     "default_flag": {
@@ -1677,12 +1683,6 @@
         "description": "True Obliquity Limit Flag",
         "unit": null,
         "dtype": "<i4",
-        "time_info": null
-    },
-    "gaia_id": {
-        "description": "GAIA ID",
-        "unit": null,
-        "dtype": "<i8",
         "time_info": null
     },
     "cb_flag": {

@@ -113,7 +113,7 @@ from exotools import TessDataset
 
 # Download specific records (by tic_id) from TIC dataset to access TESS data products
 tess_dataset = TessDataset(storage=storage)
-tess_meta = tess_dataset.download_observation_metadata(targets_tic_id=exo_db.unique_ids)
+tess_meta = tess_dataset.download_observation_metadata(targets_tic_id=exo_db.unique_tic_ids)
 
 ```
 

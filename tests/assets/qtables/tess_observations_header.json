@@ -1,5 +1,5 @@
 {
-    "obs_id": {
+    "dataURL": {
         "description": "---",
         "unit": null,
         "dtype": null,
@@ -11,13 +11,7 @@
         "dtype": null,
         "time_info": null
     },
-    "dataURL": {
-        "description": "---",
-        "unit": null,
-        "dtype": null,
-        "time_info": null
-    },
-    "t_max": {
+    "t_min": {
         "description": "---",
         "unit": null,
         "dtype": null,
@@ -29,7 +23,13 @@
         "dtype": null,
         "time_info": null
     },
-    "t_min": {
+    "t_max": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "obs_id": {
         "description": "---",
         "unit": null,
         "dtype": null,
