@@ -14,6 +14,22 @@ class GaiaDB(BaseDB):
     def __init__(self, gaia_dataset: QTable):
         super().__init__(gaia_dataset, id_field=_ID_FIELD)
 
+    @property
+    def tic_ids(self) -> np.ndarray:
+        return self.view["tic_id"].value
+
+    @property
+    def gaia_ids(self) -> np.ndarray:
+        return self.view["gaia_ids"].value
+
+    @property
+    def unique_tic_ids(self) -> np.ndarray:
+        return np.unique(self.tic_ids)
+
+    @property
+    def unique_gaia_ids(self) -> np.ndarray:
+        return np.unique(self.gaia_ids)
+
     @staticmethod
     def impute_radius(dataset: QTable) -> QTable:
         """

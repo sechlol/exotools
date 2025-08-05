@@ -28,7 +28,6 @@ class GaiaParametersDataset(BaseDataset):
             gaia_qtable = self._storage.read_qtable(table_name=self.name)
             return self._create_gaia_db(gaia_qtable)
         except ValueError:
-            logger.error("Gaia dataset not found. You need to download it first by calling download_gaia_parameters().")
             return None
 
     def download_gaia_parameters(self, gaia_ids: Sequence[int], store: bool = True) -> GaiaDB:
@@ -58,15 +57,6 @@ class GaiaParametersDataset(BaseDataset):
 
     @staticmethod
     def _create_gaia_db(gaia_dataset: QTable) -> GaiaDB:
-        """
-        Create a GaiaDB instance from a QTable dataset.
-
-        Args:
-            gaia_dataset: QTable containing Gaia data.
-
-        Returns:
-            GaiaDB: Database containing processed Gaia parameters.
-        """
         GaiaDB.impute_radius(gaia_dataset)
         GaiaDB.compute_mean_temperature(gaia_dataset)
         GaiaDB.compute_habitable_zone(gaia_dataset)

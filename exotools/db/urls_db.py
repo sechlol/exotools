@@ -25,8 +25,24 @@ class TessMetaDB(BaseDB):
         super().__init__(meta_dataset, id_field=_ID_FIELD)
 
     @property
-    def obs_id(self):
+    def tic_ids(self) -> np.ndarray:
+        return self.view["tic_id"].value
+
+    @property
+    def obs_id(self) -> np.ndarray:
         return self.view["obs_id"].value
+
+    @property
+    def unique_tic_ids(self) -> np.ndarray:
+        return np.unique(self.tic_ids)
+
+    @property
+    def unique_obs_ids(self) -> np.ndarray:
+        return np.unique(self.obs_id)
+
+    @property
+    def data_urls(self):
+        return self.view["dataURL"].value
 
     def _factory(self, dataset: QTable) -> Self:
         return TessMetaDB(dataset)

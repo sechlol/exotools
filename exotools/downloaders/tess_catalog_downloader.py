@@ -161,4 +161,4 @@ class TessCatalogDownloader(DatasetDownloader):
         if self._verbose_log:
             logger.info(message)
         else:
-            logger.trace(message)
+            logger.debug(message)

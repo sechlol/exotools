@@ -54,6 +54,14 @@ class ExoDB(BaseDB):
     def gaia_ids(self) -> np.ndarray:
         return self.view["gaia_id"].value
 
+    @property
+    def unique_tic_ids(self) -> np.ndarray:
+        return np.unique(self.tic_ids)
+
+    @property
+    def unique_gaia_ids(self) -> np.ndarray:
+        return np.unique(self.gaia_ids)
+
     def _factory(self, dataset: QTable) -> Self:
         return ExoDB(dataset)
 

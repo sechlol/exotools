@@ -26,12 +26,20 @@ class LightcurveDB(BaseDB):
         super().__init__(dataset=dataset, id_field="obs_id")
 
     @property
+    def tic_ids(self) -> np.ndarray:
+        return self.view["tic_id"].value
+
+    @property
+    def obs_id(self) -> np.ndarray:
+        return self.view["obs_id"].value
+
+    @property
     def unique_tic_ids(self) -> np.ndarray:
-        return np.unique(self.view["tic_id"].value)
+        return np.unique(self.tic_ids)
 
     @property
     def unique_obs_ids(self) -> np.ndarray:
-        return np.unique(self.view["obs_id"].value)
+        return np.unique(self.obs_id)
 
     def _factory(self, dataset: QTable) -> Self:
         return LightcurveDB(dataset)
