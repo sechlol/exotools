@@ -7,7 +7,7 @@ from exotools import CandidateExoplanetsDataset, KnownExoplanetsDataset, Lightcu
 from exotools.datasets import GaiaParametersDataset
 from exotools.io.fs_storage import EcsvStorage
 from tests.conftest import _TEST_ASSETS_DIR, TEST_ASSETS_LC, TEST_ASSETS_QTABLES
-from tests.utils.comparison import compare_qtables
+from tests.utils.table_comparison import compare_qtables
 
 logger = logging.getLogger(__name__)
 

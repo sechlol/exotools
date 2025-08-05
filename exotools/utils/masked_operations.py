@@ -113,13 +113,14 @@ def safe_average(
 def safe_combine(
     columns: list[Union[MaskedColumn, Column, np.ndarray]],
     combine_func: Callable[[list[Any]], Any],
-    default_mask: bool = True,
+    fill_value: Optional[Any] = None,
 ) -> MaskedColumn:
     """
     Safely combine multiple columns using a custom function, respecting masks.
 
     For each row, the function is applied to unmasked values only.
-    If all values for a row are masked, the result will be masked.
+    If all values for a row are masked, the result will be masked unless
+    a fill_value is provided.
 
     Parameters
     ----------
@@ -127,8 +128,10 @@ def safe_combine(
         List of columns to combine
     combine_func : Callable[[list[Any]], Any]
         Function to apply to unmasked values for each row
-    default_mask : bool, optional
-        Default mask value when no valid values are found, by default True (masked)
+    fill_value : Optional[Any], optional
+        Value to use for rows where all input values are masked, by default None.
+        If None, rows with all masked values will be masked in the output.
+        If provided, these rows will be unmasked and filled with this value.
 
     Returns
     -------
@@ -165,7 +168,7 @@ def safe_combine(
 
     # Initialize result arrays
     result_values = np.zeros(length)
-    result_mask = np.ones(length, dtype=bool) if default_mask else np.zeros(length, dtype=bool)
+    result_mask = np.ones(length, dtype=bool)  # Start with all masked
 
     # For each row
     for i in range(length):
@@ -190,6 +193,10 @@ def safe_combine(
         # If we have valid values, apply the combine function
         if valid_values:
             result_values[i] = combine_func(valid_values)
+            result_mask[i] = False  # Unmask this row
+        elif fill_value is not None:
+            # Use fill value for rows with no valid values
+            result_values[i] = fill_value
             result_mask[i] = False  # Unmask this row
 
     # Create the result column

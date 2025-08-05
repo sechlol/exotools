@@ -4,7 +4,7 @@ from astropy.table import QTable
 
 from exotools.io.memory_storage import MemoryStorage
 from exotools.utils.qtable_utils import QTableHeader, get_header_from_table
-from tests.utils.comparison import compare_qtables
+from tests.utils.table_comparison import compare_qtables
 
 
 @pytest.fixture

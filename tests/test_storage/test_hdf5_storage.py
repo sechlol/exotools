@@ -5,7 +5,7 @@ from astropy.table import QTable
 from exotools.io.hdf5_storage import Hdf5Storage
 from exotools.utils.qtable_utils import QTableHeader, get_header_from_table
 from tests.conftest import TEST_TMP_DIR
-from tests.utils.comparison import compare_qtables
+from tests.utils.table_comparison import compare_qtables
 
 _TEST_FILE = TEST_TMP_DIR / "test.hdf5"
 

@@ -19,7 +19,6 @@ class TapService:
     def __init__(self, url: str):
         self._url = url
         self._service = vo.dal.TAPService(self._url)
-        self._tables: Optional[VOSITables] = None
 
     @property
     def url(self) -> str:

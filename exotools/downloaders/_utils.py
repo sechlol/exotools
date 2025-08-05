@@ -18,5 +18,7 @@ def override_units(table: QTable, unit_overrides: dict[str, u.Unit]):
     """
     Override units that are mistakenly labelled in the source table
     """
+    table_columns = set(table.colnames)
     for c, unit in unit_overrides.items():
-        table[c] = table[c].value * unit
+        if c in table_columns:
+            table[c] = table[c].value * unit

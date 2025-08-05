@@ -1,6 +1,6 @@
 from astropy.table import QTable
 
-from .utils.comparison import compare_qtables
+from tests.utils.table_comparison import compare_qtables
 
 
 class TestUtils:
