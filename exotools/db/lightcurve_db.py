@@ -56,9 +56,8 @@ class LightcurveDB(BaseDB):
         lcs = [LightCurvePlus(load_lightcurve(row["path"]), obs_id=row["obs_id"]) for row in paths]
         lcs = sorted(lcs, key=lambda x: x.time[0])
         if start_time_at_zero:
-            t0 = lcs[0].time_x[0]
             for lc in lcs:
-                lc.shift_time(-t0)
+                lc.start_at_zero()
         return lcs
 
     def load_stitched_by_tic(self, tic_id: int, start_time_at_zero: bool = False) -> Optional[LightCurvePlus]:

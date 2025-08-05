@@ -5,8 +5,8 @@ import pytest
 from astropy.table import QTable
 from lightkurve import LightCurve
 
-from exotools import ExoDB
-from exotools.datasets._exoplanet_dataset_reducer import reduce_exoplanet_dataset
+from exotools import GaiaDB, KnownExoplanetsDataset, StarSystemDB
+from exotools.datasets import GaiaParametersDataset
 from exotools.db.lightcurve_db import load_lightcurve
 from exotools.io import EcsvStorage
 from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
@@ -120,10 +120,15 @@ def tess_tic_by_id_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTab
 
 
 @pytest.fixture(scope="module")
-def star_system_test_data(known_exoplanets_test_data) -> tuple[QTable, QTableHeader]:
+def star_system_test_db() -> StarSystemDB:
     """Test data for StarSystem dataset"""
-    exo_db = ExoDB(exoplanets_dataset=known_exoplanets_test_data[0])
-    return reduce_exoplanet_dataset(exo_db)
+    return KnownExoplanetsDataset(storage=_TEST_STORAGE).load_star_system_dataset()
+
+
+@pytest.fixture(scope="module")
+def gaia_test_db() -> GaiaDB:
+    """Test data for ExoDB dataset"""
+    return GaiaParametersDataset(storage=_TEST_STORAGE).load_gaia_parameters_dataset()
 
 
 @pytest.fixture(scope="module")

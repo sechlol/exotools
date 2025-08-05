@@ -57,26 +57,31 @@ class TestTessMetaDB:
         # Create a dataset with valid obs_id values
         if len(tess_meta_db) > 0:
             # Ensure at least some records have valid obs_id values
-            valid_indices = np.arange(len(tess_meta_db) // 2)
-            test_obs_ids = np.array([101, 102, 103])[: len(valid_indices)]
+            valid_indices = np.arange(3)  # Just use first 3 indices
+            test_obs_ids = np.array([101, 102, 103])
 
-            # Set obs_id values for testing
-            tess_meta_db.view["obs_id"][valid_indices] = test_obs_ids
+            # Make a copy of the view to avoid modifying the original
+            test_db = tess_meta_db._factory(tess_meta_db.view.copy())
+
+            # Set obs_id values for testing (only for the first 3 records)
+            for i, obs_id in zip(valid_indices, test_obs_ids):
+                if i < len(test_db.view):
+                    test_db.view["obs_id"][i] = obs_id
 
             # Test with a single obs_id
-            result = tess_meta_db.select_by_obs_id(np.array([101]))
+            result = test_db.select_by_obs_id(np.array([101]))
             assert isinstance(result, TessMetaDB)
             if len(result) > 0:
                 assert all(obs_id == 101 for obs_id in result.obs_id)
 
             # Test with multiple obs_ids
-            result = tess_meta_db.select_by_obs_id(np.array([101, 102]))
+            result = test_db.select_by_obs_id(np.array([101, 102]))
             assert isinstance(result, TessMetaDB)
             if len(result) > 0:
                 assert all(obs_id in [101, 102] for obs_id in result.obs_id)
 
             # Test with non-existent obs_id
-            result = tess_meta_db.select_by_obs_id(np.array([999]))
+            result = test_db.select_by_obs_id(np.array([999]))
             assert isinstance(result, TessMetaDB)
             assert len(result) == 0
 

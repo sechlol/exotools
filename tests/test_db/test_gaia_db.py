@@ -1,42 +1,36 @@
 import numpy as np
-import pytest
 from astropy.table import MaskedColumn, QTable
 
 from exotools import GaiaDB
-from exotools.utils.qtable_utils import QTableHeader
 
 
 class TestGaiaDb:
-    @pytest.fixture
-    def gaia_db(self, gaia_parameters_test_data: tuple[QTable, QTableHeader]) -> GaiaDB:
-        return GaiaDB(gaia_dataset=gaia_parameters_test_data[0])
-
-    def test_init(self, gaia_db, gaia_parameters_test_data):
+    def test_init(self, gaia_test_db):
         """Test initialization of GaiaDB."""
         # Check that the dataset was properly set
-        assert len(gaia_db) == len(gaia_parameters_test_data[0])
-        assert gaia_db._id_column == "gaia_id"
+        assert len(gaia_test_db) > 0
+        assert gaia_test_db._id_column == "gaia_id"
 
-    def test_gaia_ids_property(self, gaia_db):
+    def test_gaia_ids_property(self, gaia_test_db):
         """Test the gaia_ids property."""
-        gaia_ids = gaia_db.gaia_ids
+        gaia_ids = gaia_test_db.gaia_ids
         assert isinstance(gaia_ids, np.ndarray)
-        assert len(gaia_ids) == len(gaia_db)
+        assert len(gaia_ids) == len(gaia_test_db)
 
-    def test_unique_gaia_ids_property(self, gaia_db):
+    def test_unique_gaia_ids_property(self, gaia_test_db):
         """Test the unique_gaia_ids property."""
-        unique_gaia_ids = gaia_db.unique_gaia_ids
+        unique_gaia_ids = gaia_test_db.unique_gaia_ids
         assert isinstance(unique_gaia_ids, np.ndarray)
-        assert len(unique_gaia_ids) <= len(gaia_db)
+        assert len(unique_gaia_ids) <= len(gaia_test_db)
         # Check that all IDs are unique
         assert len(unique_gaia_ids) == len(set(unique_gaia_ids))
 
-    def test_impute_radius(self, gaia_db):
+    def test_impute_radius(self, gaia_test_db):
         """Test the impute_radius static method."""
         # Create a test dataset with masked values
         test_data = QTable()
-        test_data["radius_flame"] = MaskedColumn([1.0, 2.0, None, 4.0], mask=[False, False, True, False])
-        test_data["radius_gspphot"] = MaskedColumn([1.5, None, 3.0, 4.5], mask=[False, True, False, False])
+        test_data["radius_flame"] = MaskedColumn([1.0, 2.0, -1, 4.0], mask=[False, False, True, False])
+        test_data["radius_gspphot"] = MaskedColumn([1.5, -1, 3.0, 4.5], mask=[False, True, False, False])
 
         # Apply the impute_radius method
         result = GaiaDB.impute_radius(test_data)
@@ -50,7 +44,7 @@ class TestGaiaDb:
         assert result["radius"][2] == 3.0  # Only radius_gspphot available
         assert result["radius"][3] == 4.25  # Average of 4.0 and 4.5
 
-    def test_compute_mean_temperature(self, gaia_db):
+    def test_compute_mean_temperature(self, gaia_test_db):
         """Test the compute_mean_temperature static method."""
         # Create a test dataset
         test_data = QTable()
@@ -72,7 +66,7 @@ class TestGaiaDb:
         assert result["teff_mean"][1] == 6250.0  # Average of all temperatures for second row
         assert result["teff_mean"][2] == 7250.0  # Average of all temperatures for third row
 
-    def test_compute_habitable_zone(self, gaia_db):
+    def test_compute_habitable_zone(self, gaia_test_db):
         """Test the compute_habitable_zone static method."""
         # Create a test dataset
         test_data = QTable()
