@@ -68,6 +68,9 @@ class BaseDB(ABC):
         random_indices = np.random.choice(len(self._ds), size=n, replace=False)
         return self._factory(self._ds[random_indices])
 
+    def append(self, other: Self) -> Self:
+        return self._factory(QTable(np.concatenate([self._ds, other._ds])))
+
     def to_pandas(self) -> pd.DataFrame:
         if len(self._ds) == 0:
             return pd.DataFrame()
