@@ -325,7 +325,7 @@ class TestDatasets:
             tess_meta_db = TicObsDB(tess_qtable)
 
             # Test downloading lightcurves from TessMetaDB
-            lc_db = dataset.download_lightcurves_from_tess_db(tess_db=tess_meta_db)
+            lc_db = dataset.download_lightcurves_from_tic_db(tic_obs_db=tess_meta_db)
 
             # Verify downloader was called correctly
             mock_downloader.download_fits_parallel.assert_called_once()
