@@ -85,6 +85,39 @@ class TestTessMetaDB:
             assert isinstance(result, TessMetaDB)
             assert len(result) == 0
 
+    def test_select_by_tic_id(self, tess_meta_db):
+        """Test the select_by_tic_id method."""
+        # Create a dataset with valid tic_id values
+        if len(tess_meta_db) > 0:
+            # Ensure at least some records have valid obs_id values
+            valid_indices = np.arange(3)  # Just use first 3 indices
+            test_tic_ids = np.array([101, 102, 103])
+
+            # Make a copy of the view to avoid modifying the original
+            test_db = tess_meta_db._factory(tess_meta_db.view.copy())
+
+            # Set tic_id values for testing (only for the first 3 records)
+            for i, tic_id in zip(valid_indices, test_tic_ids):
+                if i < len(test_db.view):
+                    test_db.view["tic_id"][i] = tic_id
+
+            # Test with a single tic_id
+            result = test_db.select_by_tic_id(np.array([101]))
+            assert isinstance(result, TessMetaDB)
+            if len(result) > 0:
+                assert all(tic_id == 101 for tic_id in result.tic_ids)
+
+            # Test with multiple tic_ids
+            result = test_db.select_by_tic_id(np.array([101, 102]))
+            assert isinstance(result, TessMetaDB)
+            if len(result) > 0:
+                assert all(tic_id in [101, 102] for tic_id in result.tic_ids)
+
+            # Test with non-existent tic_id
+            result = test_db.select_by_tic_id(np.array([999]))
+            assert isinstance(result, TessMetaDB)
+            assert len(result) == 0
+
     def test_inherited_methods(self, tess_meta_db):
         """Test that inherited methods from BaseDB work correctly."""
         # Test where method

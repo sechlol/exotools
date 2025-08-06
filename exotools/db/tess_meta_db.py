@@ -51,3 +51,8 @@ class TessMetaDB(BaseDB):
         masked_ds = self.view[self.view["obs_id"] != NAN_VALUE]
         selection = np.isin(masked_ds["obs_id"], other_obs_id)
         return self._factory(masked_ds[selection])
+
+    def select_by_tic_id(self, other_tic_ids: np.ndarray) -> Self:
+        masked_ds = self.view[self.view["tic_id"] != NAN_VALUE]
+        selection = np.isin(masked_ds["tic_id"], other_tic_ids)
+        return self._factory(masked_ds[selection])
