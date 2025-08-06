@@ -9,17 +9,14 @@ from exotools.utils.download import DownloadParams
 
 class TestLightcurveDownloader:
     @pytest.fixture
-    def download_params(self) -> list[DownloadParams]:
+    def download_params(self, lightcurve_test_paths: dict[int, Path]) -> list[DownloadParams]:
         """Create test download parameters"""
         return [
             DownloadParams(
-                url="https://example.com/test1.fits",
-                download_path="/tmp/test/123456789/1000.fits",
-            ),
-            DownloadParams(
-                url="https://example.com/test2.fits",
-                download_path="/tmp/test/987654321/2000.fits",
-            ),
+                url=f"https://test.com/{tic}.fits",
+                download_path=str(path),
+            )
+            for tic, path in lightcurve_test_paths.items()
         ]
 
     def test_download_one_lc(self, download_params):
