@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import numpy as np
+import pytest
 
 from exotools.datasets import (
     CandidateExoplanetsDataset,
@@ -15,6 +16,10 @@ from .conftest import TEST_ASSETS_LC
 
 
 class TestDatasets:
+    @staticmethod
+    def teardown_method():
+        TessDataset._catalog_downloader = None
+
     def test_known_exoplanets_dataset(self, known_exoplanets_test_data, gaia_parameters_test_data):
         """Test KnownExoplanetsDataset with mocked downloader"""
         qtable, header = known_exoplanets_test_data
@@ -128,6 +133,64 @@ class TestDatasets:
             assert loaded_db is not None
             assert len(loaded_db._ds) == len(qtable)
 
+    def test_tess_authentication(self):
+        """Test that authentication is required for TIC queries but not for metadata queries"""
+        storage = MemoryStorage()
+
+        # Create mock QTables with proper structure
+        import numpy as np
+        from astropy.table import QTable
+
+        # Create a simple mock QTable for observations with required columns
+        mock_obs_qtable = QTable(
+            {"tic_id": np.array([123456, 789012], dtype=int), "sector": np.array([1, 2], dtype=int)}
+        )
+        mock_obs_header = MagicMock()
+
+        # Create a simple mock QTable for TIC data with required columns
+        mock_tic_qtable = QTable({"tic_id": np.array([123456], dtype=int), "mass": np.array([1.0], dtype=float)})
+        mock_tic_header = MagicMock()
+
+        # Mock the downloaders
+        with patch("exotools.datasets.tess.TessObservationsDownloader") as mock_obs_downloader_class:
+            mock_obs_downloader = MagicMock()
+            mock_obs_downloader.download_by_id.return_value = (mock_obs_qtable, mock_obs_header)
+            mock_obs_downloader_class.return_value = mock_obs_downloader
+
+            with patch("exotools.datasets.tess.TessCatalogDownloader") as mock_cat_downloader_class:
+                mock_cat_downloader = MagicMock()
+                mock_cat_downloader.download_by_id.return_value = (mock_tic_qtable, mock_tic_header)
+                mock_cat_downloader.download.return_value = (mock_tic_qtable, mock_tic_header)
+                mock_cat_downloader_class.return_value = mock_cat_downloader
+
+                # Create dataset
+                dataset = TessDataset(storage=storage)
+
+                # 1. Test that metadata can be queried without authentication
+                test_tic_ids = [123456, 789012]
+                dataset.download_observation_metadata(targets_tic_id=test_tic_ids)
+                mock_obs_downloader.download_by_id.assert_called_once_with(test_tic_ids)
+
+                # 2. Test that TIC queries fail without authentication
+                with pytest.raises(ValueError, match="You need to call TessDataset.authenticate()"):
+                    dataset.download_tic_targets(limit=10)
+
+                with pytest.raises(ValueError, match="You need to call TessDataset.authenticate()"):
+                    dataset.download_tic_targets_by_ids(tic_ids=[123456])
+
+                # 3. Test that authentication enables TIC queries
+                TessDataset.authenticate_casjobs(username="test_user", password="test_pass")
+
+                # Verify that the catalog downloader was created with the right credentials
+                mock_cat_downloader_class.assert_called_once_with(username="test_user", password="test_pass")
+
+                # Now TIC queries should work
+                dataset.download_tic_targets(limit=10)
+                mock_cat_downloader.download.assert_called_once_with(limit=10)
+
+                dataset.download_tic_targets_by_ids(tic_ids=[123456])
+                mock_cat_downloader.download_by_id.assert_called_once_with([123456])
+
     def test_tess_dataset(self, tess_observations_test_data):
         """Test TessDataset with mocked downloaders"""
         qtable, header = tess_observations_test_data
@@ -147,7 +210,7 @@ class TestDatasets:
                 mock_cat_downloader_class.return_value = mock_cat_downloader
 
                 # Test dataset
-                dataset = TessDataset(storage=storage, username="test_user", password="test_pass")
+                dataset = TessDataset(storage=storage)
 
                 # Test download observation metadata
                 test_tic_ids = [123456, 789012, 345678]
@@ -173,6 +236,8 @@ class TestDatasets:
                 assert len(loaded_db._ds) == len(qtable)
 
                 # Test download_tic_targets
+                TessDataset.authenticate_casjobs("username", "password")
+
                 test_limit = 50
                 test_mass_range = (0.8, 1.2)
                 test_priority = 0.5

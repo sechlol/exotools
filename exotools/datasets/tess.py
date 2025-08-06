@@ -1,6 +1,8 @@
 import logging
 from typing import Optional, Sequence
 
+from astroquery import mast
+
 from exotools.datasets.base_dataset import BaseDataset
 from exotools.db import TessMetaDB, TicDB
 from exotools.downloaders import TessCatalogDownloader, TessObservationsDownloader
@@ -19,13 +21,12 @@ class TessDataset(BaseDataset):
     """
 
     _DATASET_TESS = "tess"
+    _catalog_downloader: Optional[TessCatalogDownloader] = None
 
     def __init__(
         self,
         dataset_tag: Optional[str] = None,
         storage: Optional[BaseStorage] = None,
-        username: Optional[str] = None,
-        password: Optional[str] = None,
     ):
         """
         Initialize a TessDataset instance.
@@ -34,15 +35,39 @@ class TessDataset(BaseDataset):
             dataset_tag: Tag to identify this specific dataset instance, it will be used as a postfix for all the
                 storage keys.
             storage: Storage backend for persisting dataset information. Defaults to in-memory storage.
+        """
+        super().__init__(dataset_name=self._DATASET_TESS, dataset_tag=dataset_tag, storage=storage)
+        self._observations_name = self.name + "_observations"
+        self._tic_name = self.name + "_tic"
+
+    @classmethod
+    def authenticate_casjobs(cls, username: str, password: str):
+        """
+        Authenticate with the MAST CasJobs service using the provided username and password.
+        Authentication is required for querying the TIC
+
+        Create an account at
+        https://mastweb.stsci.edu/mcasjobs/CreateAccount.aspx
+
+        Args:
             username: MAST username for authentication. Optional for fetching observation metadata, but required for
                 querying the TIC.
             password: MAST password for authentication. Optional for fetching observation metadata, but required for
                 querying the TIC.
         """
-        super().__init__(dataset_name=self._DATASET_TESS, dataset_tag=dataset_tag, storage=storage)
-        self._catalog_downloader = TessCatalogDownloader(username, password) if username and password else None
-        self._observations_name = self.name + "_observations"
-        self._tic_name = self.name + "_tic"
+        cls._catalog_downloader = TessCatalogDownloader(username=username, password=password)
+
+    @classmethod
+    def authenticate_mast(cls, mast_token: str):
+        """
+        Authenticate with the MAST archive using the provided MAST token.
+        Get a MAST token from https://auth.mast.stsci.edu/tokens
+
+        Args:
+            mast_token: MAST token for authentication.
+        """
+        mast.Observations.login(token=mast_token)
+        mast.Catalogs.login(token=mast_token)
 
     def download_observation_metadata(
         self, targets_tic_id: Sequence[int], store: bool = True, with_name: Optional[str] = None
@@ -105,7 +130,7 @@ class TessDataset(BaseDataset):
             download fails.
         """
         if self._catalog_downloader is None:
-            raise ValueError("You need to provide a username and password to download the TIC dataset.")
+            raise ValueError("You need to call TessDataset.authenticate() to query the TIC dataset.")
         if star_mass_range is not None:
             self._catalog_downloader.star_mass_range = star_mass_range
         if priority_threshold is not None:
@@ -142,7 +167,7 @@ class TessDataset(BaseDataset):
             download fails.
         """
         if self._catalog_downloader is None:
-            raise ValueError("You need to provide a username and password to download the TIC dataset.")
+            raise ValueError("You need to call TessDataset.authenticate() to query the TIC dataset.")
         catalog_qtable, catalog_header = self._catalog_downloader.download_by_id(tic_ids)
 
         if store:

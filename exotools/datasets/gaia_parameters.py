@@ -2,6 +2,7 @@ import logging
 from typing import Optional, Sequence
 
 from astropy.table import QTable
+from astroquery.gaia import Gaia
 
 from exotools.datasets.base_dataset import BaseDataset
 from exotools.db import GaiaDB
@@ -16,6 +17,10 @@ class GaiaParametersDataset(BaseDataset):
 
     def __init__(self, dataset_tag: Optional[str] = None, storage: Optional[BaseStorage] = None):
         super().__init__(dataset_name=self._DATASET_GAIA, dataset_tag=dataset_tag, storage=storage)
+
+    @staticmethod
+    def authenticate(username: str, password: str):
+        Gaia.login(user=username, password=password)
 
     def load_gaia_parameters_dataset(self, with_name: Optional[str] = None) -> Optional[GaiaDB]:
         """
