@@ -43,9 +43,10 @@ class TessDataset(BaseDataset):
         self._catalog_downloader = TessCatalogDownloader(username, password) if username and password else None
         self._observations_name = self.name + "_observations"
         self._tic_name = self.name + "_tic"
-        self._tic_by_id_name = self.name + "_tic_by_id"
 
-    def download_observation_metadata(self, targets_tic_id: Sequence[int], store: bool = True) -> TessMetaDB:
+    def download_observation_metadata(
+        self, targets_tic_id: Sequence[int], store: bool = True, with_name: Optional[str] = None
+    ) -> TessMetaDB:
         """
         Download TESS observation metadata for specified TIC IDs.
 
@@ -55,6 +56,7 @@ class TessDataset(BaseDataset):
         Args:
             targets_tic_id: List of TIC IDs to retrieve observation metadata for.
             store: Whether to store the downloaded data in the storage backend. Default is True.
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             TessMetaDB: Database object containing the downloaded observation metadata.
@@ -67,16 +69,18 @@ class TessDataset(BaseDataset):
         meta_qtable, meta_header = TessObservationsDownloader().download_by_id(targets_tic_id)
 
         if store:
-            self._storage.write_qtable(meta_qtable, meta_header, self._observations_name, override=True)
+            table_name = self._observations_name + (f"_{with_name}" if with_name else "")
+            self._storage.write_qtable(meta_qtable, meta_header, table_name, override=True)
 
         return TessMetaDB(meta_dataset=meta_qtable)
 
-    def search_tic_targets(
+    def download_tic_targets(
         self,
         limit: Optional[int] = None,
         star_mass_range: Optional[tuple[float, float]] = None,
         priority_threshold: Optional[float] = None,
         store: bool = False,
+        with_name: Optional[str] = None,
     ) -> TicDB:
         """
         Searches the TESS Input Catalog for targets matching the given criteria
@@ -90,6 +94,7 @@ class TessDataset(BaseDataset):
                 Default is None (no filtering).
             store (bool): Whether to store the search results in the storage backend.
                 Default is False.
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             TicDB: Database object containing the search results.
@@ -109,11 +114,14 @@ class TessDataset(BaseDataset):
         catalog_qtable, catalog_header = self._catalog_downloader.download(limit=limit)
 
         if store:
-            self._storage.write_qtable(catalog_qtable, catalog_header, self._tic_name, override=True)
+            table_name = self._tic_name + (f"_{with_name}" if with_name else "")
+            self._storage.write_qtable(catalog_qtable, catalog_header, table_name, override=True)
 
         return TicDB(dataset=catalog_qtable)
 
-    def download_tic_targets_by_ids(self, tic_ids: Sequence[int], store: bool = True) -> TicDB:
+    def download_tic_targets_by_ids(
+        self, tic_ids: Sequence[int], store: bool = True, with_name: Optional[str] = None
+    ) -> TicDB:
         """
         Download TIC target information for specific TIC IDs.
 
@@ -123,6 +131,7 @@ class TessDataset(BaseDataset):
         Args:
             tic_ids: List of TIC IDs to retrieve information for.
             store: Whether to store the downloaded data in the storage backend. Default is True.
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             TicDB: Database object containing the downloaded TIC target information.
@@ -137,15 +146,21 @@ class TessDataset(BaseDataset):
         catalog_qtable, catalog_header = self._catalog_downloader.download_by_id(tic_ids)
 
         if store:
-            self._storage.write_qtable(catalog_qtable, catalog_header, self._tic_by_id_name, override=True)
+            table_name = self._tic_name + (f"_{with_name}" if with_name else "")
+            self._storage.write_qtable(
+                table=catalog_qtable, header=catalog_header, table_name=table_name, override=True
+            )
 
         return TicDB(dataset=catalog_qtable)
 
-    def load_observation_metadata(self) -> Optional[TessMetaDB]:
+    def load_observation_metadata(self, with_name: Optional[str] = None) -> Optional[TessMetaDB]:
         """
         Load previously stored TESS observation metadata.
 
         Attempts to load TESS observation metadata from the configured storage backend.
+
+        Args:
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             Optional[TessMetaDB]: Database object containing the loaded observation metadata,
@@ -155,41 +170,23 @@ class TessDataset(BaseDataset):
             Various exceptions may be raised by the underlying storage backend if the
             load operation fails for reasons other than missing data.
         """
+        table_name = self._observations_name + (f"_{with_name}" if with_name else "")
         try:
-            meta_qtable = self._storage.read_qtable(table_name=self._observations_name)
+            meta_qtable = self._storage.read_qtable(table_name=table_name)
         except ValueError:
             return None
 
         return TessMetaDB(meta_dataset=meta_qtable)
 
-    def load_tic_target_dataset(self) -> Optional[TicDB]:
+    def load_tic_target_dataset(self, with_name: Optional[str] = None) -> Optional[TicDB]:
         """
         Load previously stored TIC target dataset.
 
         Attempts to load TIC target data from the configured storage backend.
         This loads data that was previously stored via the search_tic_targets method.
 
-        Returns:
-            Optional[TicDB]: Database object containing the loaded TIC target data,
-                or None if no data is found in storage.
-
-        Raises:
-            Various exceptions may be raised by the underlying storage backend if the
-            load operation fails for reasons other than missing data.
-        """
-        try:
-            tic_qtable = self._storage.read_qtable(table_name=self._tic_name)
-        except ValueError:
-            return None
-
-        return TicDB(dataset=tic_qtable)
-
-    def load_tic_target_dataset_by_id(self) -> Optional[TicDB]:
-        """
-        Load previously stored TIC target dataset retrieved by ID.
-
-        Attempts to load TIC target data from the configured storage backend.
-        This loads data that was previously stored via the download_tic_targets_by_ids method.
+        Args:
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             Optional[TicDB]: Database object containing the loaded TIC target data,
@@ -199,8 +196,9 @@ class TessDataset(BaseDataset):
             Various exceptions may be raised by the underlying storage backend if the
             load operation fails for reasons other than missing data.
         """
+        table_name = self._tic_name + (f"_{with_name}" if with_name else "")
         try:
-            tic_qtable = self._storage.read_qtable(table_name=self._tic_by_id_name)
+            tic_qtable = self._storage.read_qtable(table_name=table_name)
         except ValueError:
             return None
 

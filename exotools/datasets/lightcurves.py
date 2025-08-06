@@ -45,7 +45,9 @@ class LightcurveDataset(BaseDataset):
         self._folder_path = lc_storage_path / self.name
         self._downloader = LightcurveDownloader(override_existing=override_existing, verbose=verbose)
 
-    def download_lightcurves_from_tess_db(self, tess_db: TessMetaDB) -> Optional[LightcurveDB]:
+    def download_lightcurves_from_tess_db(
+        self, tess_db: TessMetaDB, with_name: Optional[str] = None
+    ) -> Optional[LightcurveDB]:
         """
         Download lightcurves for targets in a TESS metadata database.
 
@@ -55,6 +57,7 @@ class LightcurveDataset(BaseDataset):
 
         Args:
             tess_db: Database containing TESS observation metadata with URLs to lightcurve files.
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             Database object containing information about the downloaded lightcurves,
@@ -64,10 +67,14 @@ class LightcurveDataset(BaseDataset):
             Various exceptions may be raised by the underlying downloader if the
             download fails.
         """
+        folder_path = self._folder_path
+        if with_name:
+            folder_path = folder_path / with_name
+
         download_params = [
             DownloadParams(
                 url=row["dataURL"],
-                download_path=str(self._folder_path / str(row["tic_id"]) / f"{row['obs_id']}.fits"),
+                download_path=str(folder_path / str(row["tic_id"]) / f"{row['obs_id']}.fits"),
             )
             for row in tess_db.view
         ]
@@ -76,20 +83,27 @@ class LightcurveDataset(BaseDataset):
         downloaded_paths = self._downloader.download_fits_parallel(download_params)
         logger.info(f"Downloaded {len(downloaded_paths)} lightcurves")
 
-        return self.load_lightcurve_dataset()
+        return self.load_lightcurve_dataset(with_name=with_name)
 
-    def load_lightcurve_dataset(self) -> Optional[LightcurveDB]:
+    def load_lightcurve_dataset(self, with_name: Optional[str] = None) -> Optional[LightcurveDB]:
         """
         Load previously downloaded lightcurve files.
 
         Scans the configured directory for lightcurve FITS files and creates a database
         object to access them.
 
+        Args:
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
+
         Returns:
             Database object containing information about the available lightcurves,
             or None if no lightcurve files were found.
         """
-        downloaded_paths = _get_file_paths_in_subfolder(self._folder_path, file_extension="fits")
+        folder_path = self._folder_path
+        if with_name:
+            folder_path = folder_path / with_name
+
+        downloaded_paths = _get_file_paths_in_subfolder(folder_path, file_extension="fits")
         if len(downloaded_paths) == 0:
             return None
 

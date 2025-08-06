@@ -10,7 +10,7 @@ from exotools.utils.qtable_utils import QTableHeader
 class TestTessMetaDB:
     @pytest.fixture
     def tess_meta_db(self, tess_observations_test_data: tuple[QTable, QTableHeader]) -> TessMetaDB:
-        return TessMetaDB(meta_dataset=tess_observations_test_data[0])
+        return TessMetaDB(meta_dataset=tess_observations_test_data[0].copy())
 
     def test_init(self, tess_meta_db, tess_observations_test_data):
         """Test initialization of TessMetaDB."""

@@ -33,10 +33,9 @@ class CandidateExoplanetsDataset(BaseDataset):
         """
         super().__init__(dataset_name=self._DATASET_NAME_CANDIDATES, dataset_tag=dataset_tag, storage=storage)
 
-    def load_candidate_exoplanets_dataset(self) -> Optional[CandidateDB]:
+    def load_candidate_exoplanets_dataset(self, with_name: Optional[str] = None) -> Optional[CandidateDB]:
         """
-        Load previously stored candidate exoplanets dataset.
-
+        Load previously stored candidate exoplanets dataset, with an optional distinctive name.
         Attempts to load candidate exoplanets data from the configured storage backend.
 
         Returns:
@@ -47,14 +46,20 @@ class CandidateExoplanetsDataset(BaseDataset):
             Various exceptions may be raised by the underlying storage backend if the
             load operation fails for reasons other than missing data.
         """
+        table_name = self.name + (f"_{with_name}" if with_name else "")
         try:
-            candidate_qtable = self._storage.read_qtable(table_name=self.name)
+            candidate_qtable = self._storage.read_qtable(table_name=table_name)
         except ValueError:
             return None
 
         return _create_candidate_db(candidate_dataset=candidate_qtable)
 
-    def download_candidate_exoplanets(self, limit: Optional[int] = None, store: bool = True) -> CandidateDB:
+    def download_candidate_exoplanets(
+        self,
+        limit: Optional[int] = None,
+        store: bool = True,
+        with_name: Optional[str] = None,
+    ) -> CandidateDB:
         """
         Retrieves candidate exoplanets data from NASA Exoplanet Archive and optionally
         stores it in the configured storage backend.
@@ -62,6 +67,7 @@ class CandidateExoplanetsDataset(BaseDataset):
         Args:
             limit: Maximum number of candidates to retrieve. Default is None (no limit).
             store: Whether to store the downloaded data in the storage backend. Default is True.
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name
 
         Returns:
             Database object containing the downloaded candidate exoplanets data.
@@ -74,10 +80,11 @@ class CandidateExoplanetsDataset(BaseDataset):
         candidate_qtable, candidate_header = CandidateExoplanetsDownloader().download(limit=limit)
 
         if store:
+            table_name = self.name + (f"_{with_name}" if with_name else "")
             self._storage.write_qtable(
                 table=candidate_qtable,
                 header=candidate_header,
-                table_name=self.name,
+                table_name=table_name,
             )
 
         return _create_candidate_db(candidate_qtable)

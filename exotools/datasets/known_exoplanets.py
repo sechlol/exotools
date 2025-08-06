@@ -40,7 +40,9 @@ class KnownExoplanetsDataset(BaseDataset):
         self._gaia_dataset = GaiaParametersDataset(dataset_tag=self._DATASET_EXO, storage=storage)
         self._reduced_dataset_name = self.name + "_reduced"
 
-    def load_known_exoplanets_dataset(self, with_gaia_star_data: bool = False) -> Optional[ExoDB]:
+    def load_known_exoplanets_dataset(
+        self, with_gaia_star_data: bool = False, with_name: Optional[str] = None
+    ) -> Optional[ExoDB]:
         """
         Load previously stored known exoplanets dataset.
 
@@ -49,6 +51,7 @@ class KnownExoplanetsDataset(BaseDataset):
 
         Args:
             with_gaia_star_data: Whether to include Gaia stellar data. Default is False.
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             Database object containing the loaded exoplanets data,
@@ -60,23 +63,27 @@ class KnownExoplanetsDataset(BaseDataset):
         """
         gaia_db = None
         if with_gaia_star_data:
-            gaia_db = self.load_gaia_dataset_of_known_exoplanets()
+            gaia_db = self.load_gaia_dataset_of_known_exoplanets(with_name=with_name)
             if gaia_db is None:
                 return None
         try:
-            exo_qtable = self._storage.read_qtable(table_name=self.name)
+            table_name = self.name + (f"_{with_name}" if with_name else "")
+            exo_qtable = self._storage.read_qtable(table_name=table_name)
         except ValueError:
             return None
 
         return _create_exo_db(exo_dataset=exo_qtable, gaia_db=gaia_db)
 
-    def load_star_system_dataset(self) -> Optional[StarSystemDB]:
+    def load_star_system_dataset(self, with_name: Optional[str] = None) -> Optional[StarSystemDB]:
         """
         Load previously stored star system dataset.
 
         Attempts to load a reduced representation of star systems from the configured storage backend.
         If the reduced dataset doesn't exist, it will attempt to compute it from the full exoplanet
         and Gaia datasets.
+
+        Args:
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             Database object containing star system data,
@@ -86,29 +93,36 @@ class KnownExoplanetsDataset(BaseDataset):
             Various exceptions may be raised by the underlying storage backend if the
             load operation fails for reasons other than missing data.
         """
+        reduced_name = self._reduced_dataset_name + (f"_{with_name}" if with_name else "")
         try:
             # Try to load reduced dataset
-            reduced_exo_dataset = self._storage.read_qtable(table_name=self._reduced_dataset_name)
+            reduced_exo_dataset = self._storage.read_qtable(table_name=reduced_name)
             return _create_star_system_db(reduced_exo_dataset)
         except ValueError:
             # If it doesn't exist, compute it from the full datasets
-            gaia_db = self.load_gaia_dataset_of_known_exoplanets()
+            gaia_db = self.load_gaia_dataset_of_known_exoplanets(with_name=with_name)
             if gaia_db is None:
                 return None
 
             try:
-                exo_qtable = self._storage.read_qtable(table_name=self.name)
+                table_name = self.name + (f"_{with_name}" if with_name else "")
+                exo_qtable = self._storage.read_qtable(table_name=table_name)
             except ValueError:
                 return None
 
-            return self._create_star_system_db_from_scratch(exo_dataset=exo_qtable, gaia_db=gaia_db)
+            return self._create_star_system_db_from_scratch(
+                exo_dataset=exo_qtable, gaia_db=gaia_db, with_name=with_name
+            )
 
-    def load_gaia_dataset_of_known_exoplanets(self) -> Optional[GaiaDB]:
+    def load_gaia_dataset_of_known_exoplanets(self, with_name: Optional[str] = None) -> Optional[GaiaDB]:
         """
         Load previously stored Gaia data for known exoplanets' host stars.
 
         Attempts to load Gaia stellar data associated with known exoplanets
         from the configured storage backend.
+
+        Args:
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             Database object containing Gaia stellar data,
@@ -118,7 +132,7 @@ class KnownExoplanetsDataset(BaseDataset):
             Various exceptions may be raised by the underlying storage backend if the
             load operation fails for reasons other than missing data.
         """
-        return self._gaia_dataset.load_gaia_parameters_dataset()
+        return self._gaia_dataset.load_gaia_parameters_dataset(with_name=with_name)
 
     def download_known_exoplanets(
         self,
@@ -127,6 +141,7 @@ class KnownExoplanetsDataset(BaseDataset):
         limit: Optional[int] = None,
         columns: Optional[Sequence[str]] = None,
         where: Optional[dict[str, Any | list[Any]]] = None,
+        with_name: Optional[str] = None,
     ) -> ExoDB:
         """
         Download known exoplanets data from NASA Exoplanet Archive.
@@ -140,6 +155,7 @@ class KnownExoplanetsDataset(BaseDataset):
             limit: Maximum number of exoplanets to retrieve. Default is None (no limit).
             columns: Specific columns to retrieve. Default is None (all available columns).
             where: Additional filters to apply to the data.
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             Database object containing the downloaded exoplanets data.
@@ -153,17 +169,20 @@ class KnownExoplanetsDataset(BaseDataset):
         exo_qtable, exo_header = KnownExoplanetsDownloader().download(limit=limit, columns=columns, where=where)
 
         if store:
-            self._storage.write_qtable(table=exo_qtable, header=exo_header, table_name=self.name, override=True)
+            table_name = self.name + (f"_{with_name}" if with_name else "")
+            self._storage.write_qtable(table=exo_qtable, header=exo_header, table_name=table_name, override=True)
 
         if with_gaia_star_data:
             gaia_ids = np.unique(exo_qtable["gaia_id"].value).tolist()
-            gaia_db = self._gaia_dataset.download_gaia_parameters(gaia_ids=gaia_ids, store=store)
+            gaia_db = self._gaia_dataset.download_gaia_parameters(gaia_ids=gaia_ids, store=store, with_name=with_name)
         else:
             gaia_db = None
 
         return _create_exo_db(exo_qtable, gaia_db)
 
-    def _create_star_system_db_from_scratch(self, exo_dataset: QTable, gaia_db: GaiaDB) -> StarSystemDB:
+    def _create_star_system_db_from_scratch(
+        self, exo_dataset: QTable, gaia_db: GaiaDB, with_name: Optional[str] = None
+    ) -> StarSystemDB:
         """
         Create a star system database from exoplanet and Gaia datasets.
 
@@ -173,6 +192,7 @@ class KnownExoplanetsDataset(BaseDataset):
         Args:
             exo_dataset: The dataset containing exoplanet data.
             gaia_db: Database containing Gaia stellar data.
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             Database object containing the processed star system data.
@@ -184,10 +204,11 @@ class KnownExoplanetsDataset(BaseDataset):
         reduced_exo_dataset, header = reduce_exoplanet_dataset(exo_db=exo_db)
 
         # Store the reduced dataset for future use
+        reduced_name = self._reduced_dataset_name + (f"_{with_name}" if with_name else "")
         self._storage.write_qtable(
             table=reduced_exo_dataset,
             header=header,
-            table_name=self._reduced_dataset_name,
+            table_name=reduced_name,
             override=True,
         )
 

@@ -17,26 +17,33 @@ class GaiaParametersDataset(BaseDataset):
     def __init__(self, dataset_tag: Optional[str] = None, storage: Optional[BaseStorage] = None):
         super().__init__(dataset_name=self._DATASET_GAIA, dataset_tag=dataset_tag, storage=storage)
 
-    def load_gaia_parameters_dataset(self) -> Optional[GaiaDB]:
+    def load_gaia_parameters_dataset(self, with_name: Optional[str] = None) -> Optional[GaiaDB]:
         """
         Load Gaia parameters dataset from storage.
+
+        Args:
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             GaiaDB: Database containing Gaia parameters, or None if not found.
         """
+        table_name = self.name + (f"_{with_name}" if with_name else "")
         try:
-            gaia_qtable = self._storage.read_qtable(table_name=self.name)
+            gaia_qtable = self._storage.read_qtable(table_name=table_name)
             return self._create_gaia_db(gaia_qtable)
         except ValueError:
             return None
 
-    def download_gaia_parameters(self, gaia_ids: Sequence[int], store: bool = True) -> GaiaDB:
+    def download_gaia_parameters(
+        self, gaia_ids: Sequence[int], store: bool = True, with_name: Optional[str] = None
+    ) -> GaiaDB:
         """
         Download Gaia DR3 data for the given Gaia IDs.
 
         Args:
             gaia_ids: Sequence of Gaia IDs to download data for.
             store: Whether to store the downloaded data.
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             GaiaDB: Database containing the downloaded Gaia parameters.
@@ -46,10 +53,11 @@ class GaiaParametersDataset(BaseDataset):
         logger.info(f"Downloaded {len(gaia_qtable)} stars")
 
         if store:
+            table_name = self.name + (f"_{with_name}" if with_name else "")
             self._storage.write_qtable(
                 table=gaia_qtable,
                 header=gaia_header,
-                table_name=self.name,
+                table_name=table_name,
                 override=True,
             )
 

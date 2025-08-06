@@ -38,7 +38,7 @@ def generate_test_qtables():
 
     # Download TESS datasets
     tess_meta = tess_ds.download_observation_metadata(targets_tic_id=all_tic_ids, store=True)
-    tess_tic = tess_ds.search_tic_targets(limit=150, store=True)
+    tess_tic = tess_ds.download_tic_targets(limit=150, store=True)
     tess_tic_by_id = tess_ds.download_tic_targets_by_ids(tic_ids=all_tic_ids, store=True)
 
     # Gaia dataset
