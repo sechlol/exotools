@@ -14,7 +14,7 @@ def _is_masked_column(col: Column) -> bool:
     return any(isinstance(col, t) for t in types)
 
 
-def compare_qtables(expected_table: QTable, test_table: QTable) -> bool:
+def compare_qtables(expected_table: QTable, test_table: QTable, excluded_unit_checks: dict = None) -> bool:
     """
     Compare two QTable objects for equality by checking:
     - Column names match
@@ -22,9 +22,20 @@ def compare_qtables(expected_table: QTable, test_table: QTable) -> bool:
     - Column dtypes match (for columns that have dtypes)
     - Column values match
 
+    Args:
+        expected_table: The expected QTable
+        test_table: The QTable to test against the expected one
+        excluded_unit_checks: Optional dictionary mapping column names to units that should be
+                             excluded from unit comparison. Format: {'column_name': unit_value}
+                             If unit_value is None, any unit mismatch for that column is ignored.
+
     Raises AssertionError with descriptive message if tables don't match.
     Returns True if tables are equivalent.
     """
+    # Initialize excluded_unit_checks if None
+    if excluded_unit_checks is None:
+        excluded_unit_checks = {}
+
     # Check if both tables have the same number of columns
     if len(expected_table.colnames) != len(test_table.colnames):
         raise AssertionError(
@@ -97,8 +108,17 @@ def compare_qtables(expected_table: QTable, test_table: QTable) -> bool:
         # Check units match (if applicable)
         if hasattr(expected_col, "unit"):
             if expected_col.unit != test_col.unit:
+                # Check if this column/unit is in the excluded list
+                if col_name in excluded_unit_checks and (
+                    excluded_unit_checks[col_name] is None or excluded_unit_checks[col_name] == test_col.unit
+                ):
+                    # Skip assertion for this specific column/unit combination
+                    logger.warning(
+                        f"Ignoring unit mismatch for column '{col_name}' as specified in excluded_unit_checks: "
+                        f"expected {expected_col.unit}, got {test_col.unit}"
+                    )
                 # Handle case where one unit is None and the other is not
-                if expected_col.unit is None or test_col.unit is None:
+                elif expected_col.unit is None or test_col.unit is None:
                     # For storage tests, we'll be lenient about None vs non-None units
                     # This is because some storage formats may not preserve units perfectly
                     logger.warning(

@@ -19,7 +19,7 @@ class TestBaseDb:
     def sample_qtable(self):
         """Create a sample QTable for testing."""
         data = {
-            "id": [1, 2, 3, 4, 5, NAN_VALUE, 1],  # Note the duplicate ID and NAN_VALUE
+            "id": [1, 2, 3, 4, 5, NAN_VALUE, 1],  # Test cases: duplicate ID (1), NAN_VALUE for invalid/missing ID
             "name": ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Invalid", "Alpha Duplicate"],
             "value": [10.5, 20.3, 15.7, 8.2, 30.1, 0.0, 11.0],
             "category": ["A", "B", "A", "C", "B", "D", "A"],
