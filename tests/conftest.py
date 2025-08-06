@@ -36,7 +36,7 @@ def all_test_qtables_and_headers() -> dict[str, tuple[QTable, QTableHeader]]:
 
 
 @pytest.fixture(scope="module")
-def all_test_lightcurves() -> dict[str, LightCurve]:
+def all_test_lightcurves() -> dict[int, LightCurve]:
     return load_all_test_lightcurves()
 
 
@@ -49,13 +49,13 @@ def load_all_test_qtables() -> dict[str, QTable]:
     return qtables
 
 
-def load_all_test_lightcurves() -> dict[str, LightCurve]:
+def load_all_test_lightcurves() -> dict[int, LightCurve]:
     all_data = {}
     for path, dirs, files in os.walk(TEST_ASSETS_LC):
         for file_name in files:
             if ".fits" in file_name:
                 file_path = Path(path) / file_name
-                all_data[file_name.removesuffix(".fits")] = load_lightcurve(file_path)
+                all_data[int(file_name.removesuffix(".fits"))] = load_lightcurve(file_path)
 
     return all_data
 

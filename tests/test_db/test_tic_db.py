@@ -1,19 +1,13 @@
 import numpy as np
 import pytest
-from astropy.table import QTable
 
 from exotools import TicDB
-from exotools.utils.qtable_utils import QTableHeader
 
 
 class TestTicDB:
     @pytest.fixture
     def tic_db(self, tic_catalog_test_data) -> TicDB:
         return TicDB(dataset=tic_catalog_test_data[0])
-
-    @pytest.fixture
-    def tic_by_id_db(self, tess_tic_by_id_test_data: tuple[QTable, QTableHeader]) -> TicDB:
-        return TicDB(dataset=tess_tic_by_id_test_data[0])
 
     def test_init(self, tic_db, tic_catalog_test_data):
         """Test initialization of TicDB."""
