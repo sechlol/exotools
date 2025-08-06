@@ -67,7 +67,6 @@ class TessDataset(BaseDataset):
             mast_token: MAST token for authentication.
         """
         mast.Observations.login(token=mast_token)
-        mast.Catalogs.login(token=mast_token)
 
     def download_observation_metadata(
         self, targets_tic_id: Sequence[int], store: bool = True, with_name: Optional[str] = None
