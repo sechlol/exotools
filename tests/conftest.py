@@ -11,10 +11,10 @@ from exotools.db.lightcurve_db import load_lightcurve
 from exotools.io import EcsvStorage
 from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
 
-_CURRENT_DIR = Path(os.path.realpath(__file__)).parent
-_TEST_ASSETS_DIR = _CURRENT_DIR / "assets"
+TEST_FOLDER_ROOT = Path(os.path.realpath(__file__)).parent
+_TEST_ASSETS_DIR = TEST_FOLDER_ROOT / "assets"
 
-TEST_TMP_DIR = _CURRENT_DIR / "tmp"
+TEST_TMP_DIR = TEST_FOLDER_ROOT / "tmp"
 TEST_ASSETS_QTABLES = _TEST_ASSETS_DIR / "qtables"
 TEST_ASSETS_LC = _TEST_ASSETS_DIR / "lightcurves"
 TEST_STORAGE = EcsvStorage(TEST_ASSETS_QTABLES)

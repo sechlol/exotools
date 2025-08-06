@@ -2,6 +2,7 @@ import logging
 import os
 
 import numpy as np
+from dotenv import load_dotenv
 
 from exotools import (
     CandidateExoplanetsDataset,
@@ -11,7 +12,7 @@ from exotools import (
     TicObservationsDataset,
 )
 from exotools.datasets import GaiaParametersDataset
-from tests.conftest import _TEST_ASSETS_DIR, TEST_ASSETS_LC, TEST_STORAGE
+from tests.conftest import _TEST_ASSETS_DIR, TEST_ASSETS_LC, TEST_FOLDER_ROOT, TEST_STORAGE
 from tests.utils.table_comparison import compare_qtables
 
 logger = logging.getLogger(__name__)
@@ -83,18 +84,16 @@ def ensure_credentials():
             raise ValueError(f"Missing required environment variable '{cred}', please set it and try again.")
 
 
-def set_credentials():
-    os.environ["CASJOB_USER"] = "93279598"
-    os.environ["CASJOB_PASSWORD"] = "xbe9BRU7cet0nex_wdt"
-    os.environ["MAST_TOKEN"] = "f890932156234485af1ab0ee055d7b39"
+def load_secrets():
+    load_dotenv(dotenv_path=TEST_FOLDER_ROOT.parent / ".env")
 
 
 def main():
     # Example way to set credentials
-    # set_credentials()
+    load_secrets()
 
-    # ensure_credentials()
-    # generate_test_qtables()
+    ensure_credentials()
+    generate_test_qtables()
     generate_test_lightcurves()
     logger.info("Done!")
 
