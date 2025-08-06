@@ -7,6 +7,7 @@ from exotools.datasets.known_exoplanets import KnownExoplanetsDataset
 from exotools.datasets.lightcurves import LightcurveDataset
 from exotools.datasets.tic_catalog import TicCatalogDataset
 
+from .datasets import TicObservationsDataset
 from .db import CandidateDB, ExoDB, GaiaDB, LightcurveDB, LightCurvePlus, StarSystemDB, TessMetaDB, TicDB
 from .db.star_system import Planet, Star, StarSystem, UncertainDataSource, UncertainValue
 from .utils.download import DownloadParams
@@ -16,6 +17,7 @@ __all__ = [
     "KnownExoplanetsDataset",
     "CandidateExoplanetsDataset",
     "TicCatalogDataset",
+    "TicObservationsDataset",
     "LightcurveDataset",
     # Database classes
     "CandidateDB",
