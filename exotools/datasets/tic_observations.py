@@ -4,7 +4,7 @@ from typing import Optional, Sequence
 from astroquery import mast
 
 from exotools.datasets.base_dataset import BaseDataset
-from exotools.db import TessMetaDB
+from exotools.db import TicObsDB
 from exotools.downloaders import TessObservationsDownloader
 from exotools.io import BaseStorage
 
@@ -37,7 +37,7 @@ class TicObservationsDataset(BaseDataset):
         targets_tic_id: Sequence[int],
         store: bool = True,
         with_name: Optional[str] = None,
-    ) -> TessMetaDB:
+    ) -> TicObsDB:
         """
         Download TESS observation metadata for specified TIC IDs.
 
@@ -50,7 +50,7 @@ class TicObservationsDataset(BaseDataset):
             with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
-            TessMetaDB: Database object containing the downloaded observation metadata.
+            TicObsDB: Database object containing the downloaded observation metadata.
 
         Raises:
             Various exceptions may be raised by the underlying downloader if the
@@ -63,9 +63,9 @@ class TicObservationsDataset(BaseDataset):
             table_name = self.name + (f"_{with_name}" if with_name else "")
             self._storage.write_qtable(meta_qtable, meta_header, table_name, override=True)
 
-        return TessMetaDB(meta_dataset=meta_qtable)
+        return TicObsDB(meta_dataset=meta_qtable)
 
-    def load_observation_metadata(self, with_name: Optional[str] = None) -> Optional[TessMetaDB]:
+    def load_observation_metadata(self, with_name: Optional[str] = None) -> Optional[TicObsDB]:
         """
         Load previously stored TESS observation metadata.
 
@@ -75,7 +75,7 @@ class TicObservationsDataset(BaseDataset):
             with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
-            Optional[TessMetaDB]: Database object containing the loaded observation metadata,
+            Optional[TicObsDB]: Database object containing the loaded observation metadata,
                 or None if no data is found in storage.
 
         Raises:
@@ -88,4 +88,4 @@ class TicObservationsDataset(BaseDataset):
         except ValueError:
             return None
 
-        return TessMetaDB(meta_dataset=meta_qtable)
+        return TicObsDB(meta_dataset=meta_qtable)

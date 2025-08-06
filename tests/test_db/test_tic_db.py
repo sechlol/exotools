@@ -8,17 +8,17 @@ from exotools.utils.qtable_utils import QTableHeader
 
 class TestTicDB:
     @pytest.fixture
-    def tic_db(self, tess_tic_test_data: tuple[QTable, QTableHeader]) -> TicDB:
-        return TicDB(dataset=tess_tic_test_data[0])
+    def tic_db(self, tic_catalog_test_data) -> TicDB:
+        return TicDB(dataset=tic_catalog_test_data[0])
 
     @pytest.fixture
     def tic_by_id_db(self, tess_tic_by_id_test_data: tuple[QTable, QTableHeader]) -> TicDB:
         return TicDB(dataset=tess_tic_by_id_test_data[0])
 
-    def test_init(self, tic_db, tess_tic_test_data):
+    def test_init(self, tic_db, tic_catalog_test_data):
         """Test initialization of TicDB."""
         # Check that the dataset was properly set
-        assert len(tic_db) == len(tess_tic_test_data[0])
+        assert len(tic_db) == len(tic_catalog_test_data[0])
         assert tic_db._id_column == "tic_id"
 
     def test_tic_ids_property(self, tic_db):
@@ -80,8 +80,3 @@ class TestTicDB:
         # Test with_valid_ids method
         valid_ids = tic_db.with_valid_ids()
         assert isinstance(valid_ids, TicDB)
-
-    def test_tic_by_id_fixture(self, tic_by_id_db, tess_tic_by_id_test_data):
-        """Test the tic_by_id_db fixture."""
-        assert len(tic_by_id_db) == len(tess_tic_by_id_test_data[0])
-        assert tic_by_id_db._id_column == "tic_id"

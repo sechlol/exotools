@@ -3,10 +3,15 @@ import os
 
 import numpy as np
 
-from exotools import CandidateExoplanetsDataset, KnownExoplanetsDataset, LightcurveDataset, TicCatalogDataset
+from exotools import (
+    CandidateExoplanetsDataset,
+    KnownExoplanetsDataset,
+    LightcurveDataset,
+    TicCatalogDataset,
+    TicObservationsDataset,
+)
 from exotools.datasets import GaiaParametersDataset
-from exotools.io.fs_storage import EcsvStorage
-from tests.conftest import _TEST_ASSETS_DIR, TEST_ASSETS_LC, TEST_ASSETS_QTABLES
+from tests.conftest import _TEST_ASSETS_DIR, TEST_ASSETS_LC, TEST_STORAGE
 from tests.utils.table_comparison import compare_qtables
 
 logger = logging.getLogger(__name__)
@@ -15,12 +20,13 @@ _HOSTNAME_FILE = _TEST_ASSETS_DIR / "planet_hostnames.txt"
 
 
 def generate_test_qtables():
-    storage = EcsvStorage(TEST_ASSETS_QTABLES)
-    known_ds = KnownExoplanetsDataset(storage=storage)
-    candidates_ds = CandidateExoplanetsDataset(storage=storage)
-    gaia_dataset = GaiaParametersDataset(storage=storage)
-    tess_ds = TicCatalogDataset(
-        storage=storage,
+    known_ds = KnownExoplanetsDataset(storage=TEST_STORAGE)
+    candidates_ds = CandidateExoplanetsDataset(storage=TEST_STORAGE)
+    gaia_dataset = GaiaParametersDataset(storage=TEST_STORAGE)
+    tic_obs_dataset = TicObservationsDataset(storage=TEST_STORAGE)
+    tic_dataset = TicCatalogDataset(storage=TEST_STORAGE)
+
+    TicCatalogDataset.authenticate_casjobs(
         username=os.environ.get("CASJOB_USER"),
         password=os.environ.get("CASJOB_PASSWORD"),
     )
@@ -37,21 +43,20 @@ def generate_test_qtables():
     all_tic_ids = np.concatenate([known.unique_tic_ids[:150], candidates.unique_tic_ids])
 
     # Download TESS datasets
-    tess_meta = tess_ds.download_observation_metadata(targets_tic_id=all_tic_ids, store=True)
-    tess_tic = tess_ds.download_tic_targets(limit=150, store=True)
-    tess_tic_by_id = tess_ds.download_tic_targets_by_ids(tic_ids=all_tic_ids, store=True)
+    tic_obs = tic_obs_dataset.download_observation_metadata(targets_tic_id=all_tic_ids, store=True)
+    all_tic_ids = tic_obs_dataset.load_observation_metadata().unique_tic_ids
+    tic_catalog = tic_dataset.download_tic_targets_by_ids(tic_ids=all_tic_ids, store=True)
 
     # Gaia dataset
-    daia_db = gaia_dataset.download_gaia_parameters(tess_tic.gaia_ids, store=True)
+    gaia_db = gaia_dataset.download_gaia_parameters(tic_catalog.gaia_ids, store=True)
+    originals = [known, candidates, tic_obs, tic_catalog, gaia_db]
 
-    originals = [known, candidates, tess_meta, tess_tic, tess_tic_by_id, daia_db]
     # Reload datasets to compare them
     loaded = [
         known_ds.load_known_exoplanets_dataset(),
         candidates_ds.load_candidate_exoplanets_dataset(),
-        tess_ds.load_observation_metadata(),
-        tess_ds.load_tic_target_dataset(),
-        tess_ds.load_tic_target_dataset_by_id(),
+        tic_obs_dataset.load_observation_metadata(),
+        tic_dataset.load_tic_target_dataset(),
         gaia_dataset.load_gaia_parameters_dataset(),
     ]
 
@@ -64,10 +69,10 @@ def generate_test_qtables():
 
 
 def generate_test_lightcurves():
-    tess_meta = TicCatalogDataset(storage=EcsvStorage(TEST_ASSETS_QTABLES)).load_observation_metadata()
+    tic_obs = TicObservationsDataset(storage=TEST_STORAGE).load_observation_metadata()
     lc_dataset = LightcurveDataset(lc_storage_path=TEST_ASSETS_LC, override_existing=True)
 
-    small_meta = tess_meta.select_random_sample(n=10)
+    small_meta = tic_obs.select_random_sample(n=10)
     lc_dataset.download_lightcurves_from_tess_db(small_meta)
 
 
@@ -79,17 +84,17 @@ def ensure_credentials():
 
 
 def set_credentials():
-    os.environ["CASJOB_USER"] = "******"
-    os.environ["CASJOB_PASSWORD"] = "******"
-    os.environ["MAST_TOKEN"] = "******"
+    os.environ["CASJOB_USER"] = "93279598"
+    os.environ["CASJOB_PASSWORD"] = "xbe9BRU7cet0nex_wdt"
+    os.environ["MAST_TOKEN"] = "f890932156234485af1ab0ee055d7b39"
 
 
 def main():
     # Example way to set credentials
-    set_credentials()
+    # set_credentials()
 
-    ensure_credentials()
-    generate_test_qtables()
+    # ensure_credentials()
+    # generate_test_qtables()
     generate_test_lightcurves()
     logger.info("Done!")
 

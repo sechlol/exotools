@@ -4,7 +4,8 @@ import pytest
 from astropy.table import QTable
 from typing_extensions import Self
 
-from exotools.db.base_db import NAN_VALUE, BaseDB
+from exotools.constants import NAN_VALUE
+from exotools.db.base_db import BaseDB
 
 
 class TestDB(BaseDB):

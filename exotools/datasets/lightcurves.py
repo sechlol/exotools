@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from exotools.datasets.base_dataset import BaseDataset
-from exotools.db import LightcurveDB, TessMetaDB
+from exotools.db import LightcurveDB, TicObsDB
 from exotools.downloaders import LightcurveDownloader
 from exotools.utils.download import DownloadParams
 
@@ -46,7 +46,7 @@ class LightcurveDataset(BaseDataset):
         self._downloader = LightcurveDownloader(override_existing=override_existing, verbose=verbose)
 
     def download_lightcurves_from_tess_db(
-        self, tess_db: TessMetaDB, with_name: Optional[str] = None
+        self, tess_db: TicObsDB, with_name: Optional[str] = None
     ) -> Optional[LightcurveDB]:
         """
         Download lightcurves for targets in a TESS metadata database.

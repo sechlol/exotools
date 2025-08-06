@@ -193,9 +193,9 @@ class TestDatasets:
                 catalog_dataset.download_tic_targets_by_ids(tic_ids=[123456])
                 mock_cat_downloader.download_by_id.assert_called_once_with([123456])
 
-    def test_tess_dataset(self, tess_observations_test_data):
+    def test_tess_dataset(self, tic_observations_test_data):
         """Test TessDataset with mocked downloaders"""
-        qtable, header = tess_observations_test_data
+        qtable, header = tic_observations_test_data
         storage = MemoryStorage()
 
         # Mock the observations downloader
@@ -299,11 +299,11 @@ class TestDatasets:
                 assert loaded_custom_tic_db is not None
                 assert len(loaded_custom_tic_db._ds) == len(qtable)
 
-    def test_lightcurve_dataset(self, tess_observations_test_data, lightcurve_test_paths):
+    def test_lightcurve_dataset(self, tic_observations_test_data, lightcurve_test_paths):
         """Test LightcurveDataset with mocked downloader"""
         # Setup test data
         lc_obs_ids = list(lightcurve_test_paths.keys())
-        tess_qtable, tess_header = tess_observations_test_data
+        tess_qtable, tess_header = tic_observations_test_data
 
         # Limit tess_qtable to only test IDs
         tess_qtable = tess_qtable[np.isin(tess_qtable["obs_id"], lc_obs_ids)]
@@ -320,9 +320,9 @@ class TestDatasets:
             dataset = LightcurveDataset(lc_storage_path=TEST_ASSETS_LC)
 
             # Create a mock TessMetaDB with test data
-            from exotools.db import TessMetaDB
+            from exotools.db import TicObsDB
 
-            tess_meta_db = TessMetaDB(tess_qtable)
+            tess_meta_db = TicObsDB(tess_qtable)
 
             # Test downloading lightcurves from TessMetaDB
             lc_db = dataset.download_lightcurves_from_tess_db(tess_db=tess_meta_db)

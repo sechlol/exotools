@@ -1,21 +1,19 @@
 import numpy as np
 import pytest
-from astropy.table import QTable
 
-from exotools import TessMetaDB
-from exotools.db.base_db import NAN_VALUE
-from exotools.utils.qtable_utils import QTableHeader
+from exotools import TicObsDB
+from exotools.constants import NAN_VALUE
 
 
 class TestTessMetaDB:
     @pytest.fixture
-    def tess_meta_db(self, tess_observations_test_data: tuple[QTable, QTableHeader]) -> TessMetaDB:
-        return TessMetaDB(meta_dataset=tess_observations_test_data[0].copy())
+    def tess_meta_db(self, tic_observations_test_data) -> TicObsDB:
+        return TicObsDB(meta_dataset=tic_observations_test_data[0].copy())
 
-    def test_init(self, tess_meta_db, tess_observations_test_data):
+    def test_init(self, tess_meta_db, tic_observations_test_data):
         """Test initialization of TessMetaDB."""
         # Check that the dataset was properly set
-        assert len(tess_meta_db) == len(tess_observations_test_data[0])
+        assert len(tess_meta_db) == len(tic_observations_test_data[0])
         assert tess_meta_db._id_column == "tic_id"
 
     def test_tic_ids_property(self, tess_meta_db):
@@ -70,19 +68,19 @@ class TestTessMetaDB:
 
             # Test with a single obs_id
             result = test_db.select_by_obs_id(np.array([101]))
-            assert isinstance(result, TessMetaDB)
+            assert isinstance(result, TicObsDB)
             if len(result) > 0:
                 assert all(obs_id == 101 for obs_id in result.obs_id)
 
             # Test with multiple obs_ids
             result = test_db.select_by_obs_id(np.array([101, 102]))
-            assert isinstance(result, TessMetaDB)
+            assert isinstance(result, TicObsDB)
             if len(result) > 0:
                 assert all(obs_id in [101, 102] for obs_id in result.obs_id)
 
             # Test with non-existent obs_id
             result = test_db.select_by_obs_id(np.array([999]))
-            assert isinstance(result, TessMetaDB)
+            assert isinstance(result, TicObsDB)
             assert len(result) == 0
 
     def test_select_by_tic_id(self, tess_meta_db):
@@ -103,19 +101,19 @@ class TestTessMetaDB:
 
             # Test with a single tic_id
             result = test_db.select_by_tic_id(np.array([101]))
-            assert isinstance(result, TessMetaDB)
+            assert isinstance(result, TicObsDB)
             if len(result) > 0:
                 assert all(tic_id == 101 for tic_id in result.tic_ids)
 
             # Test with multiple tic_ids
             result = test_db.select_by_tic_id(np.array([101, 102]))
-            assert isinstance(result, TessMetaDB)
+            assert isinstance(result, TicObsDB)
             if len(result) > 0:
                 assert all(tic_id in [101, 102] for tic_id in result.tic_ids)
 
             # Test with non-existent tic_id
             result = test_db.select_by_tic_id(np.array([999]))
-            assert isinstance(result, TessMetaDB)
+            assert isinstance(result, TicObsDB)
             assert len(result) == 0
 
     def test_inherited_methods(self, tess_meta_db):
@@ -124,7 +122,7 @@ class TestTessMetaDB:
         if len(tess_meta_db) > 0:
             first_tic_id = tess_meta_db.tic_ids[0]
             filtered = tess_meta_db.where(tic_id=first_tic_id)
-            assert isinstance(filtered, TessMetaDB)
+            assert isinstance(filtered, TicObsDB)
             assert all(row["tic_id"] == first_tic_id for row in filtered.view)
 
         # Test to_pandas method
@@ -133,6 +131,6 @@ class TestTessMetaDB:
 
         # Test with_valid_ids method
         valid_ids = tess_meta_db.with_valid_ids()
-        assert isinstance(valid_ids, TessMetaDB)
+        assert isinstance(valid_ids, TicObsDB)
         if len(valid_ids) > 0:
             assert all(tic_id != NAN_VALUE for tic_id in valid_ids.view["tic_id"])

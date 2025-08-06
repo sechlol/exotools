@@ -7,9 +7,9 @@ import pandas as pd
 from astropy.table import QTable
 from typing_extensions import Self
 
-logger = logging.getLogger(__name__)
+from exotools.constants import NAN_VALUE
 
-NAN_VALUE = -1
+logger = logging.getLogger(__name__)
 
 
 class BaseDB(ABC):

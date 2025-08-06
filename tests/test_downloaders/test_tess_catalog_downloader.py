@@ -10,16 +10,10 @@ from exotools.utils.qtable_utils import QTableHeader
 
 class TestTessCatalogDownloader:
     @pytest.fixture
-    def tess_raw_data(self, tess_tic_test_data: tuple[QTable, QTableHeader]) -> QTable:
+    def tess_raw_data(self, tic_catalog_test_data) -> QTable:
         """Create a modified copy of the test data to simulate raw data from TIC service"""
         # Get test data and make a copy to modify
-        return tess_tic_test_data[0].copy()
-
-    @pytest.fixture
-    def tess_by_id_raw_data(self, tess_tic_by_id_test_data: tuple[QTable, QTableHeader]) -> QTable:
-        """Create a modified copy of the test data for download_by_id"""
-        # Get test data and make a copy to modify
-        return tess_tic_by_id_test_data[0].copy()
+        return tic_catalog_test_data[0].copy()
 
     @pytest.fixture
     def tess_ids(self) -> list[int]:
@@ -117,12 +111,12 @@ class TestTessCatalogDownloader:
             # Verify that _get_table_header was called
             mock_get_header.assert_called_once()
 
-    def test_download_by_id(self, tess_by_id_raw_data: QTable, tess_ids: list[int]):
+    def test_download_by_id(self, tess_raw_data: QTable, tess_ids: list[int]):
         """Test download_by_id functionality"""
         with patch("exotools.downloaders.tess_catalog_downloader.TicService") as mock_tic_service_factory:
             # Mock TicService
             mock_tic_service = MagicMock()
-            mock_tic_service.query.return_value = tess_by_id_raw_data
+            mock_tic_service.query.return_value = tess_raw_data
             mock_tic_service_factory.return_value = mock_tic_service
 
             # Create downloader and call download_by_id
@@ -147,14 +141,14 @@ class TestTessCatalogDownloader:
             assert "tic_id" in result.colnames
             assert "gaia_id" in result.colnames
 
-    def test_download_by_id_with_columns(self, tess_by_id_raw_data: QTable, tess_ids: list[int]):
+    def test_download_by_id_with_columns(self, tess_raw_data: QTable, tess_ids: list[int]):
         """Test download_by_id with extra columns parameter"""
         extra_columns = ["ra", "dec", "tmag"]
 
         with patch("exotools.downloaders.tess_catalog_downloader.TicService") as mock_tic_service_factory:
             # Mock TicService
             mock_tic_service = MagicMock()
-            mock_tic_service.query.return_value = tess_by_id_raw_data
+            mock_tic_service.query.return_value = tess_raw_data
             mock_tic_service_factory.return_value = mock_tic_service
 
             # Create downloader and call download_by_id with extra columns
@@ -166,17 +160,17 @@ class TestTessCatalogDownloader:
             for col in extra_columns:
                 assert col in query
 
-    def test_download_by_id_chunks(self, tess_by_id_raw_data: QTable):
+    def test_download_by_id_chunks(self, tess_raw_data: QTable):
         """Test download_by_id with many IDs that require chunking"""
         # Create a list of 1000 IDs (should create 3 chunks with chunk_size=400)
         many_ids = list(range(1000))
 
         with patch("exotools.downloaders.tess_catalog_downloader.TicService") as mock_tic_service_factory, patch(
-            "exotools.downloaders.tess_catalog_downloader.vstack", return_value=tess_by_id_raw_data
+            "exotools.downloaders.tess_catalog_downloader.vstack", return_value=tess_raw_data
         ) as mock_vstack:
             # Mock TicService
             mock_tic_service = MagicMock()
-            mock_tic_service.query.return_value = tess_by_id_raw_data
+            mock_tic_service.query.return_value = tess_raw_data
             mock_tic_service_factory.return_value = mock_tic_service
 
             # Create downloader and call download_by_id

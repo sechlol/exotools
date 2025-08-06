@@ -3,10 +3,11 @@ from io import BytesIO
 from typing import Optional, Sequence
 
 import astropy.units as u
-from astropy.table import QTable, vstack
+from astropy.table import MaskedColumn, QTable, vstack
 from casjobs import CasJobs
 from tqdm import tqdm
 
+from exotools.constants import NAN_VALUE
 from exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
 
 from ._utils import override_units
@@ -77,8 +78,13 @@ class TessCatalogDownloader(DatasetDownloader):
 
     def _clean_and_fix(self, table: QTable) -> QTable:
         override_units(table, self._units_override)
+
         # Force gaia_id to be integer
-        table["gaia_id"] = table["gaia_id"].value.astype(int)
+        column = table["gaia_id"]
+        if column.dtype != int:
+            if isinstance(column, MaskedColumn):
+                column = column.filled(NAN_VALUE).value
+            table["gaia_id"] = column.astype(int)
         return table
 
     def _get_table_header(self, table: QTable) -> QTableHeader:

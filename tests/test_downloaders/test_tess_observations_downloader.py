@@ -5,15 +5,14 @@ import pytest
 from astropy.table import QTable
 
 from exotools.downloaders import TessObservationsDownloader
-from exotools.utils.qtable_utils import QTableHeader
 
 
 class TestTessObservationsDownloader:
     @pytest.fixture
-    def tess_observations_raw_data(self, tess_observations_test_data: tuple[QTable, QTableHeader]) -> QTable:
+    def tess_observations_raw_data(self, tic_observations_test_data) -> QTable:
         """Create a modified copy of the test data to simulate raw data from MAST service"""
         # Get test data and make a copy to modify
-        in_table = tess_observations_test_data[0].copy()
+        in_table = tic_observations_test_data[0].copy()
 
         # Rename columns to match raw data format if needed
         if "tic_id" in in_table.colnames:
