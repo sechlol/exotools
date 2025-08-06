@@ -1,0 +1,1 @@
+NAN_VALUE = -1

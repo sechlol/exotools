@@ -7,9 +7,9 @@ import pandas as pd
 from astropy.table import QTable
 from typing_extensions import Self
 
-logger = logging.getLogger(__name__)
+from exotools.constants import NAN_VALUE
 
-NAN_VALUE = -1
+logger = logging.getLogger(__name__)
 
 
 class BaseDB(ABC):
@@ -67,6 +67,9 @@ class BaseDB(ABC):
     def select_random_sample(self, n: int) -> Self:
         random_indices = np.random.choice(len(self._ds), size=n, replace=False)
         return self._factory(self._ds[random_indices])
+
+    def append(self, other: Self) -> Self:
+        return self._factory(QTable(np.concatenate([self._ds, other._ds])))
 
     def to_pandas(self) -> pd.DataFrame:
         if len(self._ds) == 0:

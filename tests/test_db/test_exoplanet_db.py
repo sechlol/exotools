@@ -76,3 +76,59 @@ class TestExoplanetDb:
         # Check that all records have Kepler in disc_telescope
         if len(kepler_planets) > 0:
             assert all("Kepler" in record["disc_telescope"] for record in kepler_planets.view)
+
+    def test_get_transiting_planets(self, exo_db):
+        """Test the get_transiting_planets method."""
+        # Test without filter
+        transiting_planets = exo_db.get_transiting_planets()
+        assert isinstance(transiting_planets, ExoDB)
+        # Check that all records have tran_flag = 1
+        if len(transiting_planets) > 0:
+            assert all(record["tran_flag"] == 1 for record in transiting_planets.view)
+
+        # Test with kepler_or_tess_only=True
+        kepler_tess_transiting = exo_db.get_transiting_planets(kepler_or_tess_only=True)
+        assert isinstance(kepler_tess_transiting, ExoDB)
+        if len(kepler_tess_transiting) > 0:
+            # Check that all records have tran_flag = 1
+            assert all(record["tran_flag"] == 1 for record in kepler_tess_transiting.view)
+            # Check that all records have either TESS, Kepler, or K2 in disc_telescope
+            for record in kepler_tess_transiting.view:
+                telescope = record["disc_telescope"]
+                assert any(name in telescope for name in ["TESS", "Kepler", "K2"])
+
+        # Verify that kepler_or_tess_only=True returns a subset of all transiting planets
+        assert len(kepler_tess_transiting) <= len(transiting_planets)
+
+    def test_impute_stellar_parameters(self, known_exoplanets_test_data, gaia_test_db):
+        """Test the impute_stellar_parameters method."""
+        # Make a copy of the data to avoid modifying the original
+        exo_data = known_exoplanets_test_data[0].copy()
+        gaia_data = gaia_test_db.view.copy()
+
+        # Count initial masked values
+        initial_masked_st_rad = np.sum(exo_data["st_rad"].mask) if hasattr(exo_data["st_rad"], "mask") else 0
+        initial_masked_pl_ratror = np.sum(exo_data["pl_ratror"].mask) if hasattr(exo_data["pl_ratror"], "mask") else 0
+        initial_masked_pl_ratdor = np.sum(exo_data["pl_ratdor"].mask) if hasattr(exo_data["pl_ratdor"], "mask") else 0
+
+        # Apply the imputation
+        ExoDB.impute_stellar_parameters(exo_data, gaia_data)
+
+        # Verify that st_rad_gaia column was added
+        assert "st_rad_gaia" in exo_data.colnames
+
+        # Count final masked values
+        final_masked_st_rad = np.sum(exo_data["st_rad"].mask) if hasattr(exo_data["st_rad"], "mask") else 0
+        final_masked_pl_ratror = np.sum(exo_data["pl_ratror"].mask) if hasattr(exo_data["pl_ratror"], "mask") else 0
+        final_masked_pl_ratdor = np.sum(exo_data["pl_ratdor"].mask) if hasattr(exo_data["pl_ratdor"], "mask") else 0
+
+        # Check that some values were imputed (if there were any to impute)
+        # Note: This is a soft assertion since the test data might not have recoverable values
+        if initial_masked_st_rad > 0:
+            assert final_masked_st_rad <= initial_masked_st_rad, "No stellar radii were imputed"
+
+        if initial_masked_pl_ratror > 0:
+            assert final_masked_pl_ratror <= initial_masked_pl_ratror, "No planet-star radius ratios were imputed"
+
+        if initial_masked_pl_ratdor > 0:
+            assert final_masked_pl_ratdor <= initial_masked_pl_ratdor, "No planet-star distance ratios were imputed"

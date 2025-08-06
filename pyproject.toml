@@ -26,10 +26,10 @@ classifiers = [
 ]
 dependencies = [
     "numpy",
-    "pandas",
     "pandas[performance]",
-    "tables",
     "pyarrow==18.1.0",
+    "tables",
+    "tabulate",
     "h5py",
     "pydantic",
     "oktopus",
@@ -38,7 +38,6 @@ dependencies = [
     "astroquery",
     "casjobs",
     "tqdm",
-    "tabulate",
     "pyvo",
 ]
 
@@ -46,6 +45,7 @@ dependencies = [
 dev = [
     "pytest",
     "pytest-cov",
+    "python-dotenv",
     "ruff",
 ]
 

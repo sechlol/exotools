@@ -6,7 +6,7 @@ from .gaia_db import GaiaDB
 from .lightcurve_db import LightcurveDB
 from .lightcurve_plus import LightCurvePlus
 from .starsystem_db import StarSystemDB
-from .tess_meta_db import TessMetaDB
+from .tess_meta_db import TicObsDB
 from .tic_db import TicDB
 
 __all__ = [
@@ -16,6 +16,6 @@ __all__ = [
     "StarSystemDB",
     "LightcurveDB",
     "LightCurvePlus",
-    "TessMetaDB",
+    "TicObsDB",
     "TicDB",
 ]

@@ -2,12 +2,14 @@ import numpy as np
 from astropy.table import QTable
 from typing_extensions import Self
 
-from .base_db import NAN_VALUE, BaseDB
+from exotools.constants import NAN_VALUE
+
+from .base_db import BaseDB
 
 _ID_FIELD = "tic_id"
 
 
-class TessMetaDB(BaseDB):
+class TicObsDB(BaseDB):
     """
     Dtypes:
     ---------------------------
@@ -45,9 +47,14 @@ class TessMetaDB(BaseDB):
         return self.view["dataURL"].value
 
     def _factory(self, dataset: QTable) -> Self:
-        return TessMetaDB(dataset)
+        return TicObsDB(dataset)
 
     def select_by_obs_id(self, other_obs_id: np.ndarray) -> Self:
         masked_ds = self.view[self.view["obs_id"] != NAN_VALUE]
         selection = np.isin(masked_ds["obs_id"], other_obs_id)
+        return self._factory(masked_ds[selection])
+
+    def select_by_tic_id(self, other_tic_ids: np.ndarray) -> Self:
+        masked_ds = self.view[self.view["tic_id"] != NAN_VALUE]
+        selection = np.isin(masked_ds["tic_id"], other_tic_ids)
         return self._factory(masked_ds[selection])

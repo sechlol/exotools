@@ -10,6 +10,7 @@ from exotools.utils.qtable_utils import QTableHeader, TableColumnInfo
 
 class TapService:
     """
+    TODO: try out astroquery.TapPlus, seems better than pyvo?
     Unfortunately, this service is not suitable for large queries, as it doesn't support authentication.
     Use 'casjobs' package instead for large queries
     """

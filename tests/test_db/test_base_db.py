@@ -4,7 +4,8 @@ import pytest
 from astropy.table import QTable
 from typing_extensions import Self
 
-from exotools.db.base_db import NAN_VALUE, BaseDB
+from exotools.constants import NAN_VALUE
+from exotools.db.base_db import BaseDB
 
 
 class TestDB(BaseDB):
@@ -31,9 +32,26 @@ class TestBaseDb:
         return qtable
 
     @pytest.fixture
+    def sample_qtable2(self):
+        """Create a second sample QTable for testing append."""
+        data = {
+            "id": [10, 11, 12],
+            "name": ["Zeta", "Eta", "Theta"],
+            "value": [5.5, 12.8, 22.4],
+            "category": ["B", "C", "A"],
+            "flag": [True, True, False],
+        }
+        return QTable(data)
+
+    @pytest.fixture
     def test_db(self, sample_qtable):
         """Create a TestDB instance with the sample data."""
         return TestDB(sample_qtable, id_field="id")
+
+    @pytest.fixture
+    def test_db2(self, sample_qtable2):
+        """Create a second TestDB instance for testing append."""
+        return TestDB(sample_qtable2, id_field="id")
 
     @pytest.fixture
     def empty_qtable_with_columns(self):
@@ -193,6 +211,42 @@ class TestBaseDb:
         # Should get the same result as the step-by-step chain
         assert len(result) == len(chain3)
         assert set(result.view["name"]) == names_in_result
+
+    def test_append(self, test_db, test_db2):
+        """Test append method to combine two BaseDB instances."""
+        # Original datasets
+        assert len(test_db) == 7
+        assert len(test_db2) == 3
+
+        # Append test_db2 to test_db
+        combined_db = test_db.append(test_db2)
+
+        # Check that a new instance was returned
+        assert combined_db is not test_db
+        assert combined_db is not test_db2
+
+        # Check that the combined dataset has the expected number of rows
+        assert len(combined_db) == len(test_db) + len(test_db2)
+
+        # Check that the original datasets were not modified
+        assert len(test_db) == 7
+        assert len(test_db2) == 3
+
+        # Verify that the combined dataset contains all rows from both datasets
+        # Check for specific values from the first dataset
+        assert "Alpha" in combined_db.view["name"]
+        assert "Beta" in combined_db.view["name"]
+
+        # Check for specific values from the second dataset
+        assert "Zeta" in combined_db.view["name"]
+        assert "Theta" in combined_db.view["name"]
+
+        # Verify that the combined dataset has the correct structure
+        assert set(combined_db.view.colnames) == {"id", "name", "value", "category", "flag"}
+
+        # Check that we can filter the combined dataset
+        filtered = combined_db.where(category="A")
+        assert len(filtered) == 4  # 3 from test_db + 1 from test_db2
 
     def test_select_random_sample(self, test_db):
         """Test select_random_sample method."""

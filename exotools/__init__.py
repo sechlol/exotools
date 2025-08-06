@@ -2,12 +2,16 @@
 
 __version__ = "0.0.2"
 
-from exotools.datasets.candidate_exoplanets import CandidateExoplanetsDataset
-from exotools.datasets.known_exoplanets import KnownExoplanetsDataset
-from exotools.datasets.lightcurves import LightcurveDataset
-from exotools.datasets.tess import TessDataset
 
-from .db import CandidateDB, ExoDB, GaiaDB, LightcurveDB, LightCurvePlus, StarSystemDB, TessMetaDB, TicDB
+from .datasets import (
+    CandidateExoplanetsDataset,
+    GaiaParametersDataset,
+    KnownExoplanetsDataset,
+    LightcurveDataset,
+    TicCatalogDataset,
+    TicObservationsDataset,
+)
+from .db import CandidateDB, ExoDB, GaiaDB, LightcurveDB, LightCurvePlus, StarSystemDB, TicDB, TicObsDB
 from .db.star_system import Planet, Star, StarSystem, UncertainDataSource, UncertainValue
 from .utils.download import DownloadParams
 
@@ -15,7 +19,9 @@ __all__ = [
     # Main dataset classes
     "KnownExoplanetsDataset",
     "CandidateExoplanetsDataset",
-    "TessDataset",
+    "TicCatalogDataset",
+    "GaiaParametersDataset",
+    "TicObservationsDataset",
     "LightcurveDataset",
     # Database classes
     "CandidateDB",
@@ -24,7 +30,7 @@ __all__ = [
     "StarSystemDB",
     "LightcurveDB",
     "LightCurvePlus",
-    "TessMetaDB",
+    "TicObsDB",
     "TicDB",
     # Star system types
     "Star",
