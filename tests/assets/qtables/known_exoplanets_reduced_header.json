@@ -1,0 +1,344 @@
+{
+    "pl_name": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "tic_id": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "gaia_id": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "disc_telescope": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "rowupdate": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "hostname": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "hostname_lowercase": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "st_rad": {
+        "description": "---",
+        "unit": "solRad",
+        "dtype": null,
+        "time_info": null
+    },
+    "st_rad_gaia": {
+        "description": "---",
+        "unit": "solRad",
+        "dtype": null,
+        "time_info": null
+    },
+    "st_mass": {
+        "description": "---",
+        "unit": "solMass",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_rade": {
+        "description": "---",
+        "unit": "earthRad",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_masse": {
+        "description": "---",
+        "unit": "earthMass",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_dens": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbeccen": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbper": {
+        "description": "---",
+        "unit": "d",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orblper": {
+        "description": "---",
+        "unit": "deg",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbincl": {
+        "description": "---",
+        "unit": "deg",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbsmax": {
+        "description": "---",
+        "unit": "AU",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_tranmid": {
+        "description": "---",
+        "unit": "d",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_trandur": {
+        "description": "---",
+        "unit": "h",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_trandep": {
+        "description": "---",
+        "unit": "percent",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_imppar": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_ratror": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_ratdor": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "st_rad_lower": {
+        "description": "---",
+        "unit": "solRad",
+        "dtype": null,
+        "time_info": null
+    },
+    "st_rad_upper": {
+        "description": "---",
+        "unit": "solRad",
+        "dtype": null,
+        "time_info": null
+    },
+    "st_mass_lower": {
+        "description": "---",
+        "unit": "solMass",
+        "dtype": null,
+        "time_info": null
+    },
+    "st_mass_upper": {
+        "description": "---",
+        "unit": "solMass",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_rade_lower": {
+        "description": "---",
+        "unit": "earthRad",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_rade_upper": {
+        "description": "---",
+        "unit": "earthRad",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_masse_lower": {
+        "description": "---",
+        "unit": "earthMass",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_masse_upper": {
+        "description": "---",
+        "unit": "earthMass",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_dens_lower": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_dens_upper": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbeccen_lower": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbeccen_upper": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbper_lower": {
+        "description": "---",
+        "unit": "d",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbper_upper": {
+        "description": "---",
+        "unit": "d",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orblper_lower": {
+        "description": "---",
+        "unit": "deg",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orblper_upper": {
+        "description": "---",
+        "unit": "deg",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbincl_lower": {
+        "description": "---",
+        "unit": "deg",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbincl_upper": {
+        "description": "---",
+        "unit": "deg",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbsmax_lower": {
+        "description": "---",
+        "unit": "AU",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_orbsmax_upper": {
+        "description": "---",
+        "unit": "AU",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_tranmid_lower": {
+        "description": "---",
+        "unit": "d",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_tranmid_upper": {
+        "description": "---",
+        "unit": "d",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_trandur_lower": {
+        "description": "---",
+        "unit": "h",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_trandur_upper": {
+        "description": "---",
+        "unit": "h",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_trandep_lower": {
+        "description": "---",
+        "unit": "percent",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_trandep_upper": {
+        "description": "---",
+        "unit": "percent",
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_imppar_lower": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_imppar_upper": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_ratror_lower": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_ratror_upper": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_ratdor_lower": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_ratdor_upper": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "pl_valid_flag": {
+        "description": "True if the planet has all the parameters to determine transit events",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    }
+}

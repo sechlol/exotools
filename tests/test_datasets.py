@@ -10,7 +10,8 @@ from exotools.datasets import (
     TessDataset,
 )
 from exotools.io import MemoryStorage
-from tests.conftest import TEST_ASSETS_LC
+
+from .conftest import TEST_ASSETS_LC
 
 
 class TestDatasets:
@@ -39,7 +40,7 @@ class TestDatasets:
                 exo_db = dataset.download_known_exoplanets(with_gaia_star_data=False, store=True, limit=10)
 
                 # Verify downloader was called correctly
-                mock_downloader.download.assert_called_once_with(limit=10, columns=None)
+                mock_downloader.download.assert_called_once_with(limit=10, columns=None, where=None)
 
                 # Verify data was stored in memory
                 data_key = storage._get_prefixed_key(dataset.name, ".qtable")

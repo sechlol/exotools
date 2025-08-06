@@ -1,0 +1,471 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - name: gaia_id
+#   datatype: int64
+#   description: Unique source identifier (unique within a particular Data Release)
+#   meta: !!omap
+#   - {ucd: meta.id}
+# - name: phot_g_mean_mag
+#   unit: mag
+#   datatype: float32
+#   description: G-band mean magnitude
+#   meta: !!omap
+#   - {ucd: phot.mag;em.opt}
+# - name: phot_bp_mean_mag
+#   unit: mag
+#   datatype: float32
+#   description: Integrated BP mean magnitude
+#   meta: !!omap
+#   - {ucd: phot.mag;em.opt.B}
+# - name: phot_rp_mean_mag
+#   unit: mag
+#   datatype: float32
+#   description: Integrated RP mean magnitude
+#   meta: !!omap
+#   - {ucd: phot.mag;em.opt.R}
+# - name: phot_g_mean_flux_over_error
+#   datatype: float32
+#   description: G-band mean flux divided by its error
+#   meta: !!omap
+#   - {ucd: stat.snr;phot.flux;em.opt}
+# - name: phot_bp_mean_flux_over_error
+#   datatype: float32
+#   description: Integrated BP mean flux divided by its error
+#   meta: !!omap
+#   - {ucd: stat.snr;phot.flux;em.opt.B}
+# - name: phot_rp_mean_flux_over_error
+#   datatype: float32
+#   description: Integrated RP mean flux divided by its error
+#   meta: !!omap
+#   - {ucd: stat.snr;phot.flux;em.opt.R}
+# - name: phot_variable_flag
+#   datatype: string
+#   description: Photometric variability flag
+#   meta: !!omap
+#   - {ucd: meta.code;src.var}
+#   - {_votable_string_dtype: char}
+#   subtype: json
+# - name: teff_gspphot
+#   unit: K
+#   datatype: float32
+#   description: Effective temperature from GSP-Phot Aeneas best library using BP/RP spectra
+#   meta: !!omap
+#   - {ucd: phys.temperature.effective}
+# - name: teff_gspspec
+#   unit: K
+#   datatype: float32
+#   description: Effective temperature from GSP-Spec MatisseGauguin using RVS spectra and Monte Carlo realisations
+#   meta: !!omap
+#   - {ucd: phys.temperature.effective;stat.median}
+# - name: teff_esphs
+#   unit: K
+#   datatype: float32
+#   description: Effective temperature from ESP-HS
+#   meta: !!omap
+#   - {ucd: phys.temperature.effective}
+# - name: teff_espucd
+#   unit: K
+#   datatype: float32
+#   description: Effective temperature estimate from ESP-UCD based on the RP spectrum
+#   meta: !!omap
+#   - {ucd: phys.temperature.effective}
+# - name: teff_msc1
+#   unit: K
+#   datatype: float32
+#   description: Effective temperature of the primary from MSC using BP/RP spectra and parallax
+#   meta: !!omap
+#   - {ucd: phys.temperature.effective}
+# - name: teff_msc2
+#   unit: K
+#   datatype: float32
+#   description: Effective temperature of the secondary from MSC using BP/RP spectra and parallax
+#   meta: !!omap
+#   - {ucd: phys.temperature.effective}
+# - name: mh_gspphot
+#   unit: dex
+#   datatype: float32
+#   description: Iron abundance from GSP-Phot Aeneas best library using BP/RP spectra
+#   meta: !!omap
+#   - {ucd: phys.abund.Fe}
+# - name: distance_gspphot
+#   unit: pc
+#   datatype: float32
+#   description: Distance from GSP-Phot Aeneas best library using BP/RP spectra
+#   meta: !!omap
+#   - {ucd: pos.distance}
+# - name: distance_msc
+#   unit: pc
+#   datatype: float32
+#   description: Distance from MSC using BP/RP spectra and parallax
+#   meta: !!omap
+#   - {ucd: pos.distance}
+# - name: mg_gspphot
+#   unit: mag
+#   datatype: float32
+#   description: Absolute magnitude $M_{\rm G}$ from GSP-Phot Aeneas best library using BP/RP spectra
+#   meta: !!omap
+#   - {ucd: phys.magAbs;em.opt}
+# - name: spectraltype_esphs
+#   datatype: string
+#   description: Spectral type from ESP-ELS
+#   meta: !!omap
+#   - {ucd: src.spType}
+#   - {_votable_string_dtype: char}
+#   subtype: json
+# - name: age_flame
+#   unit: Gyr
+#   datatype: float32
+#   description: Age of the star from FLAME using stellar models, see {\tt massFlame} for details
+#   meta: !!omap
+#   - {ucd: time.age}
+# - name: mass_flame
+#   unit: solMass
+#   datatype: float32
+#   description: Mass of the star from FLAME using stellar models, {\tt lumFlame}, and {\tt teffGspphot}
+#   meta: !!omap
+#   - {ucd: phys.mass}
+# - name: lum_flame
+#   unit: solLum
+#   datatype: float32
+#   description: Luminosity of the star from FLAME using G band magnitude, extinction ({\tt agGspphot}),  parallax or distance, and a
+#     bolometric correction {\tt bcFlame}
+#   meta: !!omap
+#   - {ucd: phys.luminosity}
+# - name: radius_flame
+#   unit: solRad
+#   datatype: float32
+#   description: Radius of the star from FLAME using {\tt teffGspphot} and {\tt lumFlame}
+#   meta: !!omap
+#   - {ucd: phys.size.radius}
+# - name: radius_gspphot
+#   unit: solRad
+#   datatype: float32
+#   description: Radius from GSP-Phot Aeneas best library using BP/RP spectra
+#   meta: !!omap
+#   - {ucd: phys.size.radius}
+# meta: !!omap
+# - __serialized_columns__:
+#     age_flame:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Age of the star from FLAME using stellar models, see {\tt massFlame} for details
+#         meta: {ucd: time.age}
+#       unit: !astropy.units.Unit {unit: Gyr}
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: age_flame}
+#     distance_gspphot:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Distance from GSP-Phot Aeneas best library using BP/RP spectra
+#         meta: {ucd: pos.distance}
+#       unit: &id001 !astropy.units.Unit {unit: pc}
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: distance_gspphot}
+#     distance_msc:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Distance from MSC using BP/RP spectra and parallax
+#         meta: {ucd: pos.distance}
+#       unit: *id001
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: distance_msc}
+#     gaia_id:
+#       __class__: astropy.table.column.MaskedColumn
+#       data: !astropy.table.SerializedColumn {name: gaia_id}
+#     lum_flame:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Luminosity of the star from FLAME using G band magnitude, extinction ({\tt agGspphot}),  parallax or distance,
+#           and a bolometric correction {\tt bcFlame}
+#         meta: {ucd: phys.luminosity}
+#       unit: !astropy.units.Unit {unit: solLum}
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: lum_flame}
+#     mass_flame:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Mass of the star from FLAME using stellar models, {\tt lumFlame}, and {\tt teffGspphot}
+#         meta: {ucd: phys.mass}
+#       unit: !astropy.units.Unit {unit: solMass}
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: mass_flame}
+#     mg_gspphot:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Absolute magnitude $M_{\rm G}$ from GSP-Phot Aeneas best library using BP/RP spectra
+#         meta: {ucd: phys.magAbs;em.opt}
+#       unit: &id002 !astropy.units.Unit {unit: mag}
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: mg_gspphot}
+#     mh_gspphot:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Iron abundance from GSP-Phot Aeneas best library using BP/RP spectra
+#         meta: {ucd: phys.abund.Fe}
+#       unit: !astropy.units.Unit {unit: dex}
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: mh_gspphot}
+#     phot_bp_mean_flux_over_error:
+#       __class__: astropy.table.column.MaskedColumn
+#       data: !astropy.table.SerializedColumn {name: phot_bp_mean_flux_over_error}
+#     phot_bp_mean_mag:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Integrated BP mean magnitude
+#         meta: {ucd: phot.mag;em.opt.B}
+#       unit: *id002
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: phot_bp_mean_mag}
+#     phot_g_mean_flux_over_error:
+#       __class__: astropy.table.column.MaskedColumn
+#       data: !astropy.table.SerializedColumn {name: phot_g_mean_flux_over_error}
+#     phot_g_mean_mag:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: G-band mean magnitude
+#         meta: {ucd: phot.mag;em.opt}
+#       unit: *id002
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: phot_g_mean_mag}
+#     phot_rp_mean_flux_over_error:
+#       __class__: astropy.table.column.MaskedColumn
+#       data: !astropy.table.SerializedColumn {name: phot_rp_mean_flux_over_error}
+#     phot_rp_mean_mag:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Integrated RP mean magnitude
+#         meta: {ucd: phot.mag;em.opt.R}
+#       unit: *id002
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: phot_rp_mean_mag}
+#     phot_variable_flag:
+#       __class__: astropy.table.column.MaskedColumn
+#       data: !astropy.table.SerializedColumn {name: phot_variable_flag}
+#     radius_flame:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Radius of the star from FLAME using {\tt teffGspphot} and {\tt lumFlame}
+#         meta: {ucd: phys.size.radius}
+#       unit: &id003 !astropy.units.Unit {unit: solRad}
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: radius_flame}
+#     radius_gspphot:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Radius from GSP-Phot Aeneas best library using BP/RP spectra
+#         meta: {ucd: phys.size.radius}
+#       unit: *id003
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: radius_gspphot}
+#     spectraltype_esphs:
+#       __class__: astropy.table.column.MaskedColumn
+#       data: !astropy.table.SerializedColumn {name: spectraltype_esphs}
+#     teff_esphs:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Effective temperature from ESP-HS
+#         meta: {ucd: phys.temperature.effective}
+#       unit: &id004 !astropy.units.Unit {unit: K}
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: teff_esphs}
+#     teff_espucd:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Effective temperature estimate from ESP-UCD based on the RP spectrum
+#         meta: {ucd: phys.temperature.effective}
+#       unit: *id004
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: teff_espucd}
+#     teff_gspphot:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Effective temperature from GSP-Phot Aeneas best library using BP/RP spectra
+#         meta: {ucd: phys.temperature.effective}
+#       unit: *id004
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: teff_gspphot}
+#     teff_gspspec:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Effective temperature from GSP-Spec MatisseGauguin using RVS spectra and Monte Carlo realisations
+#         meta: {ucd: phys.temperature.effective;stat.median}
+#       unit: *id004
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: teff_gspspec}
+#     teff_msc1:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Effective temperature of the primary from MSC using BP/RP spectra and parallax
+#         meta: {ucd: phys.temperature.effective}
+#       unit: *id004
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: teff_msc1}
+#     teff_msc2:
+#       __class__: astropy.units.quantity.Quantity
+#       __info__:
+#         description: Effective temperature of the secondary from MSC using BP/RP spectra and parallax
+#         meta: {ucd: phys.temperature.effective}
+#       unit: *id004
+#       value: !astropy.table.SerializedColumn
+#         __class__: astropy.utils.masked.core.MaskedNDArray
+#         data: !astropy.table.SerializedColumn {name: teff_msc2}
+# schema: astropy-2.0
+gaia_id phot_g_mean_mag phot_bp_mean_mag phot_rp_mean_mag phot_g_mean_flux_over_error phot_bp_mean_flux_over_error phot_rp_mean_flux_over_error phot_variable_flag teff_gspphot teff_gspspec teff_esphs teff_espucd teff_msc1 teff_msc2 mh_gspphot distance_gspphot distance_msc mg_gspphot spectraltype_esphs age_flame mass_flame lum_flame radius_flame radius_gspphot
+91646978530365824 10.992616 11.368332 10.445997 4924.2925 2170.0295 2607.9023 """NOT_AVAILABLE""" 5423.3687 5332.0 "" "" 5628.704 4675.2314 -0.3708 118.108 172.94994 5.5586 """G""" "" "" 0.45312408 0.76215124 0.7603
+92082110257012736 11.470328 11.97488 10.812001 3036.9597 1295.1307 1793.8624 """NOT_AVAILABLE""" 4911.192 5012.0 "" "" 5100.09 4703.1455 0.3612 122.342 152.62585 5.9651 """K""" 13.316636 0.7758875 0.33027828 0.7939421 0.7962
+92253939012998400 9.597295 9.952909 9.067512 5477.1084 1754.4991 2972.05 """NOT_AVAILABLE""" 5961.474 5559.0 "" "" 5749.934 5335.4473 0.2369 159.489 157.24124 3.2989 """G""" 5.7799854 1.1668508 3.5551815 1.7677461 1.7292
+97264555235419520 10.336765 10.667928 9.844957 1930.786 1590.9694 2639.1985 """NOT_AVAILABLE""" 5760.512 5971.0 "" "" 5947.007 5382.741 -0.2218 165.6537 172.69614 4.1601 """G""" 10.147228 0.98439837 1.5915345 1.2665601 1.2645
+105084934767202944 10.603 10.890547 10.150712 3935.0986 2541.6348 2799.1257 """NOT_AVAILABLE""" 6176.472 6308.0 "" "" 6207.5723 5495.8555 -0.6014 222.9904 244.0456 3.7025 """F""" 3.8193138 1.1756353 2.4515438 1.3630061 1.3672
+291499292940592640 10.946167 11.391384 10.339786 1040.212 262.06107 403.88766 """NOT_AVAILABLE""" 5217.435 5393.0 "" "" 5243.0566 4599.869 0.2834 120.6657 128.49596 5.426 """K""" 13.226767 0.82849324 0.5178598 0.8811873 0.8782
+291527227407876736 10.913986 11.26125 10.395778 4696.024 1608.8285 2669.2493 """NOT_AVAILABLE""" 5788.091 5932.0 "" "" 5778.6104 4863.9897 -0.0052 179.7737 192.13306 4.4743 """G""" 7.3741097 0.98534715 1.1800658 1.0813159 1.0781
+291598356361784448 10.929561 11.32571 10.3634815 8101.7944 1750.7357 2960.3662 """NOT_AVAILABLE""" 5362.8613 5468.0 "" "" 5215.4062 5195.5737 -0.151 126.0959 141.4882 5.3347 """G""" 6.202739 0.89019614 0.5517013 0.86056024 0.8615
+292460201679352192 11.352557 11.838419 10.709302 1179.057 564.7157 667.75183 """VARIABLE""" 5010.379 5183.0 "" "" 5112.4688 4601.01 0.2074 119.9989 141.12488 5.8424 """K""" 13.296598 0.7889269 0.3693916 0.80681723 0.8003
+292573863693787136 10.662768 11.007397 10.145979 7442.066 1207.0221 2755.1313 """NOT_AVAILABLE""" 5459.0166 5997.0 "" "" 5741.041 5795.507 -0.8812 180.0815 193.03151 4.3669 """G""" 13.373469 0.9265113 1.3792536 1.3081834 1.3085
+292588874604531456 11.837734 12.210412 11.120247 2602.6978 536.4678 338.38434 """NOT_AVAILABLE""" 5725.4 "" "" "" 5127.217 4163.589 -0.5282 152.4415 156.37283 5.3636 """G""" "" "" 0.52084994 0.7335998 0.7426
+292687422629073280 10.784423 11.179168 10.216414 719.34375 202.80855 265.37915 """VARIABLE""" 5727.654 "" "" "" 5406.512 4617.003 -0.2727 141.4933 148.85199 4.7096 """G""" 5.5213227 0.98201203 0.965277 0.9976912 0.9951
+297328358130767872 11.711002 12.246218 11.024684 5516.4004 1108.5049 2652.5107 """NOT_AVAILABLE""" 4774.7676 4951.0 "" "" 4858.1533 4394.59 -0.1029 118.6174 134.8263 6.2266 """K""" 11.858095 0.76034147 0.2748661 0.7662133 0.7626
+297575198491256832 10.849125 11.167635 10.361801 5855.057 2245.3948 2928.8828 """NOT_AVAILABLE""" 5851.577 6028.0 "" "" 5947.508 5344.248 -0.2193 204.1389 232.04544 4.2012 """G""" 7.5269217 1.0242388 1.5290554 1.2034355 1.2014
+297655016163449856 10.518677 10.865976 10.005476 5165.865 1495.0889 2701.4712 """NOT_AVAILABLE""" 5631.934 5800.0 "" "" 5899.3857 4844.5537 0.0288 163.7597 174.17694 4.3936 """G""" 12.814598 0.9275658 1.283041 1.1900592 1.1856
+301021205371993088 11.518085 11.89811 10.968781 2944.513 1097.2272 2127.4883 """NOT_AVAILABLE""" 5553.4863 5545.0 "" "" 5793.366 4601.9517 -0.2039 171.1823 205.92667 5.1961 """G""" 0.44575298 0.97030413 0.6300251 0.85666007 0.8506
+301022369307171840 9.145908 9.555032 8.525042 1088.0015 2241.7312 2115.4417 """NOT_AVAILABLE""" "" 5341.0 "" "" 5367.714 4674.648 "" "" 61.116577 "" """G""" "" "" "" "" ""
+302153908506926848 10.249987 10.511005 9.830584 2605.1328 1424.1224 2646.9102 """NOT_AVAILABLE""" 6168.235 6250.0 "" "" 6394.827 5621.3545 -0.3463 228.5361 260.12543 3.412 """F""" 3.785975 1.2364166 3.148658 1.5534497 1.5573
+302376971928320512 11.203579 11.532072 10.70512 3906.9978 1879.3503 3214.1162 """NOT_AVAILABLE""" 5608.1714 5708.0 "" "" 5998.655 5197.5137 -0.4125 186.1075 246.33858 4.8428 """G""" 8.009081 0.9344085 0.86037046 0.9808526 0.9831
+302383431559125120 10.635251 10.909354 10.199872 2035.9698 632.3894 899.48865 """NOT_AVAILABLE""" 6018.742 6743.0 "" "" 6209.568 5419.3096 -0.4023 198.8051 260.2055 4.132 """F""" 4.76886 1.0768905 1.643281 1.178071 1.1764
+302442633388354304 10.609946 10.867568 10.193638 5181.787 1344.277 2359.0784 """NOT_AVAILABLE""" 6166.383 6553.0 "" "" 6324.2505 5802.1523 -0.3218 241.5658 287.28668 3.6664 """F""" 3.9189913 1.1793699 2.5076168 1.3870142 1.3848
+302514410881832960 10.684896 11.058828 10.146662 5657.4043 1824.6329 1757.5021 """NOT_AVAILABLE""" 5482.4243 5558.0 "" "" 5745.509 4744.3677 -0.0242 129.5765 162.86496 5.061 """G""" 8.98057 0.89818716 0.7026833 0.92764586 0.926
+303024854859265024 11.07534 11.447086 10.537617 4417.6787 1513.155 3414.315 """NOT_AVAILABLE""" 5512.771 5665.0 "" "" 5662.3867 5010.3184 0.0441 166.6402 206.36153 4.8856 """G""" 12.898306 0.88165873 0.8405779 1.0048158 0.9897
+303041557988149760 10.051825 10.376125 9.55374 2586.071 1514.1835 2727.321 """NOT_AVAILABLE""" 5653.038 5891.0 "" "" 5895.3486 5146.9307 -0.2122 150.5022 154.86578 4.1435 """F""" 12.130205 0.9569681 1.6239117 1.3264081 1.3252
+303089386743723648 11.052241 11.368838 10.571329 2342.7625 475.64526 826.3218 """NOT_AVAILABLE""" 5799.8755 5783.0 "" "" 5904.751 5664.3936 -0.1193 192.4652 269.50787 4.5879 """G""" 5.3304887 1.0025356 1.0848881 1.0314907 1.0223
+304001569077887360 11.223204 11.577499 10.7008915 5246.2505 1486.5719 2062.4211 """NOT_AVAILABLE""" 5723.4297 5666.0 "" "" 5795.2017 5091.4736 0.0994 180.895 214.48601 4.8013 """G""" 3.5271988 0.99621755 0.8875822 0.9584717 0.9473
+304035379060481792 11.445323 11.848101 10.877528 3990.8833 1140.4452 1872.1324 """NOT_AVAILABLE""" 5360.2773 5522.0 "" "" 5512.337 4899.747 0.1094 173.0404 203.29065 5.1791 """G""" "" 0.8475507 0.643533 0.9299194 0.9224
+304042285367885440 10.69255 10.999224 10.220517 1329.9021 479.40262 587.7926 """NOT_AVAILABLE""" 5807.1875 5955.0 "" "" 6090.082 5079.122 -0.2687 175.5531 216.40697 4.452 """G""" 7.206566 0.9915014 1.2195702 1.0893728 1.0873
+304415294687684352 10.342351 10.706872 9.804473 3027.554 1818.528 2697.0127 """NOT_AVAILABLE""" 5749.0283 5630.0 "" "" 5817.618 4774.6104 -0.2049 135.8083 138.71152 4.4502 """G""" 9.155425 0.97571015 1.2887912 1.1442752 1.1101
+304458656677523968 10.994051 11.355289 10.462132 1861.9944 548.8423 694.2739 """NOT_AVAILABLE""" 5646.59 5682.0 "" "" 5603.423 4601.593 -0.2819 138.0794 164.78987 5.142 """G""" "" "" 0.65612304 0.8463638 0.8411
+305273184339489152 10.409146 10.745202 9.902286 4642.5576 1499.8066 3185.8936 """NOT_AVAILABLE""" 5539.629 5740.0 "" "" 5799.9966 5036.0264 -0.6071 114.44 167.80038 5.1058 """G""" 3.9116988 0.94710124 0.6869127 0.8994255 0.899
+305279854424566656 8.75024 9.072051 8.256989 2066.8438 744.36127 1000.2306 """VARIABLE""" 5677.443 5834.0 "" "" 5867.4824 4603.2607 -0.1737 63.0441 68.955986 4.7383 """G""" 6.849526 0.9595885 0.9320551 0.9978555 0.9982
+305304937033710592 10.42085 10.878162 9.803716 7371.9795 3607.9084 3095.3574 """NOT_AVAILABLE""" 5091.5757 5075.0 "" "" 5188.6973 4600.5156 0.0461 86.8103 96.59024 5.6471 """K""" 10.941686 0.8120817 0.401619 0.81349254 0.8428
+305307410934867328 11.0014925 11.374523 10.46089 4815.8394 1258.3082 1964.0521 """NOT_AVAILABLE""" 5499.6553 5640.0 "" "" 5499.616 5199.6924 -0.0864 144.9329 176.21384 5.1104 """G""" 5.624125 0.9251547 0.67224836 0.90213114 0.8997
+305375683734902656 10.794227 11.101193 10.322668 3614.0356 1358.5936 2413.5178 """NOT_AVAILABLE""" 6044.417 6151.0 "" "" 6077.711 5057.004 0.0038 184.8512 240.86263 4.3146 """G""" 2.2264798 1.1044785 1.4294378 1.0881115 1.0534
+306078954563834496 10.500047 10.882774 9.954239 6135.149 1926.6388 3457.6077 """NOT_AVAILABLE""" 5509.204 5571.0 "" "" 5416.915 5261.762 0.3217 200.6744 201.73619 3.9114 """G""" 12.063246 0.9763614 2.0054145 1.5555801 1.5502
+311949217080368384 11.5454855 12.155228 10.801985 3935.8184 2197.9233 3231.721 """NOT_AVAILABLE""" "" 4561.0 "" "" 4585.956 4495.907 "" "" 111.790634 "" """K""" "" "" "" "" ""
+311959628081118976 10.434377 10.717696 9.984362 6165.535 3879.907 4383.6235 """NOT_AVAILABLE""" 5918.6743 6128.0 "" "" 6160.8525 5126.887 -0.3276 172.5663 234.38486 4.237 """G""" 6.243465 1.0390368 1.5113887 1.1686107 1.1573
+312862189688967936 11.635082 12.002791 11.099727 4813.2236 1770.371 2951.2358 """NOT_AVAILABLE""" 5566.731 5588.0 "" "" 5798.3364 5002.9316 -0.2961 188.4564 248.51042 5.1727 """G""" 0.30632704 0.97816277 0.6489532 0.8662605 0.8562
+313024810034663040 11.511041 11.870459 10.979697 4837.9785 1837.2852 2334.833 """NOT_AVAILABLE""" 5650.0845 5951.0 "" "" 5695.951 4825.673 -0.2319 194.8224 246.19547 4.9176 """G""" 5.73825 0.960939 0.85941595 0.96526617 0.9308
+313024986129085824 11.175117 11.4410095 10.742564 4353.064 1599.1979 2264.7551 """NOT_AVAILABLE""" 6136.739 6406.0 "" "" 6321.85 5502.352 -0.7186 251.6192 354.52692 4.1071 """F""" 2.5665371 1.1328591 1.7228906 1.1607554 1.1586
+313532853126278912 10.912454 11.209904 10.445724 4031.53 2576.9885 3294.5525 """NOT_AVAILABLE""" 5947.9307 6113.0 "" "" 5934.535 5241.9087 -0.4899 191.7442 264.08752 4.4115 """G""" 2.8409066 1.0680362 1.2581675 1.0548815 1.0643
+315239093310305664 11.724537 12.146511 11.137836 5152.5596 2019.1886 3540.4465 """NOT_AVAILABLE""" "" 5315.0 "" "" 5398.98 5049.423 "" "" 221.85567 "" """G""" "" "" "" "" ""
+315273865365146112 10.749146 11.045697 10.282649 5090.2026 1148.9705 1559.5513 """NOT_AVAILABLE""" 6094.115 6137.0 "" "" 6104.383 5268.4043 -0.0231 188.6647 238.73297 4.2352 """G""" 1.5252784 1.1276469 1.4775577 1.0915279 1.0833
+318566593451920896 10.774252 11.16875 10.214681 1285.8994 316.41714 498.5102 """NOT_AVAILABLE""" 5444.337 5459.0 "" "" 5443.467 5000.211 0.081 117.3195 147.63022 5.3242 """G""" 0.23929472 0.94543093 0.55024827 0.8338086 0.8325
+330300787703386752 11.585817 11.994703 11.004586 3504.884 1339.2676 1668.8383 """NOT_AVAILABLE""" 5109.1934 5462.0 "" "" 5240.6772 4706.326 -1.246 159.2156 250.03934 5.5314 """K""" 13.085112 0.8286926 0.49525246 0.89738727 0.8951
+344041143996210944 11.386266 11.834664 10.768378 1949.8865 519.17725 447.48386 """NOT_AVAILABLE""" 5127.4546 5393.0 "" "" 5299.9834 4973.9824 0.4637 144.2902 166.83853 5.5552 """K""" "" 0.81428397 0.4643394 0.8633411 0.8617
+348147510690789120 10.568071 10.833207 10.14482 5722.3457 2155.301 3292.765 """NOT_AVAILABLE""" 6182.68 6095.0 "" "" 6398.755 5373.5576 -0.0308 262.1797 282.25848 3.4243 """F""" 3.7628565 1.2293566 3.0643182 1.5259734 1.5258
+348774743417581824 11.129935 11.44724 10.647295 3822.7786 2003.4022 2937.968 """NOT_AVAILABLE""" 5828.19 6159.0 "" "" 5919.368 5099.0107 -0.4152 245.6088 265.68152 4.1294 """G""" 8.956754 1.003523 1.6168991 1.247577 1.2593
+348800586237952512 10.531927 10.987422 9.91536 1972.9001 764.2264 1081.193 """VARIABLE""" 5139.708 5050.0 "" "" 5261.485 4298.9194 0.0389 81.9371 95.23213 5.8459 """K""" "" "" 0.35569066 0.75202173 0.7509
+364272604624123520 11.174152 11.478062 10.703389 4351.278 1990.9062 1474.995 """NOT_AVAILABLE""" 5797.679 6096.0 "" "" 6076.1045 5178.413 -0.2386 221.2638 279.7691 4.4389 """F""" 7.681945 0.98722124 1.236473 1.1018443 1.0981
+364655578269496064 10.391733 10.708933 9.905003 1595.9008 577.3441 872.01105 """NOT_AVAILABLE""" 5708.8657 5722.0 "" "" 6029.288 5027.5156 -0.3688 132.4482 178.45183 4.7609 """G""" 5.340214 0.9786033 0.93018395 0.98530805 0.9813
+365019855918735232 10.576058 10.860123 10.125668 7624.7915 4444.6406 4182.003 """NOT_AVAILABLE""" 5969.396 6126.0 "" "" 6145.963 5279.8047 -0.3195 215.1729 244.74246 3.8728 """F""" 5.6795597 1.1179829 2.1635158 1.3749533 1.349
+365068891561215232 11.979971 12.41602 11.379898 5526.6455 2250.3252 3310.182 """NOT_AVAILABLE""" 5205.8335 5215.0 "" "" 5405.2285 4640.573 -0.2171 157.0662 218.06644 5.8749 """K""" "" "" 0.34536117 0.7234332 0.722
+365258832195210240 10.637416 10.903909 10.209745 4418.6147 2975.1375 3921.5044 """NOT_AVAILABLE""" 6106.3555 6299.0 "" "" 6342.29 5368.019 -0.4891 217.6151 281.4032 3.915 """F""" 4.109985 1.1270258 1.9923731 1.262394 1.2688
+366012852357564032 11.47715 11.800296 10.988121 2913.9043 2709.1863 3272.5623 """VARIABLE""" 5677.0938 6088.0 "" "" 5843.308 5598.5874 -0.2386 210.4055 321.09622 4.8518 """G""" 5.6232157 0.96859604 0.89171135 0.9760193 0.9494
+366093979996166656 10.975844 11.458069 10.329987 2389.7312 1105.4066 1419.8428 """VARIABLE""" 4875.4155 5029.0 "" "" 5169.241 4600.5596 -0.0431 92.9596 120.042915 6.1042 """K""" 11.367693 0.77191263 0.2974141 0.76411015 0.7637
+366863569416340224 10.717412 10.982248 10.252583 1957.4385 2584.4978 4973.4272 """NOT_AVAILABLE""" 6185.42 6030.0 "" "" 6098.962 5998.1475 -0.5759 224.0367 309.3289 3.8112 """F""" 3.7622294 1.1773498 2.4522996 1.363666 1.2994
+366950843151293440 11.450559 11.918112 10.823433 1837.6396 591.4342 788.49316 """VARIABLE""" 5002.664 5006.0 "" "" 5277.259 4405.2603 -0.1266 118.0013 153.02066 6.0164 """K""" 0.4059121 0.83874863 0.31375465 0.74603206 0.7449
+367798463537390208 11.000687 11.316129 10.517676 5558.8604 2605.2969 3691.3953 """NOT_AVAILABLE""" 5738.0303 5969.0 "" "" 5899.5767 5603.973 -0.0612 204.1826 263.88068 4.4372 """G""" 9.245436 0.9714975 1.2538078 1.1323282 1.1167
+367823030750144000 9.505198 9.895747 8.943169 7952.2134 5291.9844 5806.0405 """NOT_AVAILABLE""" 5246.908 5300.0 "" "" 5567.1357 4509.431 -0.3685 61.3428 77.59602 5.5543 """G""" 4.8538632 0.8732782 0.46083516 0.8215036 0.823
+367842439706655104 11.879579 12.316749 11.276555 6681.902 2347.9224 3877.3667 """NOT_AVAILABLE""" 5030.1978 5243.0 "" "" 5422.9697 4401.4106 -0.2858 162.1188 208.20132 5.8132 """K""" 12.439439 0.7944354 0.37430498 0.8038317 0.8055
+368136391564178304 10.443667 10.906045 9.820168 2760.4077 865.6889 1358.1467 """VARIABLE""" 4984.7324 5245.0 "" "" 5319.2773 4431.211 0.0891 82.7458 100.399605 5.831 """K""" 12.554102 0.7933271 0.37316635 0.81894255 0.817
+369795107933932544 10.315633 10.6056 9.858716 5196.621 2856.6846 4592.9424 """NOT_AVAILABLE""" 6245.6724 "" "" "" 5945.3154 5966.2 -0.4118 243.745 237.81693 3.1998 """G""" 3.28895 1.2936091 3.809021 1.6669801 1.6796
+370629224942620416 11.140519 11.439472 10.678352 3014.0632 2436.5503 2360.766 """NOT_AVAILABLE""" 5946.873 6208.0 "" "" 6077.339 5378.0386 -0.1298 218.5879 304.3291 4.3883 """F""" 4.1087985 1.0570272 1.344546 1.0927327 1.0676
+370725771511096064 11.537391 12.149325 10.747817 1846.4816 1559.7157 1819.2219 """NOT_AVAILABLE""" 4516.0767 4672.0 "" "" 4710.657 4299.7266 -0.2947 99.5535 117.29102 6.3129 """K""" "" "" 0.27604747 0.857973 0.8561
+376137842620914944 9.344998 9.765703 8.758285 9337.079 3442.1687 4325.154 """NOT_AVAILABLE""" 5222.086 5179.0 "" "" 5224.2607 4795.402 0.1972 58.3238 63.908737 5.4713 """K""" 11.1805935 0.83657277 0.4940656 0.8592015 0.8586
+376466188577950848 10.805364 11.157704 10.286522 6516.0874 3507.7104 4342.711 """NOT_AVAILABLE""" 5573.054 5763.0 "" "" 5648.8125 5478.2954 -0.0848 223.3897 224.7547 4.0064 """G""" 12.265241 0.96740997 1.8734502 1.4678012 1.4546
+377823668825382528 11.599254 11.964658 11.067373 4469.041 2577.8557 4102.34 """NOT_AVAILABLE""" 5486.206 5655.0 "" "" 5707.374 4823.3174 -0.3255 212.3335 257.63184 4.9357 """G""" 12.073206 0.8798187 0.7739208 0.9704054 0.9853
+377920567584838656 12.149798 12.663799 11.482151 5927.0503 1952.046 2993.0283 """NOT_AVAILABLE""" 4927.601 5183.0 "" "" 4993.9453 4598.339 0.1025 148.5431 190.61333 6.1422 """K""" 2.4033337 0.8164864 0.293525 0.7440946 0.7301
+380171641546315904 12.00139 12.415187 11.420403 2121.1562 735.93427 1008.0973 """VARIABLE""" 5439.4644 5527.0 "" "" 5239.6445 5226.814 0.0134 192.057 251.81656 5.3964 """G""" "" "" 0.530117 0.8188208 0.8066
+381067846601412864 11.28937 11.572821 10.845852 2309.4773 879.76306 1335.8557 """NOT_AVAILABLE""" 5956.639 6063.0 "" "" 6221.3755 5236.8613 -0.3708 260.4568 335.71393 4.1961 """F""" 5.6921997 1.0542016 1.5710217 1.1761298 1.1658
+381245486452394624 11.685234 12.075494 11.127834 6892.776 1909.3777 2545.6255 """NOT_AVAILABLE""" 5274.6567 5320.0 "" "" 5305.74 5373.2554 -0.4984 178.0017 237.25397 5.4479 """G""" 8.318342 0.86782366 0.5340672 0.86276853 0.8558
+381785316594569472 10.262553 10.651459 9.705895 4581.2915 2842.2065 3750.622 """NOT_AVAILABLE""" 5467.3755 5448.0 "" "" 5455.259 4519.018 -0.08 88.3194 106.44075 5.4071 """G""" "" "" 0.51588327 0.800241 0.7949
+394260478607563136 9.988328 10.377979 9.430022 6040.903 4633.557 6099.314 """NOT_AVAILABLE""" 5396.87 5343.0 "" "" 5700.797 4705.559 -0.0645 83.8539 105.569305 5.2882 """G""" 6.112812 0.8977788 0.5781154 0.86886317 0.865
+398607191666132352 9.804908 10.185218 9.260195 3944.9312 2753.9597 5956.5503 """NOT_AVAILABLE""" 5407.386 5462.0 "" "" 5446.4683 5414.257 0.1602 89.7192 102.36975 5.0216 """G""" "" 0.85881895 0.72759753 0.97225636 0.9717
+398824551370607744 9.324138 9.660434 8.815767 7694.0986 2561.8948 3936.6965 """NOT_AVAILABLE""" 5653.8945 5616.0 "" "" 5898.628 4753.034 -0.1859 76.7436 87.1069 4.8397 """G""" 5.3723826 0.9646643 0.85054535 0.9615269 0.9622
+399376196970086400 6.7406116 6.9143367 6.3048677 2018.4381 771.5418 525.10394 """NOT_AVAILABLE""" "" 6631.0 "" "" 7115.635 6400.615 "" "" 73.70285 "" """F""" "" "" "" "" ""
+399411381342103040 10.6054125 11.035522 10.012828 6770.9624 1746.7236 2685.4592 """NOT_AVAILABLE""" 5218.071 5311.0 "" "" 5425.994 5092.1167 0.3179 109.879 136.99443 5.3497 """K""" "" 0.8317313 0.5570874 0.9144961 0.9107
+402652187569910400 11.251674 11.795765 10.559834 2580.7812 1496.6486 2296.9165 """NOT_AVAILABLE""" 4690.3325 4927.0 "" "" 4995.965 4491.196 0.0487 88.7831 124.573586 6.4709 """K""" 8.362328 0.74856293 0.22573547 0.7193842 0.7157
+404518269257392768 10.896462 11.273623 10.346632 3916.18 1080.55 1765.1089 """NOT_AVAILABLE""" "" 5420.0 "" "" 5682.3696 4716.407 "" "" 174.70517 "" """G""" "" "" "" "" ""
+406239722210332288 11.187862 11.5305395 10.673272 1514.3297 456.01025 813.07623 """VARIABLE""" 5934.402 5945.0 "" "" 5865.528 4809.1846 -0.0889 186.7527 212.88739 4.5973 """F""" 0.20509452 1.0856978 1.0702332 0.9786982 0.9678
+406254874855107328 11.682011 12.122861 11.053606 2149.6592 1750.6948 3047.787 """VARIABLE""" 5120.1353 5346.0 "" "" 5151.39 4880.508 -0.3409 149.5172 176.57703 5.6617 """K""" 11.476729 0.81489116 0.4207405 0.82448894 0.8304
+406278381213935744 11.653559 12.006732 11.125412 5615.1484 1768.5181 2739.1853 """NOT_AVAILABLE""" 5428.0454 6568.0 "" "" 5722.0723 4743.5723 -1.317 226.3141 265.86624 4.839 """G""" "" 0.8800356 0.902078 1.0738881 1.076
+416803559352939136 9.580543 9.916245 9.075477 4218.2305 1217.1527 1432.8066 """NOT_AVAILABLE""" 5797.38 5844.0 "" "" 5999.244 4893.8945 0.1881 91.9834 106.40833 4.6681 """G""" 2.6768403 1.0245405 0.972687 0.97795445 0.9782
+573325464835318016 11.666364 11.958547 11.219436 5278.046 2495.5962 3839.758 """NOT_AVAILABLE""" 5928.3125 5967.0 "" "" 6139.3506 5397.7188 -0.1987 287.3805 385.82205 4.3675 """F""" 4.2608395 1.0497544 1.3148977 1.0859464 1.0823
+573517948090064256 10.569981 10.864463 10.109607 7800.228 2270.3813 3687.2605 """NOT_AVAILABLE""" 5903.1177 5926.0 "" "" 6008.9863 5801.42 -0.546 261.6609 266.68146 3.4677 """F""" 6.5748067 1.1287621 3.1225939 1.6865854 1.6668
+574076293837140480 11.40728 11.66413 10.992071 4538.8145 1806.7583 2931.993 """NOT_AVAILABLE""" 6147.853 6154.0 "" "" 6394.9746 5315.0254 -0.2257 289.1611 396.19922 4.0951 """F""" 2.1468236 1.1398911 1.694724 1.1473649 1.1404
+2754918918463844224 10.947307 11.304294 10.426678 3250.295 1124.2634 1476.8138 """NOT_AVAILABLE""" 5550.1064 5721.0 "" "" 5700.301 5083.0645 0.0916 159.1718 198.06888 4.9092 """G""" 9.476323 0.91033286 0.8016073 0.96831834 0.9644
+2755635387728454528 9.73468 10.064919 9.233187 6311.7905 2299.6812 5256.514 """NOT_AVAILABLE""" 5724.7715 5723.0 "" "" 5997.8945 4881.83 -0.2456 89.3558 115.24312 4.9046 """G""" 0.78199005 1.0140767 0.804774 0.912796 0.9107
+2769059531350539008 11.737101 12.234853 11.082026 6614.4097 2062.1763 2493.3733 """NOT_AVAILABLE""" 4802.225 4948.0 "" "" 4994.0615 4398.5264 -0.1485 123.6959 150.63895 6.2613 """K""" 8.40868 0.76906 0.26226494 0.7399253 0.7401
+2776169523291206400 10.932702 11.321506 10.379101 3845.0198 2375.0369 2949.1106 """NOT_AVAILABLE""" 5487.0015 5399.0 "" "" 5299.0845 5203.632 -0.0348 123.5266 160.09654 5.3536 """G""" "" "" 0.54081833 0.8135035 0.808
+2776549404558613248 10.927438 11.329651 10.356133 6622.6216 1912.1465 2132.0427 """NOT_AVAILABLE""" 5257.161 5453.0 "" "" 5392.7744 4898.668 -0.0445 123.0948 148.85513 5.445 """G""" 9.481686 0.85103005 0.50334555 0.85530233 0.8565
+2777996327501031552 11.499289 11.98726 10.852912 3962.4502 2181.0369 2816.8762 """NOT_AVAILABLE""" 4828.343 4938.0 "" "" 5026.089 4859.1514 -0.375 117.204 154.62299 6.148 """K""" 10.120279 0.7863438 0.31626245 0.77084374 0.7696
+2781772703265731968 11.382689 11.758453 10.836278 2301.2336 1937.9907 2487.6238 """VARIABLE""" 5514.778 5592.0 "" "" 5531.076 5322.2534 -0.0925 154.0541 218.31744 5.3392 """G""" "" "" 0.58118 0.8331004 0.8053
+2783160149501096704 11.4654665 11.854403 10.9062195 1805.6743 1467.9972 2118.3115 """NOT_AVAILABLE""" 5386.756 5496.0 "" "" 5400.782 5437.365 -0.0438 155.9258 235.2335 5.4315 """G""" 3.0423727 0.914829 0.54071975 0.84420204 0.8133
+2783173584158795008 11.14133 11.50848 10.605298 3770.9702 2567.692 2847.3162 """NOT_AVAILABLE""" 5536.16 5535.0 "" "" 5615.7485 5409.2646 -0.2314 150.1347 214.5426 5.1922 """G""" 2.2898169 0.95730096 0.65803695 0.8815204 0.8581
+2785343642154922368 11.12585 11.529951 10.551318 3130.479 1086.9484 1894.4198 """NOT_AVAILABLE""" 5570.228 5445.0 "" "" 5450.1494 4829.508 -0.1456 152.6889 178.73901 4.9729 """K""" 7.4433846 0.934717 0.8154144 0.9634898 0.9332
+2785363433364445696 10.226742 10.467468 9.825192 1939.8068 3369.6157 3833.314 """NOT_AVAILABLE""" 6316.0327 6223.0 "" "" 6530.0713 5724.9805 -0.6304 230.7476 275.43695 3.3622 """F""" 3.1408226 1.2689315 3.436318 1.5463451 1.5352
+2785462251971780992 9.6908455 10.210381 9.018617 358.66003 97.92247 136.76826 """VARIABLE""" 4802.913 "" "" "" 4811.664 4016.7236 0.1237 48.9854 49.415413 6.2216 """K""" 12.406457 0.75565654 0.27138284 0.7523846 0.7517
+2787734667628526336 10.266935 10.592924 9.771948 4792.5303 2388.0007 3141.2153 """NOT_AVAILABLE""" 5680.255 5741.0 "" "" 5899.92 5283.4844 -0.2362 118.5695 152.08817 4.8639 """G""" 3.704191 0.98355734 0.83934987 0.94582564 0.943
+2788717390505527168 11.4663 11.906363 10.866756 2142.6619 1241.711 1868.8214 """NOT_AVAILABLE""" 5161.5566 5229.0 "" "" 5394.6943 4399.1553 -0.0463 132.4179 177.91885 5.7715 """K""" 0.41110778 0.8752239 0.38408467 0.7750246 0.77
+2791213247540798336 9.698387 9.971949 9.261113 4639.592 3422.8691 5354.8853 """NOT_AVAILABLE""" 6006.6147 6269.0 "" "" 6280.258 5485.292 -0.1879 145.5717 165.62827 3.8731 """F""" 5.4208236 1.1112815 2.0541563 1.3231146 1.322
+2793443950475409280 10.6251135 10.942778 10.14349 6768.975 2435.7712 3118.9465 """NOT_AVAILABLE""" 5723.882 5982.0 "" "" 5960.9814 5188.408 -0.1469 190.5183 213.95879 4.2155 """G""" 10.838123 0.96900237 1.5108944 1.2497528 1.2473
+2793466456104092416 9.636819 9.979642 9.114671 1129.5432 364.7065 640.68445 """NOT_AVAILABLE""" 5716.562 5588.0 "" "" 5824.9766 4689.907 -0.0122 85.7192 96.31604 4.8486 """G""" 1.3711623 1.0126811 0.82590646 0.92697 0.932
+2793969551393180928 10.582221 11.048596 9.957368 9104.446 2957.6846 5030.8687 """NOT_AVAILABLE""" 5045.2036 5064.0 "" "" 5296.6035 4712.833 0.3494 90.357 109.59341 5.755 """K""" "" 0.7931312 0.3925396 0.820134 0.8192
+2795006974973633664 9.862323 10.157966 9.391966 5398.466 2628.2678 4119.7324 """NOT_AVAILABLE""" 5985.324 4250.0 "" "" 6210.8276 5134.6865 -0.9762 93.9212 147.74469 4.8828 """G""" "" "" 0.8588659 0.86184895 0.8564
+2795259862647922560 9.593993 10.09242 8.9355 9145.316 4060.821 4775.0503 """NOT_AVAILABLE""" 4789.443 4792.0 "" "" 4889.533 4499.5293 -0.1592 49.9577 55.62613 6.0948 """K""" "" "" 0.30624354 0.8033335 0.8049
+2797395732705009920 9.0815325 9.334583 8.660124 3753.7644 2841.9065 3594.8599 """NOT_AVAILABLE""" 6133.5728 "" "" "" 6307.853 5848.024 -0.8319 148.4315 156.4216 3.1949 """F""" 3.428583 1.3185775 4.183527 1.8085355 1.7655
+2797589315470530816 9.576094 9.820027 9.173109 6947.0454 3490.1274 5180.841 """NOT_AVAILABLE""" 6248.8105 6295.0 "" "" 6496.783 5597.372 -0.2024 153.9433 207.10468 3.6272 """F""" 3.4126723 1.1939529 2.5786753 1.3696594 1.3682
+2798666630707965952 10.278895 10.740388 9.651535 2767.5857 811.754 1313.2725 """VARIABLE""" 4932.76 5096.0 "" "" 5098.0293 4503.438 -0.1408 70.6249 82.53957 6.0243 """K""" 9.350083 0.78961545 0.31497726 0.7683741 0.7691
+2799731129761703936 10.150621 10.509335 9.624226 7252.217 3086.8293 4988.2485 """NOT_AVAILABLE""" 5512.5684 5539.0 "" "" 5799.2676 4797.486 -0.0184 104.6944 124.25148 5.0164 """G""" 8.215297 0.91027385 0.727469 0.9336372 0.9341
+2800532776817575808 11.815852 12.265108 11.203063 2006.7424 920.58655 1349.9097 """VARIABLE""" 5030.827 5081.0 "" "" 5363.2485 4700.6924 -0.0361 155.1811 207.26778 5.8363 """K""" 12.408314 0.79456383 0.37251043 0.80330974 0.7967
+2800629155883586944 11.484802 11.901017 10.9005575 1580.1919 801.633 1273.3892 """NOT_AVAILABLE""" 5297.4746 5440.0 "" "" 5434.5244 4800.924 -0.0547 139.5517 199.99304 5.6543 """G""" "" "" 0.42990777 0.7780761 0.7632
+2801331636438982528 9.393265 9.795652 8.8227825 3786.9636 1125.3602 1954.0574 """VARIABLE""" 5288.3564 5528.0 "" "" 5352.1465 4600.5625 -0.0604 59.0588 66.86777 5.4856 """G""" 4.6870704 0.8829345 0.4860409 0.8298331 0.828
+2801524154052909696 10.936778 11.273137 10.432842 6329.692 3330.7222 4743.791 """NOT_AVAILABLE""" 5680.779 5673.0 "" "" 5877.7334 5340.6367 -0.062 189.2612 231.65208 4.4929 """G""" 11.113314 0.9441514 1.237874 1.1479775 1.114
+2801524330148325504 10.38162 10.68352 9.912057 4920.529 3760.6533 5938.7617 """NOT_AVAILABLE""" 5812.0703 5957.0 "" "" 6099.6133 5273.0093 -0.1705 169.7009 198.8971 4.2192 """G""" 9.175412 0.9963234 1.5624756 1.2314582 1.2063
+2803615910500873216 11.10805 11.477484 10.5706 3460.809 1586.9972 3150.6245 """NOT_AVAILABLE""" 5578.0894 5519.0 "" "" 5566.397 4984.748 -0.0541 154.6651 184.80019 5.0437 """G""" 3.1247163 0.961879 0.7122089 0.90265167 0.8986
+2803834610235694208 7.4683485 7.711683 7.0571504 4066.0977 1057.9717 1798.5516 """NOT_AVAILABLE""" 6160.3193 6168.0 "" "" 6385.6357 6104.5845 -0.9361 83.9305 84.3116 2.8457 """F""" 2.9336274 1.4060646 5.554911 2.0690215 2.0632
+2803985135954410368 10.973485 11.401167 10.367988 3538.322 1398.5587 2129.1147 """NOT_AVAILABLE""" 5010.9263 5277.0 "" "" 5182.327 4761.733 -0.877 136.3282 161.34781 5.249 """K""" "" "" 0.6499534 1.0683231 1.0648
+2805819709760162304 11.036614 11.345163 10.565622 2334.6624 961.0667 1171.963 """NOT_AVAILABLE""" 5875.749 6113.0 "" "" 6077.9883 5098.0156 -0.0706 190.6485 263.03668 4.5643 """G""" 3.0693736 1.0452077 1.1349443 1.0249413 0.9857
+2807299205735227392 11.712649 12.054025 11.196436 1923.2505 677.9798 1062.9165 """VARIABLE""" "" 5632.0 "" "" 5711.1357 5172.8145 "" "" 308.1203 "" """G""" "" "" "" "" ""
+2808554293962318592 9.846207 10.420939 9.127468 4749.794 1449.4884 2326.0598 """NOT_AVAILABLE""" 4540.8276 4665.0 "" "" 4744.153 3996.671 0.0005 44.3987 47.9376 6.6139 """K""" "" 0.71591693 0.20609666 0.7334906 0.7349
+2808644217692921472 11.596228 11.975775 11.05004 4027.1206 2418.528 2630.8208 """NOT_AVAILABLE""" 5470.1167 5653.0 "" "" 5601.1484 4685.5625 -0.1269 181.6636 234.34935 5.2067 """G""" 4.021736 0.9288895 0.62198496 0.87717646 0.872
+2808657343112969088 10.7326 11.061736 10.237845 1208.1707 357.49234 475.37762 """NOT_AVAILABLE""" 5798.838 5829.0 "" "" 5952.38 4813.1055 -0.2133 155.1565 182.90417 4.6742 """G""" 3.3008733 1.019505 0.9981107 0.98986787 0.9842
+2808682563160925952 8.874199 9.240895 8.334552 4673.7935 3737.164 4594.8496 """NOT_AVAILABLE""" 5393.396 5416.0 "" "" 5466.835 4899.693 -0.2364 51.9458 60.50618 5.281 """G""" 6.020455 0.8976832 0.5744649 0.8673901 0.8731
+2808685964775023744 11.321426 11.671484 10.803225 2124.7637 1845.0424 3176.0984 """NOT_AVAILABLE""" 5704.7837 5551.0 "" "" 5703.824 5074.7236 -0.7706 192.2293 248.01904 4.7939 """G""" 3.6303816 0.99945223 0.9153519 0.96731013 0.9812
+2808876347789682432 11.162872 11.619033 10.547686 2033.2788 1322.9977 1982.6512 """NOT_AVAILABLE""" 5025.453 5276.0 "" "" 5275.233 4749.756 -0.129 141.8062 161.9117 5.3471 """K""" "" "" 0.658119 1.0710002 0.9966
+2809169264560105472 10.996877 11.281026 10.547158 3917.3215 2247.7 3241.8345 """NOT_AVAILABLE""" 5922.7827 5915.0 "" "" 6109.4824 5158.452 -0.4739 202.6234 280.28296 4.4489 """G""" 3.6970627 1.0527526 1.2602938 1.0649889 1.0529
+2809390339411665920 9.99055 10.2494545 9.567083 4705.987 3147.3577 4122.015 """NOT_AVAILABLE""" 6082.3174 6337.0 "" "" 6323.3516 5442.7812 -0.5505 153.9489 197.54883 4.0447 """F""" 4.220239 1.1029667 1.7962996 1.206678 1.2053
+2809606324727185024 10.496899 10.790727 10.040085 5323.4546 1929.0156 2414.758 """NOT_AVAILABLE""" 5913.955 6253.0 "" "" 6099.7417 5736.6543 -0.1336 215.5865 239.72263 3.8003 """F""" 7.5936675 1.0636249 2.2067327 1.4147781 1.4095
+2848756497819382272 10.563436 10.992933 9.969762 7849.088 3283.1572 5428.0264 """NOT_AVAILABLE""" 5158.591 5205.0 "" "" 5222.9717 4599.945 0.0455 93.1064 109.88713 5.6788 """G""" 5.8126774 0.85012656 0.41425917 0.80658805 0.8049
+2848761273822999808 10.763297 11.0738 10.28459 5098.088 2905.2502 3817.7493 """NOT_AVAILABLE""" 5741.3765 5928.0 "" "" 6068.5205 5089.9478 -0.2697 195.976 220.59286 4.2917 """G""" 10.268383 0.97053194 1.4253175 1.2049679 1.201
+2848774983357891456 10.394219 10.795783 9.82664 2925.385 1162.083 1625.8881 """VARIABLE""" 5434.3784 5452.0 "" "" 5390.6255 5035.9795 0.0582 94.6922 119.40485 5.3853 """G""" "" "" 0.5214647 0.8149397 0.8132
+2848979080203597312 8.099994 8.375785 7.6549435 4900.9614 3247.0068 3858.896 """NOT_AVAILABLE""" 5954.0073 6049.0 "" "" 5967.553 5228.466 -0.4552 54.9474 69.204735 4.3903 """F""" 3.2371614 1.0663493 1.2943369 1.069223 1.0704
+2855865871283966720 11.498305 11.977338 10.865734 740.7349 221.4922 321.83948 """NOT_AVAILABLE""" 4951.2573 "" "" "" 5206.9253 4198.5615 -0.8461 151.3575 148.65784 5.4607 """K""" "" "" 0.53154963 0.98958266 0.9939
+2856523409301885312 11.97411 12.386268 11.394535 5648.9385 2253.243 3843.65 """NOT_AVAILABLE""" 5377.6553 5264.0 "" "" 5322.1953 4586.718 -0.4681 168.3286 216.34769 5.7068 """K""" "" "" 0.4172487 0.7430473 0.7268
+2859768862684677888 11.403717 11.723829 10.895957 1783.6284 877.61597 409.4428 """NOT_AVAILABLE""" 5777.6113 6013.0 "" "" 5991.837 5000.6074 -0.1775 218.1629 279.20938 4.6445 """G""" 5.150221 0.99760866 1.0313592 1.0136673 1.0048
+2861704587265072896 10.180744 10.483811 9.712064 4006.6257 4813.8013 4147.497 """NOT_AVAILABLE""" 5836.0083 5998.0 "" "" 6096.1333 5297.5254 -0.2782 143.8538 175.96124 4.3607 """G""" 7.631179 1.0032011 1.3718832 1.1457895 1.1245
+2863982672278859904 10.854234 11.123774 10.4218445 7067.1187 3546.234 4923.2466 """NOT_AVAILABLE""" 6034.573 6174.0 "" "" 6293.8438 5399.035 -0.2982 215.6877 295.98648 4.1762 """F""" 4.2125325 1.0842805 1.6074545 1.1598594 1.1433

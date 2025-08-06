@@ -27,6 +27,13 @@ class TessCatalogDownloader(DatasetDownloader):
     _catalog = "TESS_v82"
     _units_override = {"ra": u.deg, "dec": u.deg}
     _mandatory_fields = {"ra", "dec", "priority"}
+    _extra_field_descriptions = {
+        "tic_id": "Star TIC id [int64]",
+        "gaia_id": "Star GAIA id [int64]",
+        "ra": "Star right ascension [deg]",
+        "dec": "Star declination [deg]",
+        "priority": "Higher priority is assigned to the TESS team to targets that are likely to host planets",
+    }
 
     def __init__(
         self,
@@ -71,19 +78,15 @@ class TessCatalogDownloader(DatasetDownloader):
     def _clean_and_fix(self, table: QTable) -> QTable:
         override_units(table, self._units_override)
         # Force gaia_id to be integer
-        table["gaia_id"] = table.to_pandas()["gaia_id"].astype(int).to_numpy()
+        table["gaia_id"] = table["gaia_id"].value.astype(int)
         return table
 
     def _get_table_header(self, table: QTable) -> QTableHeader:
         header = get_empty_table_header(table)
 
-        header["tic_id"].description = "Star TIC id [int64]"
-        header["gaia_id"].description = "Star GAIA id [int64]"
-        header["ra"].description = "Star right ascension [deg]"
-        header["dec"].description = "Star declination [deg]"
-        header[
-            "priority"
-        ].description = "Higher priority is assigned to the TESS team to targets that are likely to host planets"
+        for field, description in self._extra_field_descriptions.items():
+            header[field].description = description
+
         return header
 
     def _download_by_id(self, ids: Sequence[int], columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
@@ -118,7 +121,11 @@ class TessCatalogDownloader(DatasetDownloader):
         return result
 
     def _query_ctl_casjob(
-        self, catalog: str, query: str, estimated_minutes: int = 5, quick: bool = False
+        self,
+        catalog: str,
+        query: str,
+        estimated_minutes: int = 5,
+        quick: bool = False,
     ) -> Optional[QTable]:
         if quick:
             return self._casjob_api.quick(q=query, context=catalog)

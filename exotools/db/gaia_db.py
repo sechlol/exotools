@@ -2,6 +2,8 @@ import numpy as np
 from astropy.table import QTable
 from typing_extensions import Self
 
+from exotools.utils.masked_operations import impute_from_columns
+
 from .base_db import BaseDB
 
 _ID_FIELD = "gaia_id"
@@ -15,16 +17,8 @@ class GaiaDB(BaseDB):
         super().__init__(gaia_dataset, id_field=_ID_FIELD)
 
     @property
-    def tic_ids(self) -> np.ndarray:
-        return self.view["tic_id"].value
-
-    @property
     def gaia_ids(self) -> np.ndarray:
-        return self.view["gaia_ids"].value
-
-    @property
-    def unique_tic_ids(self) -> np.ndarray:
-        return np.unique(self.tic_ids)
+        return self.view["gaia_id"].value
 
     @property
     def unique_gaia_ids(self) -> np.ndarray:
@@ -35,17 +29,10 @@ class GaiaDB(BaseDB):
         """
         Creates a new column "radius" as the average of the available estimations. Fixes nan values where possible
         """
-        r1 = dataset["radius_flame"]
-        r2 = dataset["radius_gspphot"]
-
-        # Take average of the two observations where both are present
-        r3 = (r1 + r2) / 2
-        r1_fill = r1.mask ^ r3.mask
-        r2_fill = r2.mask ^ r3.mask
-        r3[r1_fill] = r1[r1_fill]
-        r3[r2_fill] = r2[r2_fill]
-        r3.mask = r1.mask & r2.mask
-        dataset["radius"] = r3
+        # Use the utility function to impute values from radius_flame and radius_gspphot columns
+        dataset["radius"] = impute_from_columns(
+            [dataset["radius_flame"], dataset["radius_gspphot"]], strategy="average"
+        )
         return dataset
 
     @staticmethod

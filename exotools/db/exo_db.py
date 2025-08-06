@@ -72,19 +72,26 @@ class ExoDB(BaseDB):
         return self._factory(self.view[self.view["default_flag"] == 1])
 
     def get_tess_planets(self) -> Self:
-        condition = np.char.find(self.view["disc_telescope"], "TESS") != -1
-        return self._factory(self.view[condition])
+        # Create a boolean mask for rows where disc_telescope contains "TESS"
+        mask = np.char.find(self.view["disc_telescope"].value.astype("U"), "TESS") != -1
+        return self._factory(self.view[mask])
 
     def get_kepler_planets(self) -> Self:
-        condition = np.char.find(self.view["disc_telescope"], "Kepler") != -1
-        return self._factory(self.view[condition])
+        # Create a boolean mask for rows where disc_telescope contains "Kepler"
+        mask = np.char.find(self.view["disc_telescope"].value.astype("U"), "Kepler") != -1
+        return self._factory(self.view[mask])
 
     def get_transiting_planets(self, kepler_or_tess_only: bool = False) -> Self:
         condition = self.view["tran_flag"] == 1
         if kepler_or_tess_only:
-            telescope_condition = np.char.find(self.view["disc_telescope"], "TESS") != -1
-            telescope_condition |= np.char.find(self.view["disc_telescope"], "Kepler") != -1
-            condition &= telescope_condition
+            # Create a boolean mask for rows where disc_telescope contains "TESS" or "Kepler"
+            telescope_mask = np.array(
+                [
+                    isinstance(telescope, str) and ("TESS" in telescope or "Kepler" in telescope)
+                    for telescope in self.view["disc_telescope"]
+                ]
+            )
+            condition &= telescope_mask
         return self._factory(self.view[condition])
 
     @staticmethod
