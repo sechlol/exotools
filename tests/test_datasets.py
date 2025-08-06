@@ -8,8 +8,9 @@ from exotools.datasets import (
     GaiaParametersDataset,
     KnownExoplanetsDataset,
     LightcurveDataset,
-    TessDataset,
+    TicCatalogDataset,
 )
+from exotools.datasets.tic_observations import TicObservationsDataset
 from exotools.io import MemoryStorage
 
 from .conftest import TEST_ASSETS_LC
@@ -18,7 +19,7 @@ from .conftest import TEST_ASSETS_LC
 class TestDatasets:
     @staticmethod
     def teardown_method():
-        TessDataset._catalog_downloader = None
+        TicCatalogDataset._catalog_downloader = None
 
     def test_known_exoplanets_dataset(self, known_exoplanets_test_data, gaia_parameters_test_data):
         """Test KnownExoplanetsDataset with mocked downloader"""
@@ -152,43 +153,44 @@ class TestDatasets:
         mock_tic_header = MagicMock()
 
         # Mock the downloaders
-        with patch("exotools.datasets.tess.TessObservationsDownloader") as mock_obs_downloader_class:
+        with patch("exotools.datasets.tic_observations.TessObservationsDownloader") as mock_obs_downloader_class:
             mock_obs_downloader = MagicMock()
             mock_obs_downloader.download_by_id.return_value = (mock_obs_qtable, mock_obs_header)
             mock_obs_downloader_class.return_value = mock_obs_downloader
 
-            with patch("exotools.datasets.tess.TessCatalogDownloader") as mock_cat_downloader_class:
+            with patch("exotools.datasets.tic_catalog.TessCatalogDownloader") as mock_cat_downloader_class:
                 mock_cat_downloader = MagicMock()
                 mock_cat_downloader.download_by_id.return_value = (mock_tic_qtable, mock_tic_header)
                 mock_cat_downloader.download.return_value = (mock_tic_qtable, mock_tic_header)
                 mock_cat_downloader_class.return_value = mock_cat_downloader
 
                 # Create dataset
-                dataset = TessDataset(storage=storage)
+                catalog_dataset = TicCatalogDataset(storage=storage)
+                observation_dataset = TicObservationsDataset(storage=storage)
 
                 # 1. Test that metadata can be queried without authentication
                 test_tic_ids = [123456, 789012]
-                dataset.download_observation_metadata(targets_tic_id=test_tic_ids)
+                observation_dataset.download_observation_metadata(targets_tic_id=test_tic_ids)
                 mock_obs_downloader.download_by_id.assert_called_once_with(test_tic_ids)
 
                 # 2. Test that TIC queries fail without authentication
-                with pytest.raises(ValueError, match="You need to call TessDataset.authenticate()"):
-                    dataset.download_tic_targets(limit=10)
+                with pytest.raises(ValueError, match="You need to call TicCatalogDataset.authenticate()"):
+                    catalog_dataset.download_tic_targets(limit=10)
 
-                with pytest.raises(ValueError, match="You need to call TessDataset.authenticate()"):
-                    dataset.download_tic_targets_by_ids(tic_ids=[123456])
+                with pytest.raises(ValueError, match="You need to call TicCatalogDataset.authenticate()"):
+                    catalog_dataset.download_tic_targets_by_ids(tic_ids=[123456])
 
                 # 3. Test that authentication enables TIC queries
-                TessDataset.authenticate_casjobs(username="test_user", password="test_pass")
+                TicCatalogDataset.authenticate_casjobs(username="test_user", password="test_pass")
 
                 # Verify that the catalog downloader was created with the right credentials
                 mock_cat_downloader_class.assert_called_once_with(username="test_user", password="test_pass")
 
                 # Now TIC queries should work
-                dataset.download_tic_targets(limit=10)
+                catalog_dataset.download_tic_targets(limit=10)
                 mock_cat_downloader.download.assert_called_once_with(limit=10)
 
-                dataset.download_tic_targets_by_ids(tic_ids=[123456])
+                catalog_dataset.download_tic_targets_by_ids(tic_ids=[123456])
                 mock_cat_downloader.download_by_id.assert_called_once_with([123456])
 
     def test_tess_dataset(self, tess_observations_test_data):
@@ -197,30 +199,33 @@ class TestDatasets:
         storage = MemoryStorage()
 
         # Mock the observations downloader
-        with patch("exotools.datasets.tess.TessObservationsDownloader") as mock_obs_downloader_class:
+        with patch("exotools.datasets.tic_observations.TessObservationsDownloader") as mock_obs_downloader_class:
             mock_obs_downloader = MagicMock()
             mock_obs_downloader.download_by_id.return_value = (qtable, header)
             mock_obs_downloader_class.return_value = mock_obs_downloader
 
             # Mock the catalog downloader (optional)
-            with patch("exotools.datasets.tess.TessCatalogDownloader") as mock_cat_downloader_class:
+            with patch("exotools.datasets.tic_catalog.TessCatalogDownloader") as mock_cat_downloader_class:
                 mock_cat_downloader = MagicMock()
                 mock_cat_downloader.download_by_id.return_value = (qtable, header)
                 mock_cat_downloader.download.return_value = (qtable, header)
                 mock_cat_downloader_class.return_value = mock_cat_downloader
 
                 # Test dataset
-                dataset = TessDataset(storage=storage)
+                catalog_dataset = TicCatalogDataset(storage=storage)
+                observation_dataset = TicObservationsDataset(storage=storage)
 
                 # Test download observation metadata
                 test_tic_ids = [123456, 789012, 345678]
-                tess_meta_db = dataset.download_observation_metadata(targets_tic_id=test_tic_ids, store=True)
+                tess_meta_db = observation_dataset.download_observation_metadata(
+                    targets_tic_id=test_tic_ids, store=True
+                )
 
                 # Verify observations downloader was called correctly
                 mock_obs_downloader.download_by_id.assert_called_once_with(test_tic_ids)
 
                 # Verify data was stored in memory
-                observations_name = dataset._observations_name
+                observations_name = observation_dataset.name
                 data_key = storage._get_prefixed_key(observations_name, ".qtable")
                 assert data_key in storage._memory
                 stored_qtable = storage._memory[data_key]
@@ -231,17 +236,17 @@ class TestDatasets:
                 assert len(tess_meta_db._ds) == len(qtable)
 
                 # Test loading stored dataset
-                loaded_db = dataset.load_observation_metadata()
+                loaded_db = observation_dataset.load_observation_metadata()
                 assert loaded_db is not None
                 assert len(loaded_db._ds) == len(qtable)
 
                 # Test download_tic_targets
-                TessDataset.authenticate_casjobs("username", "password")
+                TicCatalogDataset.authenticate_casjobs("username", "password")
 
                 test_limit = 50
                 test_mass_range = (0.8, 1.2)
                 test_priority = 0.5
-                tic_db = dataset.download_tic_targets(
+                tic_db = catalog_dataset.download_tic_targets(
                     limit=test_limit,
                     star_mass_range=test_mass_range,
                     priority_threshold=test_priority,
@@ -254,7 +259,7 @@ class TestDatasets:
                 mock_cat_downloader.download.assert_called_once_with(limit=test_limit)
 
                 # Verify TIC data was stored in memory
-                tic_name = dataset._tic_name
+                tic_name = catalog_dataset.name
                 tic_data_key = storage._get_prefixed_key(tic_name, ".qtable")
                 assert tic_data_key in storage._memory
                 stored_tic_qtable = storage._memory[tic_data_key]
@@ -265,13 +270,13 @@ class TestDatasets:
                 assert len(tic_db._ds) == len(qtable)
 
                 # Test load_tic_target_dataset
-                loaded_tic_db = dataset.load_tic_target_dataset()
+                loaded_tic_db = catalog_dataset.load_tic_target_dataset()
                 assert loaded_tic_db is not None
                 assert len(loaded_tic_db._ds) == len(qtable)
 
                 # Test download_tic_targets_by_ids with a different name
                 test_name = "custom_dataset"
-                tic_by_id_db = dataset.download_tic_targets_by_ids(
+                tic_by_id_db = catalog_dataset.download_tic_targets_by_ids(
                     tic_ids=test_tic_ids, store=True, with_name=test_name
                 )
 
@@ -279,7 +284,7 @@ class TestDatasets:
                 mock_cat_downloader.download_by_id.assert_called_with(test_tic_ids)
 
                 # Verify TIC data was stored in memory with custom name
-                custom_tic_name = f"{dataset._tic_name}_{test_name}"
+                custom_tic_name = f"{catalog_dataset.name}_{test_name}"
                 custom_tic_data_key = storage._get_prefixed_key(custom_tic_name, ".qtable")
                 assert custom_tic_data_key in storage._memory
                 stored_custom_tic_qtable = storage._memory[custom_tic_data_key]
@@ -290,7 +295,7 @@ class TestDatasets:
                 assert len(tic_by_id_db._ds) == len(qtable)
 
                 # Test loading custom named dataset
-                loaded_custom_tic_db = dataset.load_tic_target_dataset(with_name=test_name)
+                loaded_custom_tic_db = catalog_dataset.load_tic_target_dataset(with_name=test_name)
                 assert loaded_custom_tic_db is not None
                 assert len(loaded_custom_tic_db._ds) == len(qtable)
 

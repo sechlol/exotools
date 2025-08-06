@@ -3,7 +3,7 @@ import os
 
 import numpy as np
 
-from exotools import CandidateExoplanetsDataset, KnownExoplanetsDataset, LightcurveDataset, TessDataset
+from exotools import CandidateExoplanetsDataset, KnownExoplanetsDataset, LightcurveDataset, TicCatalogDataset
 from exotools.datasets import GaiaParametersDataset
 from exotools.io.fs_storage import EcsvStorage
 from tests.conftest import _TEST_ASSETS_DIR, TEST_ASSETS_LC, TEST_ASSETS_QTABLES
@@ -19,7 +19,7 @@ def generate_test_qtables():
     known_ds = KnownExoplanetsDataset(storage=storage)
     candidates_ds = CandidateExoplanetsDataset(storage=storage)
     gaia_dataset = GaiaParametersDataset(storage=storage)
-    tess_ds = TessDataset(
+    tess_ds = TicCatalogDataset(
         storage=storage,
         username=os.environ.get("CASJOB_USER"),
         password=os.environ.get("CASJOB_PASSWORD"),
@@ -64,7 +64,7 @@ def generate_test_qtables():
 
 
 def generate_test_lightcurves():
-    tess_meta = TessDataset(storage=EcsvStorage(TEST_ASSETS_QTABLES)).load_observation_metadata()
+    tess_meta = TicCatalogDataset(storage=EcsvStorage(TEST_ASSETS_QTABLES)).load_observation_metadata()
     lc_dataset = LightcurveDataset(lc_storage_path=TEST_ASSETS_LC, override_existing=True)
 
     small_meta = tess_meta.select_random_sample(n=10)
