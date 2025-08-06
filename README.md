@@ -5,9 +5,15 @@
   <img src="img/exotools_horizontal.png" alt="exotools logo" width="500"/>
 </div>
 
+
 [![Tests](https://github.com/sechlol/exotools/actions/workflows/tests.yml/badge.svg)](https://github.com/sechlol/exotools/actions/workflows/tests.yml)
 [![Lint](https://github.com/sechlol/exotools/actions/workflows/lint.yml/badge.svg)](https://github.com/sechlol/exotools/actions/workflows/lint.yml)
 [![codecov](https://codecov.io/gh/sechlol/exotools/graph/badge.svg?token=M9PKWIJ25Z)](https://codecov.io/gh/sechlol/exotools)
+
+
+[![PyPI version](https://badge.fury.io/py/exotools.svg)](https://badge.fury.io/py/exotools)
+[![Python Versions](https://img.shields.io/pypi/pyversions/exotools.svg)](https://pypi.org/project/exotools/)
+[![Powered by AstroPy](https://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat)](https://www.astropy.org/)
 
 Python tools for working with exoplanet data from various sources including NASA's Exoplanet Archive, TESS, and Gaia.
 
