@@ -132,7 +132,7 @@ from exotools import LightcurveDataset
 
 # Download light curve .fits files
 lc_dataset = LightcurveDataset(storage, verbose=True)
-lc_db = lc_dataset.download_lightcurves_from_tess_db(tess_meta)
+lc_db = lc_dataset.download_lightcurves_from_tic_db(tess_meta)
 
 print(f"Downloaded {len(lc_db)} lightcurves:", lc_db.unique_obs_ids)
 

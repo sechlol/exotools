@@ -45,8 +45,8 @@ class LightcurveDataset(BaseDataset):
         self._folder_path = lc_storage_path / self.name
         self._downloader = LightcurveDownloader(override_existing=override_existing, verbose=verbose)
 
-    def download_lightcurves_from_tess_db(
-        self, tess_db: TicObsDB, with_name: Optional[str] = None
+    def download_lightcurves_from_tic_db(
+        self, tic_obs_db: TicObsDB, with_name: Optional[str] = None
     ) -> Optional[LightcurveDB]:
         """
         Download lightcurves for targets in a TESS metadata database.
@@ -56,7 +56,7 @@ class LightcurveDataset(BaseDataset):
         Files are organized in subdirectories by TIC ID.
 
         Args:
-            tess_db: Database containing TESS observation metadata with URLs to lightcurve files.
+            tic_obs_db: Database containing TESS observation metadata with URLs to lightcurve files.
             with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
@@ -76,7 +76,7 @@ class LightcurveDataset(BaseDataset):
                 url=row["dataURL"],
                 download_path=str(folder_path / str(row["tic_id"]) / f"{row['obs_id']}.fits"),
             )
-            for row in tess_db.view
+            for row in tic_obs_db.view
         ]
 
         logger.info(f"Downloading {len(download_params)} lightcurves")

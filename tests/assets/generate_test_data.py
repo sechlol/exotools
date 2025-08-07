@@ -74,7 +74,7 @@ def generate_test_lightcurves():
     lc_dataset = LightcurveDataset(lc_storage_path=TEST_ASSETS_LC, override_existing=True)
 
     small_meta = tic_obs.select_random_sample(n=10)
-    lc_dataset.download_lightcurves_from_tess_db(small_meta)
+    lc_dataset.download_lightcurves_from_tic_db(small_meta)
 
 
 def ensure_credentials():
