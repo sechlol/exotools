@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "exotools"
-version = "0.0.2"
+version = "0.0.3"
 description = "Tools for working with exoplanet data"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -39,6 +39,7 @@ dependencies = [
     "casjobs",
     "tqdm",
     "pyvo",
+    "tomli",
 ]
 
 [project.optional-dependencies]

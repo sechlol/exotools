@@ -1,6 +1,22 @@
 """ExoTools - Tools for working with exoplanet data."""
 
-__version__ = "0.0.2"
+import importlib.metadata
+
+try:
+    __version__ = importlib.metadata.version("exotools")
+except importlib.metadata.PackageNotFoundError:
+    # Package is not installed, try to read from pyproject.toml
+    import os
+    from pathlib import Path
+
+    import tomli
+
+    pyproject_path = Path(os.path.realpath(__file__)).parent / "pyproject.toml"
+    try:
+        with open(pyproject_path, "rb") as f:
+            __version__ = tomli.load(f)["project"]["version"]
+    except (FileNotFoundError, KeyError, ImportError):
+        __version__ = "0.0.0"
 
 
 from .datasets import (
