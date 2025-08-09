@@ -53,7 +53,7 @@ class LightcurveDB(BaseDB):
             return None
 
         # Sort lightcurves chronologically
-        lcs = [LightCurvePlus(load_lightcurve(row["path"]), obs_id=row["obs_id"]) for row in paths]
+        lcs = [LightCurvePlus(self.load_lightcurve(row["path"]), obs_id=row["obs_id"]) for row in paths]
         lcs = sorted(lcs, key=lambda x: x.time[0])
         if start_time_at_zero:
             for lc in lcs:
@@ -72,7 +72,7 @@ class LightcurveDB(BaseDB):
         path = self.view["path"][self.view["obs_id"] == obs_id]
         if len(path) == 0:
             return None
-        lc = LightCurvePlus(load_lightcurve(path[0]))
+        lc = LightCurvePlus(self.load_lightcurve(path[0]))
         if start_time_at_zero:
             lc = lc.start_at_zero()
         return lc
@@ -95,26 +95,26 @@ class LightcurveDB(BaseDB):
         ]
         return QTable(tabular_data)
 
+    @staticmethod
+    def load_lightcurve(fits_file_path: Path | str) -> LightCurve:
+        # This line stores all the additional information from the fits file. But takes more time to execute
+        # return lightkurve.utils.read(downloaded)
 
-def load_lightcurve(fits_file_path: Path | str) -> LightCurve:
-    # This line stores all the additional information from the fits file. But takes more time to execute
-    # return lightkurve.utils.read(downloaded)
+        with fits.open(str(fits_file_path)) as hdul:
+            lightcurve_data = hdul["LIGHTCURVE"].data
+            time_array: np.ndarray = lightcurve_data["TIME"]
+            flux: np.ndarray = lightcurve_data["PDCSAP_FLUX"]
+            error: np.ndarray = lightcurve_data["PDCSAP_FLUX_ERR"]
+            valid_range = ~np.isnan(time_array) & ~np.isnan(flux)
 
-    with fits.open(str(fits_file_path)) as hdul:
-        lightcurve_data = hdul["LIGHTCURVE"].data
-        time_array: np.ndarray = lightcurve_data["TIME"]
-        flux: np.ndarray = lightcurve_data["PDCSAP_FLUX"]
-        error: np.ndarray = lightcurve_data["PDCSAP_FLUX_ERR"]
-        valid_range = ~np.isnan(time_array) & ~np.isnan(flux)
+            # Convert to JD time
+            time = Time(time_array[valid_range] + 2457000, format="jd", scale="tdb")
+            flux = flux[valid_range]
 
-        # Convert to JD time
-        time = Time(time_array[valid_range] + 2457000, format="jd", scale="tdb")
-        flux = flux[valid_range]
+            return LightCurve(time=time, flux=flux, flux_err=error[valid_range], meta=dict(hdul[0].header))
 
-        return LightCurve(time=time, flux=flux, flux_err=error[valid_range], meta=dict(hdul[0].header))
-
-
-def load_lightcurve_collection(paths: list[Path]) -> LightCurveCollection:
-    lightcurves = [load_lightcurve(p).remove_outliers() for p in paths]
-    lightcurves = [(lc if np.median(lc.flux.value) > 0 else None) for lc in lightcurves]
-    return LightCurveCollection([lc for lc in lightcurves if lc is not None])
+    @staticmethod
+    def load_lightcurve_collection(paths: list[Path]) -> LightCurveCollection:
+        lightcurves = [LightcurveDB.load_lightcurve(p).remove_outliers() for p in paths]
+        lightcurves = [(lc if np.median(lc.flux.value) > 0 else None) for lc in lightcurves]
+        return LightCurveCollection([lc for lc in lightcurves if lc is not None])

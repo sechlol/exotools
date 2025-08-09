@@ -7,7 +7,7 @@ from lightkurve import LightCurve
 
 from exotools import GaiaDB, KnownExoplanetsDataset, StarSystemDB
 from exotools.datasets import GaiaParametersDataset
-from exotools.db.lightcurve_db import load_lightcurve
+from exotools.db.lightcurve_db import LightcurveDB
 from exotools.io import EcsvStorage
 from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
 
@@ -55,7 +55,7 @@ def load_all_test_lightcurves() -> dict[int, LightCurve]:
         for file_name in files:
             if ".fits" in file_name:
                 file_path = Path(path) / file_name
-                all_data[int(file_name.removesuffix(".fits"))] = load_lightcurve(file_path)
+                all_data[int(file_name.removesuffix(".fits"))] = LightcurveDB.load_lightcurve(file_path)
 
     return all_data
 
