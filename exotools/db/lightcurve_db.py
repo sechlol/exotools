@@ -114,7 +114,16 @@ class LightcurveDB(BaseDB):
             return LightCurve(time=time, flux=flux, flux_err=error[valid_range], meta=dict(hdul[0].header))
 
     @staticmethod
-    def load_lightcurve_collection(paths: list[Path]) -> LightCurveCollection:
+    def load_lightcurve_collection(paths: list[Path | str]) -> LightCurveCollection:
         lightcurves = [LightcurveDB.load_lightcurve(p).remove_outliers() for p in paths]
         lightcurves = [(lc if np.median(lc.flux.value) > 0 else None) for lc in lightcurves]
         return LightCurveCollection([lc for lc in lightcurves if lc is not None])
+
+    @staticmethod
+    def load_lightcurve_plus(fits_file_path: Path | str) -> LightCurvePlus:
+        return LightCurvePlus(LightcurveDB.load_lightcurve(fits_file_path))
+
+    @staticmethod
+    def load_lightcurve_plus_from_collection(paths: list[Path | str]) -> LightCurvePlus:
+        collection = LightcurveDB.load_lightcurve_collection(paths)
+        return LightCurvePlus(collection.stitch())
