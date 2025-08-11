@@ -2,6 +2,8 @@ import numpy as np
 from astropy.table import QTable
 from typing_extensions import Self
 
+from exotools.utils.masked_operations import safe_average
+
 from .base_db import BaseDB
 
 _ID_FIELD = "gaia_id"
@@ -27,17 +29,8 @@ class GaiaDB(BaseDB):
         """
         Creates a new column "radius" as the average of the available estimations. Fixes nan values where possible
         """
-        r1 = dataset["radius_flame"]
-        r2 = dataset["radius_gspphot"]
-
-        # Take average of the two observations where both are present
-        r3 = (r1 + r2) / 2
-        r1_fill = r1.mask ^ r3.mask
-        r2_fill = r2.mask ^ r3.mask
-        r3[r1_fill] = r1[r1_fill]
-        r3[r2_fill] = r2[r2_fill]
-        r3.mask = r1.mask & r2.mask
-        dataset["radius"] = r3
+        fields = ["radius_flame", "radius_gspphot"]
+        dataset["radius"] = safe_average(columns=[dataset[f] for f in fields])
         return dataset
 
     @staticmethod
@@ -46,8 +39,16 @@ class GaiaDB(BaseDB):
         Creates a new column "teff_mean" as the average of the available estimations.
         """
         fields = ["teff_gspphot", "teff_gspspec", "teff_esphs", "teff_espucd", "teff_msc1", "teff_msc2"]
-        subset = dataset[fields].to_pandas()
-        dataset["teff_mean"] = subset.mean(axis=1)
+        dataset["teff_mean"] = safe_average(columns=[dataset[f] for f in fields])
+        return dataset
+
+    @staticmethod
+    def compute_mean_mass(dataset: QTable) -> QTable:
+        """
+        Creates a new column "teff_mean" as the average of the available estimations.
+        """
+        fields = ["teff_gspphot", "teff_gspspec", "teff_esphs", "teff_espucd", "teff_msc1", "teff_msc2"]
+        dataset["teff_mean"] = safe_average(columns=[dataset[f] for f in fields])
         return dataset
 
     @staticmethod

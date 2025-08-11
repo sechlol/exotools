@@ -150,6 +150,15 @@ class LightCurvePlus:
         return LightCurvePlus(self.lc[index])
 
 
+def copy_lightcurve(lightcurve: LightCurve, with_flux: Optional[np.ndarray] = None) -> LightCurve:
+    if with_flux is None:
+        return lightcurve.copy(copy_data=True)
+
+    lc = LightCurve(time=lightcurve.time.copy(), flux=with_flux.copy())
+    lc.meta = lightcurve.meta
+    return lc
+
+
 def _btjd_to_jd_time(time: Time) -> Time:
     return Time(val=time.value + 2457000, format="jd", scale="tdb")
 
@@ -164,15 +173,6 @@ def _convert_time_to_jd(lc: LightCurve) -> LightCurve:
         new_t = _btjd_to_jd_time(lc.time)
         return LightCurve(time=new_t, flux=lc.flux, flux_err=lc.flux_err, meta=lc.meta)
     raise ValueError(f"Time format {lc.time.format} unknown/unsupported.")
-
-
-def copy_lightcurve(lightcurve: LightCurve, with_flux: Optional[np.ndarray] = None) -> LightCurve:
-    if with_flux is None:
-        return lightcurve.copy(copy_data=True)
-
-    lc = LightCurve(time=lightcurve.time.copy(), flux=with_flux.copy())
-    lc.meta = lightcurve.meta
-    return lc
 
 
 def _get_phase(time: np.ndarray, period: float, midpoint: float) -> np.ndarray:
