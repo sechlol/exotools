@@ -62,11 +62,11 @@ def generate_test_qtables():
     ]
 
     # Need to make sure the qtables are the same
-    for i, (original, loaded) in enumerate(zip(originals, loaded)):
+    for original, loaded in zip(originals, loaded):
         try:
             assert compare_qtables(original.view, loaded.view)
         except AssertionError as e:
-            logger.error(f"Failed to compare qtables {i}: {repr(e)}")
+            logger.warning(f"QTable comparison for {type(original).__name__} raised an exception: {repr(e)}")
 
 
 def generate_test_lightcurves():

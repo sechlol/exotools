@@ -4,8 +4,10 @@ import pytest
 from astropy.table import QTable
 from typing_extensions import Self
 
+from exotools import ExoDB
 from exotools.constants import NAN_VALUE
 from exotools.db.base_db import BaseDB
+from exotools.utils import QTableHeader
 
 
 class TestDB(BaseDB):
@@ -283,3 +285,25 @@ class TestBaseDb:
         # Should be an empty DataFrame
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 0
+
+    def test_get_unit(self, exo_test_db: ExoDB, known_exoplanets_test_data: tuple[QTable, QTableHeader]):
+        qtable, header = known_exoplanets_test_data
+
+        for col_name, info in header.items():
+            unit = exo_test_db.get_unit(col_name)
+            if info.unit is None:
+                assert unit is None
+            else:
+                assert unit is not None, f"Unit not found for column {col_name} ({info.unit})"
+                assert unit == info.unit or str(unit) == info.unit, (
+                    f"Unit mismatch for column {col_name}: {unit} != {info.unit}"
+                )
+
+    # def test_get_unmasked_column(self, exo_test_db: ExoDB, known_exoplanets_test_data: tuple[QTable, QTableHeader]):
+    #     qtable, header = known_exoplanets_test_data
+    #
+    #     for col_name, info in header.items():
+    #         data = exo_test_db.get_unmasked_column(col_name)
+    #
+    #         assert pd.isnull(data).sum() == 0, f"Found NaNs in column {col_name}"
+    #         assert (data == NAN_VALUE).sum() == 0, f"Found NAN_VALUEs in column {col_name}"

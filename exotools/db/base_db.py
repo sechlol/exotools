@@ -72,11 +72,18 @@ class BaseDB(ABC):
     def append(self, other: Self) -> Self:
         return self._factory(QTable(np.concatenate([self._ds, other._ds])))
 
-    def get_unmasked_column(self, column_name: str) -> np.ndarray:
-        return self._ds[column_name][~self._ds[column_name].mask]
+    # def get_unmasked_column(self, column_name: str) -> np.ndarray:
+    #     col = self._ds[column_name]
+    #     if hasattr(col, "unmasked"):
+    #         return col.unmasked.value
+    #     if hasattr(col, "mask"):
+    #         filled_col = col.filled(NAN_VALUE)
+    #         return filled_col[~col.mask & (filled_col != NAN_VALUE)].value
+    #     return col[~np.isnan(col) & (col != NAN_VALUE)].value
 
     def get_unit(self, column_name: str) -> Optional[u.Unit]:
-        return self._ds[column_name].unit
+        col = self._ds[column_name]
+        return col.unit if hasattr(col, "unit") else None
 
     def to_pandas(self) -> pd.DataFrame:
         if len(self._ds) == 0:
