@@ -17,16 +17,13 @@ exotools provides several dataset classes for working with exoplanet data:
 
 .. code-block:: python
 
-    from exotools import KnownExoplanetsDataset, CandidateExoplanetsDataset, TessDataset, LightcurveDataset
+    from exotools import KnownExoplanetsDataset, CandidateExoplanetsDataset, LightcurveDataset
 
     # Load known exoplanets
     known = KnownExoplanetsDataset()
 
     # Access candidate exoplanets
     candidates = CandidateExoplanetsDataset()
-
-    # Work with TESS data
-    tess = TessDataset()
 
     # Analyze lightcurves
     lc = LightcurveDataset()
@@ -38,7 +35,7 @@ exotools provides database classes for efficient data management:
 
 .. code-block:: python
 
-    from exotools import CandidateDB, ExoDB, GaiaDB, StarSystemDB, LightcurveDB, TessMetaDB, TicDB
+    from exotools import CandidateDB, ExoDB, GaiaDB, StarSystemDB, LightcurveDB, TicDB
 
     # Access exoplanet database
     exo_db = ExoDB()
@@ -48,6 +45,27 @@ exotools provides database classes for efficient data management:
 
     # Manage lightcurve data
     lc_db = LightcurveDB()
+
+    # Access TIC catalog data
+    tic_db = TicDB()
+
+Star System Components
+---------------------
+
+exotools provides classes for working with star systems:
+
+.. code-block:: python
+
+    from exotools import Star, Planet, StarSystem, UncertainValue
+
+    # Create a star
+    star = Star(name="Sun", mass=1.0)
+
+    # Create a planet
+    planet = Planet(name="Earth", radius=1.0)
+
+    # Create a star system
+    system = StarSystem(star=star, planets=[planet])
 
 Download Utilities
 -----------------
