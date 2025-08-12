@@ -50,14 +50,6 @@ class GaiaDB(BaseDB):
         In: Doyle, Laurence (ed.). Circumstellar Habitable Zones, 117-142. Travis House Publications, Menlo Park.
         """
         valid_luminosity = np.where(dataset["lum_flame"] > 0, dataset["lum_flame"], np.nan)
-        dataset["inner_hz"] = GaiaDB.inner_hz(valid_luminosity)
-        dataset["outer_hz"] = GaiaDB.outer_hz(valid_luminosity)
+        dataset["inner_hz"] = np.sqrt(valid_luminosity / 1.1)
+        dataset["outer_hz"] = np.sqrt(valid_luminosity / 0.53)
         return dataset
-
-    @staticmethod
-    def inner_hz(luminosity: np.ndarray):
-        return np.sqrt(luminosity / 1.1)
-
-    @staticmethod
-    def outer_hz(luminosity: np.ndarray):
-        return np.sqrt(luminosity / 0.53)
