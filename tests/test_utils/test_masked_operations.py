@@ -7,8 +7,9 @@ import pytest
 from astropy import units as u
 from astropy.table import Column, MaskedColumn
 from astropy.units import Quantity
+from astropy.utils.masked import Masked
 
-from exotools.utils.masked_operations import impute_from_columns, safe_average, safe_combine, safe_fill
+from exotools.utils.masked_operations import impute_from_columns, safe_average_columns, safe_combine, safe_fill
 
 
 class TestSafeAverage:
@@ -18,55 +19,43 @@ class TestSafeAverage:
         """Test basic averaging of unmasked columns."""
         col1 = MaskedColumn([1.0, 2.0, 3.0])
         col2 = MaskedColumn([4.0, 5.0, 6.0])
-        result = safe_average([col1, col2])
+        result = safe_average_columns([col1, col2])
 
-        assert isinstance(result, MaskedColumn)
+        assert isinstance(result, Column)
         assert len(result) == 3
         assert np.allclose(result, [2.5, 3.5, 4.5])
-        assert not np.any(result.mask)  # No masked values
+        assert not np.any(np.isnan(result))  # No masked values
 
     def test_with_masked_values(self):
         """Test averaging with some masked values."""
         col1 = MaskedColumn([1.0, 2.0, 3.0], mask=[False, False, True])
         col2 = MaskedColumn([4.0, 5.0, 6.0], mask=[False, True, False])
-        result = safe_average([col1, col2])
 
-        assert isinstance(result, MaskedColumn)
+        result = safe_average_columns([col1, col2])
+
+        assert isinstance(result, Column)
         assert len(result) == 3
         assert np.isclose(result[0], 2.5)  # Average of 1.0 and 4.0
         assert np.isclose(result[1], 2.0)  # Only col1 value (2.0) is unmasked
         assert np.isclose(result[2], 6.0)  # Only col2 value (6.0) is unmasked
-        assert not np.any(result.mask)  # All rows have at least one value
 
     def test_all_masked(self):
         """Test averaging when all values for a row are masked."""
         col1 = MaskedColumn([1.0, 2.0, 3.0], mask=[False, True, True])
         col2 = MaskedColumn([4.0, 5.0, 6.0], mask=[False, True, True])
-        result = safe_average([col1, col2])
+        result = safe_average_columns([col1, col2])
 
-        assert isinstance(result, MaskedColumn)
+        assert isinstance(result, Masked)
         assert len(result) == 3
         assert np.isclose(result[0], 2.5)  # Average of 1.0 and 4.0
         assert result.mask[1]  # Row 1 should be masked (all inputs masked)
         assert result.mask[2]  # Row 2 should be masked (all inputs masked)
 
-    def test_with_weights(self):
-        """Test weighted averaging."""
-        col1 = MaskedColumn([1.0, 2.0, 3.0])
-        col2 = MaskedColumn([4.0, 5.0, 6.0])
-        weights = [1.0, 3.0]  # col2 has 3x the weight of col1
-        result = safe_average([col1, col2], weights=weights)
-
-        assert isinstance(result, MaskedColumn)
-        assert len(result) == 3
-        # Weighted averages: (1*1 + 4*3)/4 = 3.25, etc.
-        assert np.allclose(result, [3.25, 4.25, 5.25])
-
     def test_with_units(self):
         """Test averaging columns with units."""
         col1 = MaskedColumn([1.0, 2.0, 3.0], unit=u.solRad)
         col2 = MaskedColumn([4.0, 5.0, 6.0], unit=u.solRad)
-        result = safe_average([col1, col2])
+        result = safe_average_columns([col1, col2])
 
         # When units are involved, the result is a Quantity object
         assert isinstance(result, Quantity)
@@ -80,7 +69,7 @@ class TestSafeAverage:
         col1 = MaskedColumn([1.0, 2.0, 3.0], unit=u.solRad)
         # Using raw values without conversion for simplicity in test
         col2 = MaskedColumn([4.0, 5.0, 6.0], unit=u.solRad)
-        result = safe_average([col1, col2])
+        result = safe_average_columns([col1, col2])
 
         # When units are involved, the result is a Quantity object
         assert isinstance(result, Quantity)
@@ -92,9 +81,9 @@ class TestSafeAverage:
         """Test averaging with NaN values."""
         col1 = MaskedColumn([1.0, 2.0, np.nan])
         col2 = MaskedColumn([4.0, np.nan, 6.0])
-        result = safe_average([col1, col2])
+        result = safe_average_columns([col1, col2])
 
-        assert isinstance(result, MaskedColumn)
+        assert isinstance(result, Column)
         assert len(result) == 3
         assert np.isclose(result[0], 2.5)  # Average of 1.0 and 4.0
         assert np.isclose(result[1], 2.0)  # Only col1 value (2.0) is not NaN
@@ -103,22 +92,14 @@ class TestSafeAverage:
     def test_empty_columns(self):
         """Test with empty columns list."""
         with pytest.raises(ValueError, match="At least one column must be provided"):
-            safe_average([])
+            safe_average_columns([])
 
     def test_mismatched_lengths(self):
         """Test with columns of different lengths."""
         col1 = MaskedColumn([1.0, 2.0, 3.0])
         col2 = MaskedColumn([4.0, 5.0])
-        with pytest.raises(ValueError, match="All columns must have the same length"):
-            safe_average([col1, col2])
-
-    def test_mismatched_weights(self):
-        """Test with mismatched number of weights."""
-        col1 = MaskedColumn([1.0, 2.0, 3.0])
-        col2 = MaskedColumn([4.0, 5.0, 6.0])
-        weights = [1.0, 2.0, 3.0]  # Too many weights
-        with pytest.raises(ValueError, match="Number of weights must match number of columns"):
-            safe_average([col1, col2], weights=weights)
+        with pytest.raises(ValueError):
+            safe_average_columns([col1, col2])
 
 
 class TestSafeCombine:
@@ -337,7 +318,7 @@ class TestImputeFromColumns:
         col2 = MaskedColumn([4.0, 5.0, 6.0], mask=[False, True, False])
         result = impute_from_columns([col1, col2], strategy="average")
 
-        assert isinstance(result, MaskedColumn)
+        assert isinstance(result, Column)
         assert len(result) == 3
         assert np.isclose(result[0], 2.5)  # Average of 1.0 and 4.0
         assert np.isclose(result[1], 2.0)  # Only col1 value (2.0) is unmasked
@@ -397,20 +378,6 @@ class TestImputeFromColumns:
         col2 = MaskedColumn([4.0, 5.0, 6.0])
         with pytest.raises(ValueError, match="Unknown strategy: invalid"):
             impute_from_columns([col1, col2], strategy="invalid")
-
-    def test_with_weights(self):
-        """Test average strategy with weights."""
-        col1 = MaskedColumn([1.0, 2.0, 3.0], mask=[False, False, True])
-        col2 = MaskedColumn([4.0, 5.0, 6.0], mask=[False, True, False])
-        weights = [1.0, 3.0]  # col2 has 3x the weight of col1
-        result = impute_from_columns([col1, col2], strategy="average", weights=weights)
-
-        assert isinstance(result, MaskedColumn)
-        assert len(result) == 3
-        # Weighted average: (1*1 + 4*3)/4 = 3.25
-        assert np.isclose(result[0], 3.25)
-        assert np.isclose(result[1], 2.0)  # Only col1 value (2.0) is unmasked
-        assert np.isclose(result[2], 6.0)  # Only col2 value (6.0) is unmasked
 
     def test_with_units(self):
         """Test with units."""

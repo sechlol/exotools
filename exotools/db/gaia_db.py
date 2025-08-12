@@ -29,8 +29,8 @@ class GaiaDB(BaseDB):
         """
         Creates a new column "radius" as the average of the available estimations. Fixes nan values where possible
         """
-        fields = ["radius_flame", "radius_gspphot"]
-        dataset["radius"] = safe_average(columns=[dataset[f] for f in fields])
+        # Take average of the two observations where both are present
+        dataset["radius"] = safe_average(dataset, ["radius_flame", "radius_gspphot"])
         return dataset
 
     @staticmethod
@@ -39,16 +39,7 @@ class GaiaDB(BaseDB):
         Creates a new column "teff_mean" as the average of the available estimations.
         """
         fields = ["teff_gspphot", "teff_gspspec", "teff_esphs", "teff_espucd", "teff_msc1", "teff_msc2"]
-        dataset["teff_mean"] = safe_average(columns=[dataset[f] for f in fields])
-        return dataset
-
-    @staticmethod
-    def compute_mean_mass(dataset: QTable) -> QTable:
-        """
-        Creates a new column "teff_mean" as the average of the available estimations.
-        """
-        fields = ["teff_gspphot", "teff_gspspec", "teff_esphs", "teff_espucd", "teff_msc1", "teff_msc2"]
-        dataset["teff_mean"] = safe_average(columns=[dataset[f] for f in fields])
+        dataset["teff_mean"] = safe_average(dataset, fields)
         return dataset
 
     @staticmethod
