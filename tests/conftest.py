@@ -5,7 +5,7 @@ import pytest
 from astropy.table import QTable
 from lightkurve import LightCurve
 
-from exotools import ExoDB, GaiaDB, KnownExoplanetsDataset, StarSystemDB
+from exotools import ExoDB, GaiaDB, KnownExoplanetsDataset, LightcurveDataset, StarSystemDB
 from exotools.datasets import GaiaParametersDataset
 from exotools.db.lightcurve_db import LightcurveDB
 from exotools.io import EcsvStorage
@@ -129,6 +129,11 @@ def gaia_test_db() -> GaiaDB:
 def exo_test_db() -> ExoDB:
     """Test data for ExoDB dataset"""
     return KnownExoplanetsDataset(storage=TEST_STORAGE).load_known_exoplanets_dataset()
+
+
+@pytest.fixture(scope="module")
+def lc_test_db() -> LightcurveDB:
+    return LightcurveDataset(lc_storage_path=TEST_ASSETS_LC).load_lightcurve_dataset()
 
 
 @pytest.fixture(scope="module")

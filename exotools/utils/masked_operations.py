@@ -34,16 +34,16 @@ def safe_average_columns(columns: list[Union[MaskedColumn, Column, np.ndarray]])
     final_mask = masked.all(axis=1)
     non_masked_count = (masked == 0).sum(axis=1)
 
-    to_sum = np.zeros(len(columns[0]))
+    to_average = np.zeros(len(columns[0]))
     for i, c in enumerate(columns):
         filled = c.filled(0) if hasattr(c, "filled") else c
         filled[nan_values[:, i]] = 0
-        to_sum = to_sum + filled
+        to_average = to_average + filled
 
-    avg = to_sum / non_masked_count
-    avg = Quantity(avg, units[0]) if units else Column(avg)
+    to_average[~final_mask] = to_average[~final_mask] / non_masked_count[~final_mask]
+    to_average = Quantity(to_average, units[0]) if units else Column(to_average)
 
-    return Masked(avg, mask=final_mask) if final_mask.any() else avg
+    return Masked(to_average, mask=final_mask) if final_mask.any() else to_average
 
 
 def safe_average(dataset: QTable, columns: Sequence[str]) -> Masked | Column | Quantity:

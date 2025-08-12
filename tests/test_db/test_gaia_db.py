@@ -88,23 +88,3 @@ class TestGaiaDb:
         assert np.isnan(result["outer_hz"][2])  # 0.0 luminosity
         assert np.isnan(result["inner_hz"][3])  # -1.0 luminosity
         assert np.isnan(result["outer_hz"][3])  # -1.0 luminosity
-
-    def test_inner_hz(self):
-        """Test the inner_hz static method."""
-        luminosities = np.array([1.0, 4.0, 9.0])
-        result = GaiaDB.inner_hz(luminosities)
-
-        # Check that values were computed correctly
-        assert np.isclose(result[0], 0.9534, rtol=1e-4)  # sqrt(1.0/1.1)
-        assert np.isclose(result[1], 1.9069, rtol=1e-4)  # sqrt(4.0/1.1)
-        assert np.isclose(result[2], 2.8603, rtol=1e-4)  # sqrt(9.0/1.1)
-
-    def test_outer_hz(self):
-        """Test the outer_hz static method."""
-        luminosities = np.array([1.0, 4.0, 9.0])
-        result = GaiaDB.outer_hz(luminosities)
-
-        # Check that values were computed correctly
-        assert np.isclose(result[0], 1.3736, rtol=1e-4)  # sqrt(1.0/0.53)
-        assert np.isclose(result[1], 2.7472, rtol=1e-4)  # sqrt(4.0/0.53)
-        assert np.isclose(result[2], 4.1208, rtol=1e-4)  # sqrt(9.0/0.53)

@@ -70,10 +70,15 @@ def generate_test_qtables():
 
 
 def generate_test_lightcurves():
+    np.random.seed(42)
+
     tic_obs = TicObservationsDataset(storage=TEST_STORAGE).load_observation_metadata()
+    exo_db = KnownExoplanetsDataset(storage=TEST_STORAGE).load_known_exoplanets_dataset()
     lc_dataset = LightcurveDataset(lc_storage_path=TEST_ASSETS_LC, override_existing=True)
 
-    small_meta = tic_obs.select_random_sample(n=10)
+    small_meta = tic_obs.select_random_sample(n=5)
+    exo_meta = tic_obs.select_by_tic_id(other_tic_ids=exo_db.unique_tic_ids).select_random_sample(n=5)
+    small_meta = small_meta.append(exo_meta)
     lc_dataset.download_lightcurves_from_tic_db(small_meta)
 
 
