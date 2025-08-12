@@ -46,6 +46,13 @@ class DatasetDownloader(ABC):
         """
         pass
 
+    @abstractmethod
+    def _initialize_services(self):
+        """
+        Initialize services, like TapService, to perform network operations
+        """
+        pass
+
     def download(self, limit: Optional[int] = None, **kwargs) -> tuple[QTable, QTableHeader]:
         """
         Download data from the dataset and store it.
@@ -57,6 +64,7 @@ class DatasetDownloader(ABC):
             QTable: Downloaded data as a QTable.
             QTableHeader: Table header with info on data types, units and field descriptions
         """
+        self._initialize_services()
 
         # Download
         raw_data = self._download(limit=limit, **kwargs)
@@ -80,6 +88,8 @@ class DatasetDownloader(ABC):
         Returns:
             QTable: Downloaded data as a QTable.
         """
+        self._initialize_services()
+
         # Download
         raw_data = self._download_by_id(ids=ids, **kwargs)
 

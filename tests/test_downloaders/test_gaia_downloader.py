@@ -49,14 +49,17 @@ class TestGaiaDownloader:
 
     def test_download_by_id(self, gaia_raw_data: QTable, gaia_field_info: dict, gaia_ids: list[str]):
         """Test download_by_id functionality"""
-        with patch("exotools.downloaders.gaia_downloader.Gaia") as mock_gaia, patch(
-            "exotools.downloaders.gaia_downloader.GaiaService"
-        ) as mock_gaia_service_factory:
-            # Mock Gaia.launch_job to return our test data
-            mock_job = MagicMock()
-            mock_job.get_results.return_value = gaia_raw_data
-            mock_gaia.launch_job.return_value = mock_job
+        # Create a mock Gaia module
+        mock_gaia = MagicMock()
+        mock_job = MagicMock()
+        mock_job.get_results.return_value = gaia_raw_data
+        mock_gaia.launch_job.return_value = mock_job
 
+        with (
+            # Patch the import statement instead of the module directly
+            patch("astroquery.gaia.Gaia", mock_gaia),
+            patch("exotools.downloaders.gaia_downloader.GaiaService") as mock_gaia_service_factory,
+        ):
             # Mock GaiaService
             mock_gaia_service = MagicMock()
             mock_gaia_service.get_field_info.side_effect = lambda table_name: gaia_field_info
@@ -102,14 +105,17 @@ class TestGaiaDownloader:
         """Test download_by_id with extra columns parameter"""
         extra_columns = ["ra", "dec", "parallax"]
 
-        with patch("exotools.downloaders.gaia_downloader.Gaia") as mock_gaia, patch(
-            "exotools.downloaders.gaia_downloader.GaiaService"
-        ) as mock_gaia_service_factory:
-            # Mock Gaia.launch_job to return our test data
-            mock_job = MagicMock()
-            mock_job.get_results.return_value = gaia_raw_data
-            mock_gaia.launch_job.return_value = mock_job
+        # Create a mock Gaia module
+        mock_gaia = MagicMock()
+        mock_job = MagicMock()
+        mock_job.get_results.return_value = gaia_raw_data
+        mock_gaia.launch_job.return_value = mock_job
 
+        with (
+            # Patch the import statement instead of the module directly
+            patch("astroquery.gaia.Gaia", mock_gaia),
+            patch("exotools.downloaders.gaia_downloader.GaiaService") as mock_gaia_service_factory,
+        ):
             # Mock GaiaService
             mock_gaia_service = MagicMock()
             mock_gaia_service.get_field_info.side_effect = lambda table_name: gaia_field_info
@@ -129,16 +135,18 @@ class TestGaiaDownloader:
         # Create a list of 2500 IDs (should create 3 chunks)
         many_ids = [str(i).zfill(19) for i in range(2500)]
 
-        with patch("exotools.downloaders.gaia_downloader.Gaia") as mock_gaia, patch(
-            "exotools.downloaders.gaia_downloader.GaiaService"
-        ) as mock_gaia_service_factory, patch(
-            "exotools.downloaders.gaia_downloader.vstack", return_value=gaia_raw_data
-        ) as mock_vstack:
-            # Mock Gaia.launch_job to return our test data
-            mock_job = MagicMock()
-            mock_job.get_results.return_value = gaia_raw_data
-            mock_gaia.launch_job.return_value = mock_job
+        # Create a mock Gaia module
+        mock_gaia = MagicMock()
+        mock_job = MagicMock()
+        mock_job.get_results.return_value = gaia_raw_data
+        mock_gaia.launch_job.return_value = mock_job
 
+        with (
+            # Patch the import statement instead of the module directly
+            patch("astroquery.gaia.Gaia", mock_gaia),
+            patch("exotools.downloaders.gaia_downloader.GaiaService") as mock_gaia_service_factory,
+            patch("exotools.downloaders.gaia_downloader.vstack", return_value=gaia_raw_data) as mock_vstack,
+        ):
             # Mock GaiaService
             mock_gaia_service = MagicMock()
             mock_gaia_service.get_field_info.side_effect = lambda table_name: gaia_field_info

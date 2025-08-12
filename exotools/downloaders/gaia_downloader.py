@@ -3,13 +3,12 @@ from typing import Iterable, Optional, Sequence
 
 import astropy.units as u
 from astropy.table import QTable, vstack
-from astroquery.gaia import Gaia
 from tqdm import tqdm
 
 from exotools.utils.qtable_utils import QTableHeader
 
 from .dataset_downloader import DatasetDownloader, iterate_chunks
-from .tap_service import GaiaService
+from .tap_service import GaiaService, TapService
 
 logger = logging.getLogger(__name__)
 
@@ -25,10 +24,16 @@ class GaiaDownloader(DatasetDownloader):
 
     _parameters_tables = ["gaiadr3.astrophysical_parameters", "gaiadr3.gaia_source_lite"]
 
-    def __init__(self):
-        self._gaia_service = GaiaService()
+    _gaia_service: Optional[TapService] = None
+
+    def _initialize_services(self):
+        if not self._gaia_service:
+            self._gaia_service = GaiaService()
 
     def _download_by_id(self, ids: list[str], columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
+        # This import causes network operations. It's included locally to avoid overheads at import time
+        from astroquery.gaia import Gaia
+
         # This is a hard limit imposed by the server. Synchronous queries are allowed up to 2000 results
         all_tables = []
         chunk_ids = list(iterate_chunks(ids, chunk_size=1000))

@@ -17,6 +17,9 @@ logger = logging.getLogger(__name__)
 class TessObservationsDownloader(DatasetDownloader):
     _mandatory_columns = {"target_name", "sequence_number", "dataURL", "t_obs_release", "t_min", "t_max", "obsid"}
 
+    def _initialize_services(self):
+        return
+
     def _download(self, limit: Optional[int] = None, **kwargs) -> QTable:
         raise NotImplementedError("TessObservationsDownloader does not implement this download method")
 
