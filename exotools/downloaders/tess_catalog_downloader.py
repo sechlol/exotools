@@ -12,7 +12,7 @@ from exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
 
 from ._utils import override_units
 from .dataset_downloader import DatasetDownloader, iterate_chunks
-from .tap_service import TicService
+from .tap_service import TapService, TicService
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +36,8 @@ class TessCatalogDownloader(DatasetDownloader):
         "priority": "Higher priority is assigned to the TESS team to targets that are likely to host planets",
     }
 
+    _tic_service: Optional[TapService] = None
+
     def __init__(
         self,
         username: str,
@@ -51,7 +53,7 @@ class TessCatalogDownloader(DatasetDownloader):
         """
         self._priority_threshold = priority_threshold
         self._star_mass_range = star_mass_range
-        self._tic_service = TicService()
+
         self._verbose_log = verbose_log
         self._casjob_api = CasJobs(
             userid=username,
@@ -59,6 +61,10 @@ class TessCatalogDownloader(DatasetDownloader):
             base_url="https://mastweb.stsci.edu/mcasjobs/services/jobs.asmx",
             context=self._catalog,
         )
+
+    def _initialize_services(self):
+        if self._tic_service is None:
+            self._tic_service = TicService()
 
     @property
     def star_mass_range(self) -> tuple[float, float]:

@@ -5,9 +5,9 @@ import pytest
 from astropy.table import QTable
 from lightkurve import LightCurve
 
-from exotools import GaiaDB, KnownExoplanetsDataset, StarSystemDB
+from exotools import ExoDB, GaiaDB, KnownExoplanetsDataset, LightcurveDataset, StarSystemDB
 from exotools.datasets import GaiaParametersDataset
-from exotools.db.lightcurve_db import load_lightcurve
+from exotools.db.lightcurve_db import LightcurveDB
 from exotools.io import EcsvStorage
 from exotools.utils.qtable_utils import QTableHeader, RootQTableHeader
 
@@ -55,7 +55,7 @@ def load_all_test_lightcurves() -> dict[int, LightCurve]:
         for file_name in files:
             if ".fits" in file_name:
                 file_path = Path(path) / file_name
-                all_data[int(file_name.removesuffix(".fits"))] = load_lightcurve(file_path)
+                all_data[int(file_name.removesuffix(".fits"))] = LightcurveDB.load_lightcurve(file_path)
 
     return all_data
 
@@ -123,6 +123,17 @@ def star_system_test_db() -> StarSystemDB:
 def gaia_test_db() -> GaiaDB:
     """Test data for ExoDB dataset"""
     return GaiaParametersDataset(storage=TEST_STORAGE).load_gaia_parameters_dataset()
+
+
+@pytest.fixture(scope="module")
+def exo_test_db() -> ExoDB:
+    """Test data for ExoDB dataset"""
+    return KnownExoplanetsDataset(storage=TEST_STORAGE).load_known_exoplanets_dataset()
+
+
+@pytest.fixture(scope="module")
+def lc_test_db() -> LightcurveDB:
+    return LightcurveDataset(lc_storage_path=TEST_ASSETS_LC).load_lightcurve_dataset()
 
 
 @pytest.fixture(scope="module")

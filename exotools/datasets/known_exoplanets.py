@@ -198,7 +198,7 @@ class KnownExoplanetsDataset(BaseDataset):
             Database object containing the processed star system data.
         """
         # Disable parsing Time columns; we need them as Quantities to copy units to the transiting qtable.
-        exo_db = _create_exo_db(exo_dataset=exo_dataset, gaia_db=gaia_db, convert_time_columns=False)
+        exo_db = _create_exo_db(exo_dataset=exo_dataset, gaia_db=gaia_db)
 
         # Reduce exoplanet dataset to a compact representation
         reduced_exo_dataset, header = reduce_exoplanet_dataset(exo_db=exo_db)
@@ -215,7 +215,7 @@ class KnownExoplanetsDataset(BaseDataset):
         return _create_star_system_db(reduced_exo_dataset)
 
 
-def _create_exo_db(exo_dataset: QTable, gaia_db: Optional[GaiaDB] = None, convert_time_columns: bool = True) -> ExoDB:
+def _create_exo_db(exo_dataset: QTable, gaia_db: Optional[GaiaDB] = None) -> ExoDB:
     """
     Create an ExoDB instance from an exoplanet dataset.
 
@@ -224,18 +224,12 @@ def _create_exo_db(exo_dataset: QTable, gaia_db: Optional[GaiaDB] = None, conver
     Args:
         exo_dataset: The dataset containing exoplanet data.
         gaia_db: Optional database containing Gaia stellar data to integrate.
-        convert_time_columns: Whether to convert time columns to astropy Time objects.
 
     Returns:
         Database object for accessing and querying exoplanet data.
     """
     ExoDB.preprocess_dataset(exo_dataset)
     ExoDB.compute_bounds(exo_dataset)
-
-    # It's useful to disable parsing Time columns if we need them as Quantities,
-    # for example to copy units to another qtable.
-    if convert_time_columns:
-        ExoDB.convert_time_columns(exo_dataset)
 
     if gaia_db:
         ExoDB.impute_stellar_parameters(exo_dataset, gaia_db.view)
@@ -254,7 +248,5 @@ def _create_star_system_db(reduced_exo_dataset: QTable) -> StarSystemDB:
     Returns:
         Database object for accessing and querying star system data.
     """
-    # Now it's safe to parse Time columns
-    ExoDB.convert_time_columns(reduced_exo_dataset)
     reduced_exo_dataset = StarSystemDB.preprocess_dataset(reduced_exo_dataset)
     return StarSystemDB(reduced_exo_dataset)

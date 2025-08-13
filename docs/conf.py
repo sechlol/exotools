@@ -55,7 +55,7 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "pandas": ("https://pandas.pydata.org/docs/", None),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
-    "lightkurve": ("https://docs.lightkurve.org/api/", None),
+    "lightkurve": ("https://docs.lightkurve.org/", None),  # Updated URL
 }
 
 # -- Napoleon settings -------------------------------------------------------

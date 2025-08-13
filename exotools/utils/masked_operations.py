@@ -5,109 +5,49 @@ These functions provide a consistent way to perform operations on masked columns
 while properly handling the masking.
 """
 
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, Sequence, Union
 
 import numpy as np
-from astropy.table import Column, MaskedColumn
+from astropy.table import Column, MaskedColumn, QTable
+from astropy.units import Quantity
+from astropy.utils.masked import Masked
 
 
-def safe_average(
-    columns: list[Union[MaskedColumn, Column, np.ndarray]],
-    weights: Optional[list[float]] = None,
-) -> MaskedColumn:
-    """
-    Safely average multiple columns, respecting masks.
-
-    For each row, the average is computed using only unmasked values.
-    If all values for a row are masked, the result will be masked.
-
-    Parameters
-    ----------
-    columns : list[Union[MaskedColumn, Column, np.ndarray]]
-        List of columns to average
-    weights : Optional[list[float]], optional
-        Weights to apply to each column, by default None (equal weights)
-
-    Returns
-    -------
-    MaskedColumn
-        A masked column containing the average of unmasked values
-
-    Examples
-    --------
-    >>> from astropy.table import MaskedColumn
-    >>> import numpy as np
-    >>> col1 = MaskedColumn([1.0, 2.0, 3.0], mask=[False, False, True])
-    >>> col2 = MaskedColumn([4.0, 5.0, 6.0], mask=[False, True, False])
-    >>> safe_average([col1, col2])
-    MaskedColumn([2.5, 2.0, 6.0], mask=[False, False, False])
-    """
-    if not columns:
+def safe_average_columns(columns: list[Union[MaskedColumn, Column, np.ndarray]]) -> Masked | Column | Quantity:
+    if len(columns) == 0:
         raise ValueError("At least one column must be provided")
 
-    # Ensure all columns have the same length
-    length = len(columns[0])
-    for col in columns:
-        if len(col) != length:
-            raise ValueError("All columns must have the same length")
+    # Check if all columns have the same unit
+    units = [c.unit for c in columns if hasattr(c, "unit") and c.unit is not None]
 
-    # Set default weights if not provided
-    if weights is None:
-        weights = [1.0] * len(columns)
-    elif len(weights) != len(columns):
-        raise ValueError("Number of weights must match number of columns")
+    # Assert units are all the same:
+    if len(units) > 1 and not all(u == units[0] for u in units):
+        raise ValueError("All columns must have the same unit")
 
-    # Determine if we need to handle units
-    has_units = any(hasattr(col, "unit") for col in columns)
-    unit = None
-    if has_units:
-        # Use the unit from the first column that has one
-        for col in columns:
-            if hasattr(col, "unit") and col.unit is not None:
-                unit = col.unit
-                break
+    nan_values = np.hstack([np.isnan(c)[:, np.newaxis] for c in columns])
+    nan_values = nan_values.filled(True) if hasattr(nan_values, "filled") else nan_values
 
-    # Initialize result arrays
-    result_values = np.zeros(length)
-    result_mask = np.ones(length, dtype=bool)  # Start with all masked
+    masked = np.hstack(
+        [c.mask[:, np.newaxis] if hasattr(c, "mask") else np.full(shape=(len(c), 1), fill_value=False) for c in columns]
+    )
+    masked = masked | nan_values
+    final_mask = masked.all(axis=1)
+    non_masked_count = (masked == 0).sum(axis=1)
 
-    # For each row
-    for i in range(length):
-        valid_values = []
-        valid_weights = []
+    to_average = np.zeros(len(columns[0]))
+    for i, c in enumerate(columns):
+        filled = c.filled(0) if hasattr(c, "filled") else c
+        filled[nan_values[:, i]] = 0
+        to_average = to_average + filled
 
-        # Collect unmasked values and their weights
-        for col_idx, col in enumerate(columns):
-            # Check if the value is masked
-            is_masked = hasattr(col, "mask") and col.mask[i]
+    to_average[~final_mask] = to_average[~final_mask] / non_masked_count[~final_mask]
+    to_average = Quantity(to_average, units[0]) if units else Column(to_average)
 
-            if not is_masked and not np.isnan(col[i]):
-                # Extract the raw value without units for calculation
-                if hasattr(col, "unit") and col.unit is not None:
-                    # If the column has units, get the raw value
-                    if hasattr(col[i], "value"):
-                        valid_values.append(col[i].value)
-                    else:
-                        valid_values.append(col[i])
-                else:
-                    valid_values.append(col[i])
-                valid_weights.append(weights[col_idx])
+    return Masked(to_average, mask=final_mask) if final_mask.any() else to_average
 
-        # If we have valid values, compute weighted average
-        if valid_values:
-            total_weight = sum(valid_weights)
-            if total_weight > 0:
-                result_values[i] = sum(v * w for v, w in zip(valid_values, valid_weights)) / total_weight
-                result_mask[i] = False  # Unmask this row
 
-    # Create the result column
-    result = MaskedColumn(result_values, mask=result_mask)
-
-    # Add the unit if needed
-    if unit is not None:
-        result = result * unit
-
-    return result
+def safe_average(dataset: QTable, columns: Sequence[str]) -> Masked | Column | Quantity:
+    return safe_average_columns([dataset[c] for c in columns])
 
 
 def safe_combine(
@@ -325,7 +265,7 @@ def impute_from_columns(
     MaskedColumn([1.0, 2.0, 6.0], mask=[False, False, False])
     """
     if strategy == "average":
-        return safe_average(columns, weights)
+        return safe_average_columns(columns)
     elif strategy == "first":
         # Use the first column as primary and others as fallbacks
         primary, *fallbacks = columns

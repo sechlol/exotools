@@ -11,8 +11,8 @@
         "dtype": null,
         "time_info": null
     },
-    "dec": {
-        "description": "Star declination [deg]",
+    "ra": {
+        "description": "Star right ascension [deg]",
         "unit": "deg",
         "dtype": null,
         "time_info": null
@@ -23,8 +23,8 @@
         "dtype": null,
         "time_info": null
     },
-    "ra": {
-        "description": "Star right ascension [deg]",
+    "dec": {
+        "description": "Star declination [deg]",
         "unit": "deg",
         "dtype": null,
         "time_info": null

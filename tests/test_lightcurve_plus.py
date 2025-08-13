@@ -3,7 +3,7 @@ import pytest
 from astropy.time import Time
 from lightkurve import FoldedLightCurve
 
-from exotools import LightCurvePlus, StarSystemDB
+from exotools import LightcurveDB, LightCurvePlus, Planet, StarSystemDB
 
 
 class TestLightcurvePlus:
@@ -18,12 +18,15 @@ class TestLightcurvePlus:
         return LightCurvePlus(all_test_lightcurves[obs_id], obs_id=obs_id)
 
     @pytest.fixture
-    def sample_planet(self, star_system_test_db, sample_lc_plus):
-        """Get a sample planet from the star system associated with the sample lightcurve."""
-        star_system = star_system_test_db.get_star_system_from_tic_id(sample_lc_plus.tic_id)
-        if star_system and star_system.planets:
-            return star_system.planets[0]
-        pytest.skip("No valid planet found for testing")
+    def lc_and_planet(
+        self, star_system_test_db: StarSystemDB, lc_test_db: LightcurveDB
+    ) -> tuple[Planet, LightCurvePlus]:
+        planets_with_lc = list(set(star_system_test_db.unique_tic_ids) & set(lc_test_db.unique_tic_ids))
+        tic_id = np.random.choice(planets_with_lc)
+        planet = star_system_test_db.get_star_system_from_tic_id(tic_id).planets[0]
+        obs_id = np.random.choice(lc_test_db.where(tic_id=tic_id).unique_obs_ids)
+        lc = lc_test_db.load_by_obs_id(obs_id)
+        return planet, lc
 
     def test_planet_ids(self, star_system_test_db: StarSystemDB, tic_with_planets):
         for tic_id in tic_with_planets:
@@ -57,6 +60,66 @@ class TestLightcurvePlus:
         # Test metadata properties
         assert isinstance(sample_lc_plus.meta, dict)
         assert "TICID" in sample_lc_plus.meta
+
+    def test_time_bjd(self, sample_lc_plus):
+        """Test the time_bjd property."""
+        # Test that time_bjd returns a numpy array
+        bjd_time = sample_lc_plus.time_bjd
+        assert isinstance(bjd_time, np.ndarray)
+        assert len(bjd_time) == len(sample_lc_plus)
+
+        # Test that the values are in the expected range for BJD
+        # BJD values should be around 2.4-2.5 million for recent astronomical observations
+        assert np.all(bjd_time > 2400000)
+        assert np.all(bjd_time < 2500000)
+
+        # Test that the values match the underlying time.tdb.jd values
+        expected_bjd = np.asarray(sample_lc_plus.time.tdb.jd, dtype=float)
+        np.testing.assert_array_equal(bjd_time, expected_bjd)
+
+    def test_time_elapsed(self, sample_lc_plus):
+        """Test the time_elapsed property."""
+        elapsed_time = sample_lc_plus.time_elapsed
+        assert isinstance(elapsed_time, np.ndarray)
+        assert len(elapsed_time) == len(sample_lc_plus)
+
+        # First value should always be 0 (days since first cadence)
+        assert elapsed_time[0] == 0
+
+        # All values should be non-negative and monotonically increasing
+        assert np.all(elapsed_time >= 0)
+        assert np.all(np.diff(elapsed_time) >= 0)
+
+        # Verify the calculation is correct
+        bjd_time = sample_lc_plus.time_bjd
+        expected_elapsed = bjd_time - bjd_time[0]
+        np.testing.assert_array_equal(elapsed_time, expected_elapsed)
+
+    def test_time_btjd(self, sample_lc_plus):
+        """Test the time_btjd property."""
+        btjd_time = sample_lc_plus.time_btjd
+        assert isinstance(btjd_time, np.ndarray)
+        assert len(btjd_time) == len(sample_lc_plus)
+
+        # Get the reference values from metadata or use TESS default
+        refi = sample_lc_plus.meta.get("BJDREFI")
+        reff = sample_lc_plus.meta.get("BJDREFF")
+        if refi is None and reff is None:
+            bjd_ref = 2457000.0  # TESS default
+        else:
+            refi = 0 if refi is None else refi
+            reff = 0.0 if reff is None else reff
+            bjd_ref = float(refi) + float(reff)
+
+        # Test that the calculation is correct
+        expected_btjd = sample_lc_plus.time_bjd - bjd_ref
+        np.testing.assert_array_almost_equal(btjd_time, expected_btjd)
+
+        # BTJD values for TESS data should be in a reasonable range (typically 1000-3000)
+        # This is a loose check since we don't know the exact reference time
+        if "TESS" in sample_lc_plus.meta.get("TELESCOP", ""):
+            assert np.all(btjd_time > 0)
+            assert np.all(btjd_time < 10000)
 
     def test_to_numpy(self, sample_lc_plus):
         """Test conversion to numpy array."""
@@ -113,11 +176,9 @@ class TestLightcurvePlus:
         # Check that the first time value is close to zero
         assert abs(zeroed_lc.time_x[0]) < 1e-10
 
-    def test_get_transit_phase(self, sample_lc_plus, sample_planet):
+    def test_get_transit_phase(self, lc_and_planet: tuple[Planet, LightCurvePlus]):
         """Test get_transit_phase method."""
-        if sample_planet is None:
-            pytest.skip("No valid planet available for testing")
-
+        sample_planet, sample_lc_plus = lc_and_planet
         phase = sample_lc_plus.get_transit_phase(sample_planet)
 
         # Check that the result is a numpy array with the correct length
@@ -129,12 +190,10 @@ class TestLightcurvePlus:
         assert np.all(phase >= 0)
         assert np.all(phase <= period / 2)
 
-    def test_get_transit_mask(self, sample_lc_plus, sample_planet):
+    def test_get_transit_mask(self, lc_and_planet: tuple[Planet, LightCurvePlus]):
         """Test get_transit_mask method."""
-        if sample_planet is None:
-            pytest.skip("No valid planet available for testing")
-
         # Test with default parameters
+        sample_planet, sample_lc_plus = lc_and_planet
         mask = sample_lc_plus.get_transit_mask(sample_planet)
         assert isinstance(mask, np.ndarray)
         assert mask.dtype == bool
@@ -145,21 +204,19 @@ class TestLightcurvePlus:
         # Extended mask should have at least as many True values as the original
         assert np.sum(mask_extended) >= np.sum(mask)
 
-    def test_get_transit_count(self, sample_lc_plus, sample_planet):
+    def test_get_transit_count(self, lc_and_planet: tuple[Planet, LightCurvePlus]):
         """Test get_transit_count method."""
-        if sample_planet is None:
-            pytest.skip("No valid planet available for testing")
-
+        sample_planet, sample_lc_plus = lc_and_planet
         count = sample_lc_plus.get_transit_count(sample_planet)
         assert isinstance(count, int)
         assert count >= 0
 
-    def test_get_combined_transit_mask(self, star_system_test_db, sample_lc_plus):
+    def test_get_combined_transit_mask(
+        self, lc_and_planet: tuple[Planet, LightCurvePlus], star_system_test_db: StarSystemDB
+    ):
         """Test get_combined_transit_mask method."""
+        _, sample_lc_plus = lc_and_planet
         star_system = star_system_test_db.get_star_system_from_tic_id(sample_lc_plus.tic_id)
-        if not star_system or len(star_system.planets) < 1:
-            pytest.skip("No valid planets available for testing")
-
         planets = star_system.planets
         mask = sample_lc_plus.get_combined_transit_mask(planets)
 
@@ -173,12 +230,10 @@ class TestLightcurvePlus:
             assert isinstance(subset_mask, np.ndarray)
             assert len(subset_mask) == len(sample_lc_plus)
 
-    def test_fold_with_planet(self, sample_lc_plus, sample_planet):
+    def test_fold_with_planet(self, lc_and_planet: tuple[Planet, LightCurvePlus]):
         """Test fold_with_planet method."""
-        if sample_planet is None:
-            pytest.skip("No valid planet available for testing")
-
         # Test with default parameters
+        sample_planet, sample_lc_plus = lc_and_planet
         folded_lc = sample_lc_plus.fold_with_planet(sample_planet)
         assert isinstance(folded_lc, FoldedLightCurve)
 
@@ -222,9 +277,6 @@ class TestLightcurvePlus:
 
     def test_getitem(self, sample_lc_plus):
         """Test __getitem__ method."""
-        # Skip single index test as it returns a Row object, not a LightCurve
-        # and LightCurvePlus doesn't handle this case correctly
-
         # Test with a slice
         slice_lc = sample_lc_plus[0:10]
         assert isinstance(slice_lc, LightCurvePlus)
@@ -260,19 +312,15 @@ class TestLightcurvePlus:
         assert isinstance(subtracted_lc, LightCurvePlus)
         assert np.allclose(subtracted_lc.flux_y, sample_lc_plus.flux_y - lc_copy.flux_y)
 
-    def test_get_first_transit_value(self, sample_lc_plus, sample_planet):
+    def test_get_first_transit_value(self, lc_and_planet: tuple[Planet, LightCurvePlus]):
         """Test get_first_transit_value method."""
-        if sample_planet is None:
-            pytest.skip("No valid planet available for testing")
-
+        sample_planet, sample_lc_plus = lc_and_planet
         transit_time = sample_lc_plus.get_first_transit_value(sample_planet)
         assert isinstance(transit_time, Time)
 
-    def test_get_transit_first_index(self, sample_lc_plus, sample_planet):
+    def test_get_transit_first_index(self, lc_and_planet: tuple[Planet, LightCurvePlus]):
         """Test get_transit_first_index method."""
-        if sample_planet is None:
-            pytest.skip("No valid planet available for testing")
-
+        sample_planet, sample_lc_plus = lc_and_planet
         index = sample_lc_plus.get_transit_first_index(sample_planet)
         assert isinstance(index, int)
         assert 0 <= index < len(sample_lc_plus)

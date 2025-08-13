@@ -100,7 +100,7 @@ class TestLightcurveDb:
         assert isinstance(result, LightcurveDB)
         assert len(result) == 0
 
-    @patch("exotools.db.lightcurve_db.load_lightcurve")
+    @patch.object(LightcurveDB, "load_lightcurve")
     def test_load_by_tic(self, mock_load_lightcurve, lightcurve_db, mock_lightcurve, mock_lightcurve_plus):
         """Test the load_by_tic method."""
         # Create mock lightcurves using fixtures
@@ -144,27 +144,26 @@ class TestLightcurveDb:
             assert mock_lcp1.start_at_zero.call_count == 1
             assert mock_lcp2.start_at_zero.call_count == 1
 
-    @patch("exotools.db.lightcurve_db.load_lightcurve")
+    @patch.object(LightcurveDB, "load_by_tic")
     @patch("lightkurve.LightCurveCollection.stitch")
     def test_load_stitched_by_tic(
-        self, mock_stitch, mock_load_lightcurve, lightcurve_db, mock_lightcurve, mock_lightcurve_plus
+        self, mock_stitch, mock_load_by_tic, lightcurve_db, mock_lightcurve, mock_lightcurve_plus
     ):
         """Test the load_stitched_by_tic method."""
-        # Create mock lightcurves using fixtures
-        mock_lc1 = mock_lightcurve([10, 11, 12])
-        mock_lc2 = mock_lightcurve([20, 21, 22])
-        mock_load_lightcurve.side_effect = [mock_lc1, mock_lc2]
+        # Create mock LightCurvePlus instances
+        mock_lcp1 = mock_lightcurve_plus([10, 11, 12])
+        mock_lcp2 = mock_lightcurve_plus([20, 21, 22])
+        mock_load_by_tic.return_value = [mock_lcp1, mock_lcp2]
 
+        # Create mock for the stitched lightcurve
         mock_stitched = mock_lightcurve([10, 11, 12, 20, 21, 22])
         mock_stitch.return_value = mock_stitched
 
         # Mock LightCurvePlus to avoid sorting issues
         with patch("exotools.db.lightcurve_db.LightCurvePlus") as mock_lcp:
-            # Create mock LightCurvePlus instances
-            mock_lcp1 = mock_lightcurve_plus([10, 11, 12])
-            mock_lcp2 = mock_lightcurve_plus([20, 21, 22])
+            # Create mock for the stitched LightCurvePlus
             mock_stitched_lcp = mock_lightcurve_plus([10, 11, 12, 20, 21, 22])
-            mock_lcp.side_effect = [mock_lcp1, mock_lcp2, mock_stitched_lcp]
+            mock_lcp.return_value = mock_stitched_lcp
 
             # Test loading stitched lightcurve for TIC ID 100
             result = lightcurve_db.load_stitched_by_tic(100)
@@ -172,7 +171,16 @@ class TestLightcurveDb:
             # Verify the result
             assert result == mock_stitched_lcp
 
-    @patch("exotools.db.lightcurve_db.load_lightcurve")
+            # Verify that load_by_tic was called with the correct parameters
+            mock_load_by_tic.assert_called_once_with(100, start_time_at_zero=False)
+
+            # Verify that stitch was called
+            mock_stitch.assert_called_once()
+
+            # Verify that LightCurvePlus was created with the stitched result
+            mock_lcp.assert_called_once_with(mock_stitched)
+
+    @patch.object(LightcurveDB, "load_lightcurve")
     def test_load_by_obs_id(self, mock_load_lightcurve, lightcurve_db, mock_lightcurve, mock_lightcurve_plus):
         """Test the load_by_obs_id method."""
         # Create mock lightcurve using fixture

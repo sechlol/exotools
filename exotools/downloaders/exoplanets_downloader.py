@@ -40,8 +40,11 @@ class KnownExoplanetsDownloader(DatasetDownloader):
     #   see https://exoplanetarchive.ipac.caltech.edu/docs/API_PS_columns.html
     _unit_overrides = {p: u.hour for p in _get_error_parameters(["pl_trandur"], True)}
 
-    def __init__(self):
-        self._exo_service = ExoService()
+    _exo_service: Optional[TapService] = None
+
+    def _initialize_services(self):
+        if self._exo_service is None:
+            self._exo_service = ExoService()
 
     def _download(
         self,

@@ -1,7 +1,8 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Sequence
+from typing import Optional, Sequence
 
+import astropy.units as u
 import numpy as np
 import pandas as pd
 from astropy.table import QTable
@@ -70,6 +71,19 @@ class BaseDB(ABC):
 
     def append(self, other: Self) -> Self:
         return self._factory(QTable(np.concatenate([self._ds, other._ds])))
+
+    # def get_unmasked_column(self, column_name: str) -> np.ndarray:
+    #     col = self._ds[column_name]
+    #     if hasattr(col, "unmasked"):
+    #         return col.unmasked.value
+    #     if hasattr(col, "mask"):
+    #         filled_col = col.filled(NAN_VALUE)
+    #         return filled_col[~col.mask & (filled_col != NAN_VALUE)].value
+    #     return col[~np.isnan(col) & (col != NAN_VALUE)].value
+
+    def get_unit(self, column_name: str) -> Optional[u.Unit]:
+        col = self._ds[column_name]
+        return col.unit if hasattr(col, "unit") else None
 
     def to_pandas(self) -> pd.DataFrame:
         if len(self._ds) == 0:

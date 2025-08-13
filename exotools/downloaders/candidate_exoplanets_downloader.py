@@ -11,7 +11,7 @@ from exotools.utils.unit_mapper import UNIT_MAPPER
 from ._utils import fix_unrecognized_units, override_units
 from .dataset_downloader import DatasetDownloader
 from .exoplanets_downloader import _get_error_parameters, _get_fixed_table_header
-from .tap_service import ExoService
+from .tap_service import ExoService, TapService
 
 logger = logging.getLogger(__name__)
 
@@ -23,17 +23,20 @@ class CandidateExoplanetsDownloader(DatasetDownloader):
     https://exoplanetarchive.ipac.caltech.edu/docs/API_TOI_columns.html
     """
 
-    def _download_by_id(self, ids: list[int], **kwargs) -> QTable:
-        raise NotImplementedError("CandidateExoplanetsDownloader does not support this download method")
-
     _table_name = "toi"
     _index_col = "tid"
 
     # "pl_trandep" unit is "ppm", but it's not a recognized unit
     _unit_overrides = {p: (u.Unit("%") * 1e-6) for p in _get_error_parameters(["pl_trandep"], True)}
 
-    def __init__(self):
-        self._exo_service = ExoService()
+    _exo_service: Optional[TapService] = None
+
+    def _initialize_services(self):
+        if self._exo_service is None:
+            self._exo_service = ExoService()
+
+    def _download_by_id(self, ids: list[int], **kwargs) -> QTable:
+        raise NotImplementedError("CandidateExoplanetsDownloader does not support this download method")
 
     def _download(self, limit: Optional[int] = None, columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
         if columns:

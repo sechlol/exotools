@@ -2,7 +2,6 @@ import logging
 from typing import Optional, Sequence
 
 from astropy.table import QTable
-from astroquery.gaia import Gaia
 
 from exotools.datasets.base_dataset import BaseDataset
 from exotools.db import GaiaDB
@@ -20,6 +19,9 @@ class GaiaParametersDataset(BaseDataset):
 
     @staticmethod
     def authenticate(username: str, password: str):
+        # This import causes network operations. It's included locally to avoid overheads at import time
+        from astroquery.gaia import Gaia
+
         Gaia.login(user=username, password=password)
 
     def load_gaia_parameters_dataset(self, with_name: Optional[str] = None) -> Optional[GaiaDB]:

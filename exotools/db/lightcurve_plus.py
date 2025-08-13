@@ -1,3 +1,4 @@
+import warnings
 from math import ceil
 from typing import Any, Optional
 
@@ -15,6 +16,7 @@ class LightCurvePlus:
         self.lc: LightCurve = _convert_time_to_jd(lightcurve)
         self._time_shift = TimeDelta(0, format=self.lc.time.format, scale=self.lc.time.scale)
         self._obs_id = obs_id
+        self._warn_if_not_barycentric()
 
     @property
     def time_x(self) -> np.ndarray:
@@ -43,6 +45,48 @@ class LightCurvePlus:
     @property
     def meta(self) -> dict[str, Any]:
         return self.lc.meta
+
+    @property
+    def time_bjd(self) -> np.ndarray:
+        """Absolute BJD in TDB (days) as a NumPy array."""
+        # Convert to TDB explicitly to be unambiguous
+        return np.asarray(self.time.tdb.jd, dtype=float)
+
+    @property
+    def time_elapsed(self) -> np.ndarray:
+        """
+        Days since first cadence (relative timeline), independent of BJDREF*.
+        """
+        bjd = self.time_bjd
+        return bjd - bjd[0]
+
+    @property
+    def time_btjd(self) -> np.ndarray:
+        """
+        TESS BTJD in days, i.e., BJD_TDB − (BJDREFI + BJDREFF).
+        """
+
+        refi = self.meta.get("BJDREFI")
+        reff = self.meta.get("BJDREFF")
+        if refi is None and reff is None:
+            # TESS convention; safe fallback for BTJD if headers were stripped
+            warnings.warn("BJDREFI/BJDREFF not found in meta; assuming 2457000.0 (TESS default) for BTJD.")
+            refi, reff = 2457000, 0.0
+        else:
+            refi = 0 if refi is None else refi
+            reff = 0.0 if reff is None else reff
+        bjd_ref = float(refi) + float(reff)
+
+        return self.time_bjd - bjd_ref
+
+    def _warn_if_not_barycentric(self) -> None:
+        """Warn if TIMEREF suggests times are not barycentric."""
+        timeref = (self.meta.get("TIMEREF") or "").upper()
+        if timeref and timeref != "SOLARSYSTEM":
+            warnings.warn(
+                f"TIMEREF='{timeref}' indicates times may not be barycentric; "
+                "BJD/BTJD semantics assume barycentric timing."
+            )
 
     def to_numpy(self) -> np.ndarray:
         return np.array([self.time_x, self.flux_y]).T
@@ -150,6 +194,15 @@ class LightCurvePlus:
         return LightCurvePlus(self.lc[index])
 
 
+def copy_lightcurve(lightcurve: LightCurve, with_flux: Optional[np.ndarray] = None) -> LightCurve:
+    if with_flux is None:
+        return lightcurve.copy(copy_data=True)
+
+    lc = LightCurve(time=lightcurve.time.copy(), flux=with_flux.copy())
+    lc.meta = lightcurve.meta
+    return lc
+
+
 def _btjd_to_jd_time(time: Time) -> Time:
     return Time(val=time.value + 2457000, format="jd", scale="tdb")
 
@@ -164,15 +217,6 @@ def _convert_time_to_jd(lc: LightCurve) -> LightCurve:
         new_t = _btjd_to_jd_time(lc.time)
         return LightCurve(time=new_t, flux=lc.flux, flux_err=lc.flux_err, meta=lc.meta)
     raise ValueError(f"Time format {lc.time.format} unknown/unsupported.")
-
-
-def copy_lightcurve(lightcurve: LightCurve, with_flux: Optional[np.ndarray] = None) -> LightCurve:
-    if with_flux is None:
-        return lightcurve.copy(copy_data=True)
-
-    lc = LightCurve(time=lightcurve.time.copy(), flux=with_flux.copy())
-    lc.meta = lightcurve.meta
-    return lc
 
 
 def _get_phase(time: np.ndarray, period: float, midpoint: float) -> np.ndarray:
