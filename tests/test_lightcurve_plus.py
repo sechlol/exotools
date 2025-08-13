@@ -61,6 +61,66 @@ class TestLightcurvePlus:
         assert isinstance(sample_lc_plus.meta, dict)
         assert "TICID" in sample_lc_plus.meta
 
+    def test_time_bjd(self, sample_lc_plus):
+        """Test the time_bjd property."""
+        # Test that time_bjd returns a numpy array
+        bjd_time = sample_lc_plus.time_bjd
+        assert isinstance(bjd_time, np.ndarray)
+        assert len(bjd_time) == len(sample_lc_plus)
+
+        # Test that the values are in the expected range for BJD
+        # BJD values should be around 2.4-2.5 million for recent astronomical observations
+        assert np.all(bjd_time > 2400000)
+        assert np.all(bjd_time < 2500000)
+
+        # Test that the values match the underlying time.tdb.jd values
+        expected_bjd = np.asarray(sample_lc_plus.time.tdb.jd, dtype=float)
+        np.testing.assert_array_equal(bjd_time, expected_bjd)
+
+    def test_time_elapsed(self, sample_lc_plus):
+        """Test the time_elapsed property."""
+        elapsed_time = sample_lc_plus.time_elapsed
+        assert isinstance(elapsed_time, np.ndarray)
+        assert len(elapsed_time) == len(sample_lc_plus)
+
+        # First value should always be 0 (days since first cadence)
+        assert elapsed_time[0] == 0
+
+        # All values should be non-negative and monotonically increasing
+        assert np.all(elapsed_time >= 0)
+        assert np.all(np.diff(elapsed_time) >= 0)
+
+        # Verify the calculation is correct
+        bjd_time = sample_lc_plus.time_bjd
+        expected_elapsed = bjd_time - bjd_time[0]
+        np.testing.assert_array_equal(elapsed_time, expected_elapsed)
+
+    def test_time_btjd(self, sample_lc_plus):
+        """Test the time_btjd property."""
+        btjd_time = sample_lc_plus.time_btjd
+        assert isinstance(btjd_time, np.ndarray)
+        assert len(btjd_time) == len(sample_lc_plus)
+
+        # Get the reference values from metadata or use TESS default
+        refi = sample_lc_plus.meta.get("BJDREFI")
+        reff = sample_lc_plus.meta.get("BJDREFF")
+        if refi is None and reff is None:
+            bjd_ref = 2457000.0  # TESS default
+        else:
+            refi = 0 if refi is None else refi
+            reff = 0.0 if reff is None else reff
+            bjd_ref = float(refi) + float(reff)
+
+        # Test that the calculation is correct
+        expected_btjd = sample_lc_plus.time_bjd - bjd_ref
+        np.testing.assert_array_almost_equal(btjd_time, expected_btjd)
+
+        # BTJD values for TESS data should be in a reasonable range (typically 1000-3000)
+        # This is a loose check since we don't know the exact reference time
+        if "TESS" in sample_lc_plus.meta.get("TELESCOP", ""):
+            assert np.all(btjd_time > 0)
+            assert np.all(btjd_time < 10000)
+
     def test_to_numpy(self, sample_lc_plus):
         """Test conversion to numpy array."""
         numpy_array = sample_lc_plus.to_numpy()
