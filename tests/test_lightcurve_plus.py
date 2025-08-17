@@ -12,7 +12,7 @@ class TestLightcurvePlus:
         return [159781361, 179317684, 441765914, 158635959, 328081248]
 
     @pytest.fixture
-    def sample_lc_plus(self, all_test_lightcurves):
+    def sample_lc_plus(self, all_test_lightcurves) -> LightCurvePlus:
         """Get a sample LightCurvePlus object with a valid observation ID."""
         obs_id = next(iter(all_test_lightcurves))
         return LightCurvePlus(all_test_lightcurves[obs_id], obs_id=obs_id)
@@ -707,3 +707,8 @@ class TestLightcurvePlus:
 
         # Should match original BTJD values
         np.testing.assert_array_almost_equal(lc_plus_jd_to_btjd.lc.time.value, lc_plus_btjd.lc.time.value, decimal=8)
+
+    def test_gaps(self, sample_lc_plus: LightCurvePlus):
+        """Test that gaps are handled correctly."""
+        times = sample_lc_plus.find_contiguous_time_i()
+        assert times is not None

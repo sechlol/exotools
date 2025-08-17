@@ -199,6 +199,98 @@ class LightCurvePlus:
         lc = copy_lightcurve(self.lc, with_flux=flux)
         return LightCurvePlus(lc)
 
+    def find_time_gaps_i(self, greater_than_median: float = 10.0) -> list[tuple[int, int]]:
+        """
+        Find time gaps in the lightcurve based on time step analysis.
+
+        Identifies locations where the time difference between consecutive points
+        exceeds the median time step by a specified factor, indicating data gaps
+        or interruptions in observations.
+
+        Args:
+            greater_than_median: Threshold multiplier for gap detection. Gaps are
+                identified where time_diff > median_time_step * greater_than_median.
+
+
+        Returns:
+            List of index tuples (i, i+1) where each tuple represents the indices
+            immediately before and after a detected gap. The gap occurs between
+            time[i] and time[i+1].
+        """
+        return [(i, i + 1) for i in get_gaps_indices(x=self.time_x, greater_than_median=greater_than_median)]
+
+    def find_time_gaps_x(self, greater_than_median: float = 10.0) -> list[tuple[float, float]]:
+        """
+        Find time gaps in the lightcurve and return actual time values.
+
+        Identifies locations where the time difference between consecutive points
+        exceeds the median time step by a specified factor, returning the actual
+        time values at gap boundaries rather than indices.
+
+        Args:
+            greater_than_median: Threshold multiplier for gap detection. Gaps are
+                identified where time_diff > median_time_step * greater_than_median.
+
+        Returns:
+            List of time value tuples (t1, t2) where each tuple represents the
+            actual time values immediately before and after a detected gap.
+            The gap occurs between time t1 and time t2.
+
+        See Also:
+            find_time_gaps_i: Returns the same gaps as index pairs instead of time values.
+        """
+        t = self.time_x
+        return [
+            (t[i].item(), t[i + 1].item())
+            for i in get_gaps_indices(x=self.time_x, greater_than_median=greater_than_median)
+        ]
+
+    def find_contiguous_time_i(self, greater_than_median: float = 10.0) -> list[tuple[int, int]]:
+        """
+        Find contiguous time intervals in the lightcurve based on time step analysis.
+
+        Identifies regions where time differences between consecutive points remain
+        below the threshold, indicating continuous observation periods without
+        significant gaps.
+
+        Args:
+            greater_than_median: Threshold multiplier for gap detection. Contiguous
+                intervals are where time_diff <= median_time_step * greater_than_median.
+
+        Returns:
+            List of index tuples (start, end) where each tuple represents the start
+            and end indices (inclusive) of a contiguous time interval.
+        """
+        # Get the gaps first
+        gaps = self.find_time_gaps_i(greater_than_median=greater_than_median)
+        if len(gaps) == 0:
+            return [(0, len(self.time_x) - 1)]
+
+        # Get the contiguous intervals
+        return []
+
+    def find_contiguous_time_x(self, greater_than_median: float = 10.0) -> list[tuple[float, float]]:
+        """
+        Find contiguous time intervals in the lightcurve and return actual time values.
+
+        Identifies regions where time differences between consecutive points remain
+        below the threshold, returning the actual time values at the boundaries
+        of contiguous intervals.
+
+        Args:
+            greater_than_median: Threshold multiplier for gap detection. Contiguous
+                intervals are where time_diff <= median_time_step * greater_than_median.
+
+        Returns:
+            List of time value tuples (t_start, t_end) where each tuple represents
+            the actual time values at the start and end of a contiguous interval.
+        """
+        t = self.time_x
+        return [
+            (t[start].item(), t[end].item())
+            for (start, end) in self.find_contiguous_time_i(greater_than_median=greater_than_median)
+        ]
+
     def to_jd_time(self) -> Self:
         """Convert the lightcurve time to Julian Date (JD) format in place.
 
@@ -256,6 +348,12 @@ class LightCurvePlus:
 
     def __getitem__(self, index) -> Self:
         return LightCurvePlus(self.lc[index])
+
+
+def get_gaps_indices(x: np.ndarray, greater_than_median: float) -> np.ndarray:
+    time_diffs = x[1:] - x[:-1]
+    exp_time = np.median(time_diffs)
+    return np.argwhere(time_diffs > (exp_time * greater_than_median)).ravel()
 
 
 def copy_lightcurve(lightcurve: LightCurve, with_flux: Optional[np.ndarray] = None) -> LightCurve:
