@@ -75,7 +75,7 @@ class LightCurvePlus:
             return np.asarray(self.lc.time.value, dtype=float)
         else:
             # Convert to TDB explicitly to be unambiguous
-            return np.asarray(self.time.tdb.jd, dtype=float)
+            return np.asarray(self.lc.time.tdb.jd, dtype=float)
 
     @property
     def elapsed_time(self) -> np.ndarray:
@@ -262,12 +262,12 @@ class LightCurvePlus:
             and end indices (inclusive) of a contiguous time interval.
         """
         # Get the gaps first
-        gaps = self.find_time_gaps_i(greater_than_median=greater_than_median)
+        gaps = get_gaps_indices(x=self.time_x, greater_than_median=greater_than_median)
         if len(gaps) == 0:
             return [(0, len(self.time_x) - 1)]
 
-        # Get the contiguous intervals
-        return []
+        boundaries = [-1] + gaps.tolist() + [len(self.time_x) - 1]
+        return [(i1 + 1, i2) for i1, i2 in zip(boundaries[:-1], boundaries[1:])]
 
     def find_contiguous_time_x(self, greater_than_median: float = 10.0) -> list[tuple[float, float]]:
         """

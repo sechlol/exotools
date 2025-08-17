@@ -1,9 +1,10 @@
 import numpy as np
 import pytest
 from astropy.time import Time
-from lightkurve import FoldedLightCurve
+from lightkurve import FoldedLightCurve, LightCurve
 
 from exotools import LightcurveDB, LightCurvePlus, Planet, StarSystemDB
+from exotools.db.lightcurve_plus import get_gaps_indices
 
 
 class TestLightcurvePlus:
@@ -708,7 +709,225 @@ class TestLightcurvePlus:
         # Should match original BTJD values
         np.testing.assert_array_almost_equal(lc_plus_jd_to_btjd.lc.time.value, lc_plus_btjd.lc.time.value, decimal=8)
 
-    def test_gaps(self, sample_lc_plus: LightCurvePlus):
-        """Test that gaps are handled correctly."""
-        times = sample_lc_plus.find_contiguous_time_i()
-        assert times is not None
+    @pytest.fixture
+    def time_array_with_gaps(self):
+        """
+        Create a time array with known gaps for testing gap detection functions.
+
+        The array has evenly spaced points with dt=0.1 except for three gaps:
+        1. Between indices 4-5: gap of 0.5 (5x normal spacing)
+        2. Between indices 9-10: gap of 1.0 (10x normal spacing)
+        3. Between indices 14-15: gap of 0.3 (3x normal spacing)
+
+        Returns:
+            tuple: (time_array, expected_gap_indices, expected_gap_tuples_i, expected_gap_tuples_x,
+                   expected_contiguous_tuples_i, expected_contiguous_tuples_x)
+        """
+        # Create base array with even spacing
+        base = np.arange(0, 2, 0.1)
+
+        # Insert gaps
+        time_array = np.concatenate(
+            [
+                base[:5],  # 0.0 to 0.4 with dt=0.1
+                [base[5] + 0.5],  # 1.0 (gap of 0.5 after 0.4)
+                base[6:10],  # 0.6 to 0.9 with dt=0.1
+                [base[10] + 1.0],  # 2.0 (gap of 1.0 after 0.9)
+                base[11:15],  # 1.1 to 1.4 with dt=0.1
+                [base[15] + 0.3],  # 1.8 (gap of 0.3 after 1.4)
+                base[16:20],  # 1.6 to 1.9 with dt=0.1
+            ]
+        )
+
+        # Expected gap indices (positions where gaps start)
+        expected_gap_indices = np.array([4, 9, 14])
+
+        # Expected gap tuples as (i, i+1) pairs
+        expected_gap_tuples_i = [(4, 5), (9, 10), (14, 15)]
+
+        # Expected gap tuples as (time[i], time[i+1]) pairs
+        expected_gap_tuples_x = [(0.4, 1.0), (0.9, 2.0), (1.4, 1.8)]
+
+        # Expected contiguous intervals as (start, end) index pairs
+        expected_contiguous_tuples_i = [(0, 4), (5, 9), (10, 14), (15, 19)]
+
+        # Expected contiguous intervals as (time[start], time[end]) pairs
+        expected_contiguous_tuples_x = [(0.0, 0.4), (1.0, 0.9), (2.0, 1.4), (1.8, 1.9)]
+
+        return (
+            time_array,
+            expected_gap_indices,
+            expected_gap_tuples_i,
+            expected_gap_tuples_x,
+            expected_contiguous_tuples_i,
+            expected_contiguous_tuples_x,
+        )
+
+    @pytest.fixture
+    def mock_lightcurve_plus_with_gaps(self, time_array_with_gaps):
+        """Create a mock LightCurvePlus object with known time gaps."""
+        time_array = time_array_with_gaps[0]
+        # Create a simple flux array matching the time array length
+        flux_array = np.ones_like(time_array)
+
+        # Create a LightCurve object with the time array
+        lc = LightCurve(time=Time(time_array, format="jd", scale="tdb"), flux=flux_array)
+
+        # Create a LightCurvePlus object with the LightCurve
+        return LightCurvePlus(lc)
+
+    def test_get_gaps_indices(self, time_array_with_gaps):
+        """Test the get_gaps_indices standalone function."""
+        time_array, expected_gap_indices, _, _, _, _ = time_array_with_gaps
+
+        # Test with default threshold (should find all gaps >= 5x median)
+        gaps_5x = get_gaps_indices(time_array, greater_than_median=5.0)
+        assert len(gaps_5x) == 2  # Should find gaps at indices 4 and 9 (5x and 10x)
+        assert 4 in gaps_5x
+        assert 9 in gaps_5x
+        assert 14 not in gaps_5x  # This gap is only 3x
+
+        # Test with lower threshold (should find all gaps >= 3x median)
+        gaps_3x = get_gaps_indices(time_array, greater_than_median=3.0)
+        assert len(gaps_3x) == 3  # Should find all three gaps
+        assert set(gaps_3x) == set(expected_gap_indices)
+
+        # Test with higher threshold (should find only the largest gap)
+        gaps_8x = get_gaps_indices(time_array, greater_than_median=8.0)
+        assert len(gaps_8x) == 1  # Should find only the 10x gap at index 9
+        assert 9 in gaps_8x
+
+        # Test with threshold that finds no gaps
+        gaps_none = get_gaps_indices(time_array, greater_than_median=15.0)
+        assert len(gaps_none) == 0
+
+    def test_find_time_gaps_i(self, mock_lightcurve_plus_with_gaps, time_array_with_gaps):
+        """Test the find_time_gaps_i method of LightCurvePlus."""
+        _, _, expected_gap_tuples_i, _, _, _ = time_array_with_gaps
+
+        # Test with threshold that finds all gaps >= 5x median
+        gaps_5x = mock_lightcurve_plus_with_gaps.find_time_gaps_i(greater_than_median=5.0)
+        assert len(gaps_5x) == 2  # Should find gaps at indices 4 and 9
+        assert (4, 5) in gaps_5x
+        assert (9, 10) in gaps_5x
+        assert (14, 15) not in gaps_5x  # This gap is only 3x
+
+        # Test with lower threshold (should find all gaps >= 3x median)
+        gaps_3x = mock_lightcurve_plus_with_gaps.find_time_gaps_i(greater_than_median=3.0)
+        assert len(gaps_3x) == 3  # Should find all three gaps
+        assert set(gaps_3x) == set(expected_gap_tuples_i)
+
+        # Test with higher threshold (should find only the largest gap)
+        gaps_8x = mock_lightcurve_plus_with_gaps.find_time_gaps_i(greater_than_median=8.0)
+        assert len(gaps_8x) == 1  # Should find only the 10x gap
+        assert (9, 10) in gaps_8x
+
+        # Test with threshold that finds no gaps
+        gaps_none = mock_lightcurve_plus_with_gaps.find_time_gaps_i(greater_than_median=15.0)
+        assert len(gaps_none) == 0
+
+    def test_find_time_gaps_x(self, mock_lightcurve_plus_with_gaps, time_array_with_gaps):
+        """Test the find_time_gaps_x method of LightCurvePlus."""
+        _, _, _, expected_gap_tuples_x, _, _ = time_array_with_gaps
+
+        # Test with threshold that finds all gaps >= 5x median
+        gaps_5x = mock_lightcurve_plus_with_gaps.find_time_gaps_x(greater_than_median=5.0)
+        assert len(gaps_5x) == 2  # Should find gaps at indices 4 and 9
+
+        # Check that the time values match expected values
+        # Use np.isclose for floating point comparison
+        assert any(np.isclose(gap[0], 0.4) and np.isclose(gap[1], 1.0) for gap in gaps_5x)
+        assert any(np.isclose(gap[0], 0.9) and np.isclose(gap[1], 2.0) for gap in gaps_5x)
+
+        # Test with lower threshold (should find all gaps >= 3x median)
+        gaps_3x = mock_lightcurve_plus_with_gaps.find_time_gaps_x(greater_than_median=3.0)
+        assert len(gaps_3x) == 3  # Should find all three gaps
+
+        # Check that all expected gaps are found (using approximate comparison)
+        for expected_gap in expected_gap_tuples_x:
+            assert any(np.isclose(gap[0], expected_gap[0]) and np.isclose(gap[1], expected_gap[1]) for gap in gaps_3x)
+
+        # Test with threshold that finds no gaps
+        gaps_none = mock_lightcurve_plus_with_gaps.find_time_gaps_x(greater_than_median=15.0)
+        assert len(gaps_none) == 0
+
+    def test_find_contiguous_time_i(self, mock_lightcurve_plus_with_gaps, time_array_with_gaps):
+        """Test the find_contiguous_time_i method of LightCurvePlus."""
+        _, _, _, _, expected_contiguous_tuples_i, _ = time_array_with_gaps
+
+        # Test with threshold that finds all gaps >= 5x median
+        contiguous_5x = mock_lightcurve_plus_with_gaps.find_contiguous_time_i(greater_than_median=5.0)
+        assert len(contiguous_5x) == 3  # Should find 3 contiguous regions
+
+        # Check that the contiguous regions include the start and end regions
+        assert (0, 4) in contiguous_5x
+        assert (5, 9) in contiguous_5x
+        assert (10, 19) in contiguous_5x  # This includes the small gap that wasn't detected
+
+        # Test with lower threshold (should find all gaps >= 3x median)
+        contiguous_3x = mock_lightcurve_plus_with_gaps.find_contiguous_time_i(greater_than_median=3.0)
+        assert len(contiguous_3x) == 4  # Should find 4 contiguous regions
+        assert set(contiguous_3x) == set(expected_contiguous_tuples_i)
+
+        # Test with threshold that finds no gaps (entire array is one contiguous region)
+        contiguous_none = mock_lightcurve_plus_with_gaps.find_contiguous_time_i(greater_than_median=15.0)
+        assert len(contiguous_none) == 1
+        assert contiguous_none[0] == (0, 19)  # Full array
+
+    def test_find_contiguous_time_x(self, mock_lightcurve_plus_with_gaps, time_array_with_gaps):
+        """Test the find_contiguous_time_x method of LightCurvePlus."""
+        time_array, _, _, _, _, expected_contiguous_tuples_x = time_array_with_gaps
+
+        # Test with threshold that finds all gaps >= 5x median
+        contiguous_5x = mock_lightcurve_plus_with_gaps.find_contiguous_time_x(greater_than_median=5.0)
+        assert len(contiguous_5x) == 3  # Should find 3 contiguous regions
+
+        # Check that the time values match expected values
+        # Use np.isclose for floating point comparison
+        assert any(np.isclose(interval[0], 0.0) and np.isclose(interval[1], 0.4) for interval in contiguous_5x)
+        assert any(np.isclose(interval[0], 1.0) and np.isclose(interval[1], 0.9) for interval in contiguous_5x)
+        assert any(np.isclose(interval[0], 2.0) and np.isclose(interval[1], 1.9) for interval in contiguous_5x)
+
+        # Test with lower threshold (should find all gaps >= 3x median)
+        contiguous_3x = mock_lightcurve_plus_with_gaps.find_contiguous_time_x(greater_than_median=3.0)
+        assert len(contiguous_3x) == 4  # Should find 4 contiguous regions
+
+        # Check that all expected contiguous intervals are found (using approximate comparison)
+        for expected_interval in expected_contiguous_tuples_x:
+            assert any(
+                np.isclose(interval[0], expected_interval[0]) and np.isclose(interval[1], expected_interval[1])
+                for interval in contiguous_3x
+            )
+
+        # Test with threshold that finds no gaps (entire array is one contiguous region)
+        contiguous_none = mock_lightcurve_plus_with_gaps.find_contiguous_time_x(greater_than_median=15.0)
+        assert len(contiguous_none) == 1
+        assert np.isclose(contiguous_none[0][0], time_array[0])
+        assert np.isclose(contiguous_none[0][1], time_array[-1])
+
+    def test_edge_cases(self):
+        """Test edge cases for gap detection functions."""
+        # Test with empty array
+        empty_array = np.array([])
+        assert len(get_gaps_indices(empty_array, greater_than_median=5.0)) == 0
+
+        # Test with single element array (no gaps possible)
+        single_element = np.array([1.0])
+        assert len(get_gaps_indices(single_element, greater_than_median=5.0)) == 0
+
+        # Test with two elements (one difference, which becomes the median)
+        two_elements = np.array([1.0, 2.0])
+        assert len(get_gaps_indices(two_elements, greater_than_median=5.0)) == 0
+
+        # Test with constant time differences (no gaps)
+        constant_diff = np.arange(0, 10, 1.0)
+        assert len(get_gaps_indices(constant_diff, greater_than_median=5.0)) == 0
+
+        # Test with all identical values (zero differences)
+        identical_values = np.ones(10)
+        # This should not raise errors, but the result is not meaningful
+        # since all differences are zero and median is zero
+        try:
+            get_gaps_indices(identical_values, greater_than_median=5.0)
+        except Exception as e:
+            pytest.fail(f"get_gaps_indices raised {type(e).__name__} with identical values: {e}")
