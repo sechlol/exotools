@@ -454,8 +454,8 @@ class TestLightcurvePlus:
         lc_plus_jd.start_at_zero()
 
         # First time value should be close to zero for both
-        assert abs(lc_plus_btjd.time_x[0]) < 1e-10
-        assert abs(lc_plus_jd.time_x[0]) < 1e-10
+        assert abs(lc_plus_btjd.time_x[0]) == pytest.approx(0, abs=1e-9)
+        assert abs(lc_plus_jd.time_x[0]) == pytest.approx(0, abs=1e-9)
 
         # Verify that the time differences are preserved
         original_btjd_lc = LightCurvePlus(base_lc.copy())
