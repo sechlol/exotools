@@ -4,6 +4,7 @@ from astropy.time import Time
 from lightkurve import FoldedLightCurve, LightCurve
 
 from exotools import LightcurveDB, LightCurvePlus, Planet, StarSystemDB
+from exotools.db.lightcurve_plus import copy_lightcurve
 from exotools.utils.array_utils import get_gaps_indices
 
 
@@ -15,8 +16,8 @@ class TestLightcurvePlus:
     @pytest.fixture
     def sample_lc_plus(self, all_test_lightcurves) -> LightCurvePlus:
         """Get a sample LightCurvePlus object with a valid observation ID."""
-        obs_id = next(iter(all_test_lightcurves))
-        return LightCurvePlus(all_test_lightcurves[obs_id], obs_id=obs_id)
+        obs_id = 65149728  # next(iter(all_test_lightcurves))
+        return LightCurvePlus(copy_lightcurve(all_test_lightcurves[obs_id]), obs_id=obs_id)
 
     @pytest.fixture
     def lc_and_planet(
@@ -138,18 +139,37 @@ class TestLightcurvePlus:
         np.testing.assert_array_equal(numpy_array[:, 0], sample_lc_plus.time_x)
         np.testing.assert_array_equal(numpy_array[:, 1], sample_lc_plus.flux_y)
 
+    def test_remove_nans(self, sample_lc_plus):
+        """Test remove_outliers method."""
+        nan_flux = sample_lc_plus.flux_y
+        nan_flux[0:10] = np.nan
+
+        cleaned_lc = sample_lc_plus.copy_with_flux(nan_flux).remove_nans()
+        assert isinstance(cleaned_lc, LightCurvePlus)
+
+        # The cleaned lightcurve should have the same or fewer points
+        assert len(cleaned_lc) == len(sample_lc_plus) - 10
+        assert sample_lc_plus.obs_id is not None
+        assert cleaned_lc.obs_id == sample_lc_plus.obs_id
+
     def test_remove_outliers(self, sample_lc_plus):
         """Test remove_outliers method."""
         cleaned_lc = sample_lc_plus.remove_outliers()
         assert isinstance(cleaned_lc, LightCurvePlus)
-        # The cleaned lightcurve should have the same or fewer points
-        assert len(cleaned_lc) <= len(sample_lc_plus)
+
+        # The cleaned lightcurve should have fewer points
+        assert len(cleaned_lc) < len(sample_lc_plus)
+        assert len(cleaned_lc) == 13745  # Specific value for the test sample
+        assert sample_lc_plus.obs_id is not None
+        assert cleaned_lc.obs_id == sample_lc_plus.obs_id
 
     def test_normalize(self, sample_lc_plus):
         """Test normalize method."""
         normalized_lc = sample_lc_plus.normalize()
         assert isinstance(normalized_lc, LightCurvePlus)
         assert len(normalized_lc) == len(sample_lc_plus)
+        assert sample_lc_plus.obs_id is not None
+        assert normalized_lc.obs_id == sample_lc_plus.obs_id
 
         # Check that the normalized flux has mean close to 1
         assert 0.9 <= np.mean(normalized_lc.flux_y) <= 1.1

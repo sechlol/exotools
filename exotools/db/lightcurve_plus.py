@@ -128,13 +128,13 @@ class LightCurvePlus:
         return np.array([self.time_x, self.flux_y]).T
 
     def remove_nans(self) -> Self:
-        return LightCurvePlus(self.lc.remove_nans())
+        return LightCurvePlus(self.lc.remove_nans(), obs_id=self._obs_id)
 
     def remove_outliers(self) -> Self:
-        return LightCurvePlus(self.lc.remove_outliers())
+        return LightCurvePlus(self.lc.remove_outliers(), obs_id=self._obs_id)
 
     def normalize(self) -> Self:
-        return LightCurvePlus(self.lc.normalize())
+        return LightCurvePlus(self.lc.normalize(), obs_id=self._obs_id)
 
     def get_first_transit_value(self, planet: Planet) -> Time:
         i = self.get_transit_first_index(planet)
@@ -207,7 +207,7 @@ class LightCurvePlus:
 
     def copy_with_flux(self, flux: np.ndarray) -> Self:
         lc = copy_lightcurve(self.lc, with_flux=flux)
-        return LightCurvePlus(lc)
+        return LightCurvePlus(lc, obs_id=self._obs_id)
 
     def find_time_gaps_i(self, greater_than_median: float = 10.0) -> list[tuple[int, int]]:
         """
@@ -343,7 +343,7 @@ class LightCurvePlus:
         return LightCurvePlus(lightcurve=self.lc + other)
 
     def __getitem__(self, index) -> Self:
-        return LightCurvePlus(self.lc[index])
+        return LightCurvePlus(self.lc[index], obs_id=self._obs_id)
 
 
 def copy_lightcurve(lightcurve: LightCurve, with_flux: Optional[np.ndarray] = None) -> LightCurve:
