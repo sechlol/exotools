@@ -315,8 +315,9 @@ class TestLightcurveDb:
                 # Verify parameters were passed correctly
                 mock_load_lc.assert_called_with("path/to/lc1.fits", load_in_jd_time=True)
                 mock_lcp_class.assert_called_with(mock_lc)
-                # Verify that to_jd_time() was called when load_in_jd_time=True
-                mock_lcp.to_jd_time.assert_called_once()
+
+                # Verify that to_jd_time() was not called when load_in_jd_time=True
+                assert mock_lcp.to_jd_time.call_count == 0
 
                 # Reset mocks and test load_by_tic
                 mock_load_lc.reset_mock()

@@ -120,6 +120,9 @@ class LightCurvePlus:
     def to_numpy(self) -> np.ndarray:
         return np.array([self.time_x, self.flux_y]).T
 
+    def remove_nans(self) -> Self:
+        return LightCurvePlus(self.lc.remove_nans())
+
     def remove_outliers(self) -> Self:
         return LightCurvePlus(self.lc.remove_outliers())
 
