@@ -8,6 +8,13 @@ from astropy.units import Quantity
 from lightkurve import FoldedLightCurve, LightCurve
 from typing_extensions import Self
 
+from exotools.utils.array_utils import (
+    get_contiguous_interval_indices,
+    get_contiguous_intervals,
+    get_gaps_interval_indices,
+    get_gaps_intervals,
+)
+
 from .star_system import Planet
 
 
@@ -220,7 +227,7 @@ class LightCurvePlus:
             immediately before and after a detected gap. The gap occurs between
             time[i] and time[i+1].
         """
-        return [(i, i + 1) for i in get_gaps_indices(x=self.time_x, greater_than_median=greater_than_median)]
+        return get_gaps_interval_indices(x=self.time_x, greater_than_median=greater_than_median)
 
     def find_time_gaps_x(self, greater_than_median: float = 10.0) -> list[tuple[float, float]]:
         """
@@ -242,11 +249,7 @@ class LightCurvePlus:
         See Also:
             find_time_gaps_i: Returns the same gaps as index pairs instead of time values.
         """
-        t = self.time_x
-        return [
-            (t[i].item(), t[i + 1].item())
-            for i in get_gaps_indices(x=self.time_x, greater_than_median=greater_than_median)
-        ]
+        return get_gaps_intervals(x=self.time_x, greater_than_median=greater_than_median)
 
     def find_contiguous_time_i(self, greater_than_median: float = 10.0) -> list[tuple[int, int]]:
         """
@@ -264,13 +267,7 @@ class LightCurvePlus:
             List of index tuples (start, end) where each tuple represents the start
             and end indices (inclusive) of a contiguous time interval.
         """
-        # Get the gaps first
-        gaps = get_gaps_indices(x=self.time_x, greater_than_median=greater_than_median)
-        if len(gaps) == 0:
-            return [(0, len(self.time_x) - 1)]
-
-        boundaries = [-1] + gaps.tolist() + [len(self.time_x) - 1]
-        return [(i1 + 1, i2) for i1, i2 in zip(boundaries[:-1], boundaries[1:])]
+        return get_contiguous_interval_indices(x=self.time_x, greater_than_median=greater_than_median)
 
     def find_contiguous_time_x(self, greater_than_median: float = 10.0) -> list[tuple[float, float]]:
         """
@@ -288,11 +285,7 @@ class LightCurvePlus:
             List of time value tuples (t_start, t_end) where each tuple represents
             the actual time values at the start and end of a contiguous interval.
         """
-        t = self.time_x
-        return [
-            (t[start].item(), t[end].item())
-            for (start, end) in self.find_contiguous_time_i(greater_than_median=greater_than_median)
-        ]
+        return get_contiguous_intervals(x=self.time_x, greater_than_median=greater_than_median)
 
     def to_jd_time(self) -> Self:
         """Convert the lightcurve time to Julian Date (JD) format in place.
@@ -351,12 +344,6 @@ class LightCurvePlus:
 
     def __getitem__(self, index) -> Self:
         return LightCurvePlus(self.lc[index])
-
-
-def get_gaps_indices(x: np.ndarray, greater_than_median: float) -> np.ndarray:
-    time_diffs = x[1:] - x[:-1]
-    exp_time = np.median(time_diffs)
-    return np.argwhere(time_diffs > (exp_time * greater_than_median)).ravel()
 
 
 def copy_lightcurve(lightcurve: LightCurve, with_flux: Optional[np.ndarray] = None) -> LightCurve:

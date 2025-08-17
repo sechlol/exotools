@@ -4,7 +4,7 @@ from astropy.time import Time
 from lightkurve import FoldedLightCurve, LightCurve
 
 from exotools import LightcurveDB, LightCurvePlus, Planet, StarSystemDB
-from exotools.db.lightcurve_plus import get_gaps_indices
+from exotools.utils.array_utils import get_gaps_indices
 
 
 class TestLightcurvePlus:
