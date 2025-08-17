@@ -79,8 +79,6 @@ class LightcurveDB(BaseDB):
             return None
         stitched = LightCurveCollection([lc.lc for lc in lcs]).stitch()
         lc_plus = LightCurvePlus(stitched)
-        if load_in_jd_time:
-            lc_plus.to_jd_time()
         return lc_plus.start_at_zero() if start_time_at_zero else lc_plus
 
     def load_by_obs_id(
@@ -90,8 +88,6 @@ class LightcurveDB(BaseDB):
         if len(path) == 0:
             return None
         lc = LightCurvePlus(self.load_lightcurve(path[0], load_in_jd_time=load_in_jd_time))
-        if load_in_jd_time:
-            lc.to_jd_time()
         if start_time_at_zero:
             lc = lc.start_at_zero()
         return lc
