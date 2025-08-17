@@ -50,44 +50,64 @@ class LightcurveDB(BaseDB):
     def select_by_tic_ids(self, tic_ids: np.ndarray) -> Self:
         return self.where(tic_id=tic_ids)
 
-    def load_by_tic(self, tic_id: int, start_time_at_zero: bool = False) -> Optional[list[LightCurvePlus]]:
+    def load_by_tic(
+        self, tic_id: int, start_time_at_zero: bool = False, load_in_jd_time: bool = False
+    ) -> Optional[list[LightCurvePlus]]:
         paths = self.view[["path", "obs_id"]][self.view["tic_id"] == tic_id]
         if len(paths) == 0:
             return None
 
         # Sort lightcurves chronologically
-        lcs = [LightCurvePlus(self.load_lightcurve(row["path"]), obs_id=row["obs_id"]) for row in paths]
+        lcs = [
+            LightCurvePlus(
+                self.load_lightcurve(row["path"], load_in_jd_time=load_in_jd_time),
+                obs_id=row["obs_id"],
+            )
+            for row in paths
+        ]
         lcs = sorted(lcs, key=lambda x: x.time[0])
         if start_time_at_zero:
             for lc in lcs:
                 lc.start_at_zero()
         return lcs
 
-    def load_stitched_by_tic(self, tic_id: int, start_time_at_zero: bool = False) -> Optional[LightCurvePlus]:
-        lcs = self.load_by_tic(tic_id, start_time_at_zero=False)
+    def load_stitched_by_tic(
+        self, tic_id: int, start_time_at_zero: bool = False, load_in_jd_time: bool = False
+    ) -> Optional[LightCurvePlus]:
+        lcs = self.load_by_tic(tic_id, start_time_at_zero=False, load_in_jd_time=load_in_jd_time)
         if not lcs:
             return None
         stitched = LightCurveCollection([lc.lc for lc in lcs]).stitch()
         lc_plus = LightCurvePlus(stitched)
+        if load_in_jd_time:
+            lc_plus.to_jd_time()
         return lc_plus.start_at_zero() if start_time_at_zero else lc_plus
 
-    def load_by_obs_id(self, obs_id: int, start_time_at_zero: bool = False) -> Optional[LightCurvePlus]:
+    def load_by_obs_id(
+        self, obs_id: int, start_time_at_zero: bool = False, load_in_jd_time: bool = False
+    ) -> Optional[LightCurvePlus]:
         path = self.view["path"][self.view["obs_id"] == obs_id]
         if len(path) == 0:
             return None
-        lc = LightCurvePlus(self.load_lightcurve(path[0]))
+        lc = LightCurvePlus(self.load_lightcurve(path[0], load_in_jd_time=load_in_jd_time))
+        if load_in_jd_time:
+            lc.to_jd_time()
         if start_time_at_zero:
             lc = lc.start_at_zero()
         return lc
 
-    def load_collections_by_tics(self, tic_ids: list[int]) -> list[Optional[LightCurveCollection]]:
-        return [self.load_by_tic(tic) for tic in tic_ids]
+    def load_collections_by_tics(
+        self, tic_ids: list[int], load_in_jd_time: bool = False
+    ) -> list[Optional[LightCurveCollection]]:
+        return [self.load_by_tic(tic, load_in_jd_time=load_in_jd_time) for tic in tic_ids]
 
-    def load_stitched_by_tics(self, tic_ids: list[int]) -> list[Optional[LightCurvePlus]]:
-        return [self.load_stitched_by_tic(tic) for tic in tic_ids]
+    def load_stitched_by_tics(
+        self, tic_ids: list[int], load_in_jd_time: bool = False
+    ) -> list[Optional[LightCurvePlus]]:
+        return [self.load_stitched_by_tic(tic, load_in_jd_time=load_in_jd_time) for tic in tic_ids]
 
-    def load_by_obs_ids(self, obs_ids: list[int]) -> list[Optional[LightCurvePlus]]:
-        return [self.load_by_obs_id(obs) for obs in obs_ids]
+    def load_by_obs_ids(self, obs_ids: list[int], load_in_jd_time: bool = False) -> list[Optional[LightCurvePlus]]:
+        return [self.load_by_obs_id(obs, load_in_jd_time=load_in_jd_time) for obs in obs_ids]
 
     @staticmethod
     def path_map_to_qtable(path_map: dict[int, list[Path]]) -> QTable:
@@ -99,7 +119,7 @@ class LightcurveDB(BaseDB):
         return QTable(tabular_data)
 
     @staticmethod
-    def load_lightcurve(fits_file_path: Path | str) -> LightCurve:
+    def load_lightcurve(fits_file_path: Path | str, load_in_jd_time: bool = False) -> LightCurve:
         # This line stores all the additional information from the fits file. But takes more time to execute
         # return lightkurve.utils.read(downloaded)
 
@@ -114,7 +134,7 @@ class LightcurveDB(BaseDB):
             meta = dict(hdul[0].header)
             meta.update(dict(hdul[1].header))
 
-            # Build the JD(TDB) timestamps from header keywords
+            # Get time information and timestamps from header keywords
             ref_int = meta.get("BJDREFI", 0)
             ref_fractional = meta.get("BJDREFF", 0)
             time_unit = (meta.get("TIMEUNIT", "d") or "d").lower()
@@ -147,23 +167,46 @@ class LightcurveDB(BaseDB):
                     "consider applying barycentric correction if needed."
                 )
 
-            # Compute barycentric Julian dates (BJD_TDB) and construct astropy Time object
-            jd = (ref_int + ref_fractional) + time_array[valid_range] * factor
-            time = Time(jd, format="jd", scale=time_sys)
+            # Determine original time format from metadata
+            tunit1 = meta.get("TUNIT1", "").lower()
+            if "bjd" in tunit1 and "2457000" in tunit1:
+                # TESS BTJD format: "BJD - 2457000, days"
+                original_format = "btjd"
+            elif "jd" in tunit1:
+                # Julian Date format
+                original_format = "jd"
+            else:
+                # Default to BTJD for TESS data if unclear
+                original_format = "btjd"
+                warnings.warn(f"Could not determine time format from TUNIT1='{meta.get('TUNIT1')}', assuming BTJD")
 
-            return LightCurve(time=time, flux=flux[valid_range], flux_err=error[valid_range], meta=meta)
+            if not load_in_jd_time:
+                # Return lightcurve with original time format
+                time = Time(time_array[valid_range], format=original_format, scale=time_sys)
+                lc = LightCurve(time=time, flux=flux[valid_range], flux_err=error[valid_range], meta=meta)
+            else:
+                # Compute barycentric Julian dates (BJD_TDB) and construct astropy Time object
+                jd = (ref_int + ref_fractional) + time_array[valid_range] * factor
+                time = Time(jd, format="jd", scale=time_sys)
+                lc = LightCurve(time=time, flux=flux[valid_range], flux_err=error[valid_range], meta=meta)
+
+            # Store original format info in metadata for LightCurvePlus
+            lc.meta["_ORIGINAL_TIME_FORMAT"] = original_format
+            return lc
 
     @staticmethod
-    def load_lightcurve_collection(paths: list[Path | str]) -> LightCurveCollection:
-        lightcurves = [LightcurveDB.load_lightcurve(p).remove_outliers() for p in paths]
+    def load_lightcurve_collection(paths: list[Path | str], load_in_jd_time: bool = False) -> LightCurveCollection:
+        lightcurves = [
+            LightcurveDB.load_lightcurve(p, load_in_jd_time=load_in_jd_time).remove_outliers() for p in paths
+        ]
         lightcurves = [(lc if np.median(lc.flux.value) > 0 else None) for lc in lightcurves]
         return LightCurveCollection([lc for lc in lightcurves if lc is not None])
 
     @staticmethod
-    def load_lightcurve_plus(fits_file_path: Path | str) -> LightCurvePlus:
-        return LightCurvePlus(LightcurveDB.load_lightcurve(fits_file_path))
+    def load_lightcurve_plus(fits_file_path: Path | str, load_in_jd_time: bool = False) -> LightCurvePlus:
+        return LightCurvePlus(LightcurveDB.load_lightcurve(fits_file_path, load_in_jd_time=load_in_jd_time))
 
     @staticmethod
-    def load_lightcurve_plus_from_collection(paths: list[Path | str]) -> LightCurvePlus:
-        collection = LightcurveDB.load_lightcurve_collection(paths)
+    def load_lightcurve_plus_from_collection(paths: list[Path | str], load_in_jd_time: bool = False) -> LightCurvePlus:
+        collection = LightcurveDB.load_lightcurve_collection(paths, load_in_jd_time=load_in_jd_time)
         return LightCurvePlus(collection.stitch())

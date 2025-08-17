@@ -13,10 +13,21 @@ from .star_system import Planet
 
 class LightCurvePlus:
     def __init__(self, lightcurve: LightCurve, obs_id: Optional[int] = None):
-        self.lc: LightCurve = _convert_time_to_jd(lightcurve)
-        self._time_shift = TimeDelta(0, format=self.lc.time.format, scale=self.lc.time.scale)
+        # Store original format information
+        self._original_time_format = lightcurve.meta.get("_ORIGINAL_TIME_FORMAT", "btjd")
+
+        # Use the lightcurve as-is, preserving its original time format
+        self.lc: LightCurve = lightcurve
+
+        # TimeDelta doesn't support all Time formats, so use 'sec' format for compatibility
+        self._time_shift = TimeDelta(0, format="sec", scale=self.lc.time.scale)
         self._obs_id = obs_id
         self._warn_if_not_barycentric()
+
+    @property
+    def time_system(self) -> str:
+        """Return the current time system (format/scale combination)."""
+        return f"{self.lc.time.format.upper()}/{self.lc.time.scale.upper()}"
 
     @property
     def time_x(self) -> np.ndarray:
@@ -47,25 +58,43 @@ class LightCurvePlus:
         return self.lc.meta
 
     @property
-    def time_bjd(self) -> np.ndarray:
-        """Absolute BJD in TDB (days) as a NumPy array."""
-        # Convert to TDB explicitly to be unambiguous
-        return np.asarray(self.time.tdb.jd, dtype=float)
+    def jd_time(self) -> np.ndarray:
+        """Julian Date as a NumPy array."""
+        if self.lc.time.format == "jd":
+            # Already in JD format, return directly
+            return np.asarray(self.lc.time.value, dtype=float)
+        else:
+            # Convert to JD
+            return np.asarray(self.lc.time.jd, dtype=float)
 
     @property
-    def time_elapsed(self) -> np.ndarray:
+    def bjd_time(self) -> np.ndarray:
+        """Absolute BJD in TDB (days) as a NumPy array."""
+        if self.lc.time.format == "jd" and self.lc.time.scale == "tdb":
+            # Already in BJD_TDB format, return directly
+            return np.asarray(self.lc.time.value, dtype=float)
+        else:
+            # Convert to TDB explicitly to be unambiguous
+            return np.asarray(self.time.tdb.jd, dtype=float)
+
+    @property
+    def elapsed_time(self) -> np.ndarray:
         """
         Days since first cadence (relative timeline), independent of BJDREF*.
         """
-        bjd = self.time_bjd
+        bjd = self.bjd_time
         return bjd - bjd[0]
 
     @property
-    def time_btjd(self) -> np.ndarray:
+    def btjd_time(self) -> np.ndarray:
         """
         TESS BTJD in days, i.e., BJD_TDB − (BJDREFI + BJDREFF).
         """
+        if self.lc.time.format == "btjd":
+            # Already in BTJD format, return directly
+            return np.asarray(self.lc.time.value, dtype=float)
 
+        # Need to convert from other format to BTJD
         refi = self.meta.get("BJDREFI")
         reff = self.meta.get("BJDREFF")
         if refi is None and reff is None:
@@ -77,7 +106,7 @@ class LightCurvePlus:
             reff = 0.0 if reff is None else reff
         bjd_ref = float(refi) + float(reff)
 
-        return self.time_bjd - bjd_ref
+        return self.bjd_time - bjd_ref
 
     def _warn_if_not_barycentric(self) -> None:
         """Warn if TIMEREF suggests times are not barycentric."""
@@ -110,7 +139,12 @@ class LightCurvePlus:
         )
 
     def shift_time(self, shift: float | Quantity) -> Self:
-        delta = TimeDelta(shift, format=self.lc.time.format, scale=self.lc.time.scale)
+        # Use 'sec' format for TimeDelta compatibility, but convert to days if needed
+        if isinstance(shift, (int, float)):
+            # Assume shift is in the same units as the time (days for astronomical data)
+            delta = TimeDelta(shift * 86400, format="sec", scale=self.lc.time.scale)  # Convert days to seconds
+        else:
+            delta = TimeDelta(shift, format="sec", scale=self.lc.time.scale)
         self._time_shift += delta
         self.lc.time += delta
         return self
@@ -165,6 +199,36 @@ class LightCurvePlus:
         lc = copy_lightcurve(self.lc, with_flux=flux)
         return LightCurvePlus(lc)
 
+    def to_jd_time(self) -> Self:
+        """Convert the lightcurve time to Julian Date (JD) format in place.
+
+        Returns:
+            Self: Returns self for method chaining.
+        """
+        if self.lc.time.format != "jd":
+            self.lc = _convert_time_to_jd(self.lc)
+        return self
+
+    def to_btjd_time(self) -> Self:
+        """Convert the lightcurve time to Barycentric TESS Julian Date (BTJD) format in place.
+
+        Returns:
+            Self: Returns self for method chaining.
+        """
+        if self.lc.time.format != "btjd":
+            self.lc = _convert_time_to_btjd(self.lc)
+        return self
+
+    def to_bjd_time(self) -> Self:
+        """Convert the lightcurve time to Barycentric Julian Date (BJD) format in place.
+
+        Returns:
+            Self: Returns self for method chaining.
+        """
+        if self.lc.time.format != "jd":  # BJD is same as JD for TDB scale
+            self.lc = _convert_time_to_bjd(self.lc)
+        return self
+
     def _get_aligned_midpoint(self, planet: Planet) -> float:
         return (planet.transit_midpoint.central + self._time_shift).value
 
@@ -217,6 +281,29 @@ def _convert_time_to_jd(lc: LightCurve) -> LightCurve:
         new_t = _btjd_to_jd_time(lc.time)
         return LightCurve(time=new_t, flux=lc.flux, flux_err=lc.flux_err, meta=lc.meta)
     raise ValueError(f"Time format {lc.time.format} unknown/unsupported.")
+
+
+def _convert_time_to_btjd(lc: LightCurve) -> LightCurve:
+    """Convert lightcurve time to BTJD format."""
+    if lc.time.scale != "tdb":
+        raise ValueError(f"Time scale {lc.time.scale} unknown/unsupported.")
+
+    if lc.time.format == "btjd":
+        return lc
+    elif lc.time.format == "jd":
+        # Convert JD to BTJD by subtracting reference
+        refi = lc.meta.get("BJDREFI", 2457000)
+        reff = lc.meta.get("BJDREFF", 0.0)
+        bjd_ref = float(refi) + float(reff)
+        new_t = Time(lc.time.value - bjd_ref, format="btjd", scale="tdb")
+        return LightCurve(time=new_t, flux=lc.flux, flux_err=lc.flux_err, meta=lc.meta)
+    raise ValueError(f"Time format {lc.time.format} unknown/unsupported.")
+
+
+def _convert_time_to_bjd(lc: LightCurve) -> LightCurve:
+    """Convert lightcurve time to BJD format (same as JD for TDB scale)."""
+    # For TDB scale, BJD is the same as JD
+    return _convert_time_to_jd(lc)
 
 
 def _get_phase(time: np.ndarray, period: float, midpoint: float) -> np.ndarray:
