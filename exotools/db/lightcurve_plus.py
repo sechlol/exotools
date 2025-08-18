@@ -8,15 +8,33 @@ from astropy.units import Quantity
 from lightkurve import FoldedLightCurve, LightCurve
 from typing_extensions import Self
 
+from exotools.utils.array_utils import (
+    get_contiguous_interval_indices,
+    get_contiguous_intervals,
+    get_gaps_interval_indices,
+    get_gaps_intervals,
+)
+
 from .star_system import Planet
 
 
 class LightCurvePlus:
     def __init__(self, lightcurve: LightCurve, obs_id: Optional[int] = None):
-        self.lc: LightCurve = _convert_time_to_jd(lightcurve)
-        self._time_shift = TimeDelta(0, format=self.lc.time.format, scale=self.lc.time.scale)
+        # Store original format information
+        self._original_time_format = lightcurve.meta.get("_ORIGINAL_TIME_FORMAT", "btjd")
+
+        # Use the lightcurve as-is, preserving its original time format
+        self.lc: LightCurve = lightcurve
+
+        # TimeDelta doesn't support all Time formats, so use 'sec' format for compatibility
+        self._time_shift = TimeDelta(0, format="sec", scale=self.lc.time.scale)
         self._obs_id = obs_id
         self._warn_if_not_barycentric()
+
+    @property
+    def time_system(self) -> str:
+        """Return the current time system (format/scale combination)."""
+        return f"{self.lc.time.format.upper()}/{self.lc.time.scale.upper()}"
 
     @property
     def time_x(self) -> np.ndarray:
@@ -47,25 +65,43 @@ class LightCurvePlus:
         return self.lc.meta
 
     @property
-    def time_bjd(self) -> np.ndarray:
-        """Absolute BJD in TDB (days) as a NumPy array."""
-        # Convert to TDB explicitly to be unambiguous
-        return np.asarray(self.time.tdb.jd, dtype=float)
+    def jd_time(self) -> np.ndarray:
+        """Julian Date as a NumPy array."""
+        if self.lc.time.format == "jd":
+            # Already in JD format, return directly
+            return np.asarray(self.lc.time.value, dtype=float)
+        else:
+            # Convert to JD
+            return np.asarray(self.lc.time.jd, dtype=float)
 
     @property
-    def time_elapsed(self) -> np.ndarray:
+    def bjd_time(self) -> np.ndarray:
+        """Absolute BJD in TDB (days) as a NumPy array."""
+        if self.lc.time.format == "jd" and self.lc.time.scale == "tdb":
+            # Already in BJD_TDB format, return directly
+            return np.asarray(self.lc.time.value, dtype=float)
+        else:
+            # Convert to TDB explicitly to be unambiguous
+            return np.asarray(self.lc.time.tdb.jd, dtype=float)
+
+    @property
+    def elapsed_time(self) -> np.ndarray:
         """
         Days since first cadence (relative timeline), independent of BJDREF*.
         """
-        bjd = self.time_bjd
+        bjd = self.bjd_time
         return bjd - bjd[0]
 
     @property
-    def time_btjd(self) -> np.ndarray:
+    def btjd_time(self) -> np.ndarray:
         """
         TESS BTJD in days, i.e., BJD_TDB − (BJDREFI + BJDREFF).
         """
+        if self.lc.time.format == "btjd":
+            # Already in BTJD format, return directly
+            return np.asarray(self.lc.time.value, dtype=float)
 
+        # Need to convert from other format to BTJD
         refi = self.meta.get("BJDREFI")
         reff = self.meta.get("BJDREFF")
         if refi is None and reff is None:
@@ -77,7 +113,7 @@ class LightCurvePlus:
             reff = 0.0 if reff is None else reff
         bjd_ref = float(refi) + float(reff)
 
-        return self.time_bjd - bjd_ref
+        return self.bjd_time - bjd_ref
 
     def _warn_if_not_barycentric(self) -> None:
         """Warn if TIMEREF suggests times are not barycentric."""
@@ -91,11 +127,14 @@ class LightCurvePlus:
     def to_numpy(self) -> np.ndarray:
         return np.array([self.time_x, self.flux_y]).T
 
+    def remove_nans(self) -> Self:
+        return LightCurvePlus(self.lc.remove_nans(), obs_id=self._obs_id)
+
     def remove_outliers(self) -> Self:
-        return LightCurvePlus(self.lc.remove_outliers())
+        return LightCurvePlus(self.lc.remove_outliers(), obs_id=self._obs_id)
 
     def normalize(self) -> Self:
-        return LightCurvePlus(self.lc.normalize())
+        return LightCurvePlus(self.lc.normalize(), obs_id=self._obs_id)
 
     def get_first_transit_value(self, planet: Planet) -> Time:
         i = self.get_transit_first_index(planet)
@@ -110,7 +149,12 @@ class LightCurvePlus:
         )
 
     def shift_time(self, shift: float | Quantity) -> Self:
-        delta = TimeDelta(shift, format=self.lc.time.format, scale=self.lc.time.scale)
+        # Use 'sec' format for TimeDelta compatibility, but convert to days if needed
+        if isinstance(shift, (int, float)):
+            # Assume shift is in the same units as the time (days for astronomical data)
+            delta = TimeDelta(shift * 86400, format="sec", scale=self.lc.time.scale)  # Convert days to seconds
+        else:
+            delta = TimeDelta(shift, format="sec", scale=self.lc.time.scale)
         self._time_shift += delta
         self.lc.time += delta
         return self
@@ -163,7 +207,115 @@ class LightCurvePlus:
 
     def copy_with_flux(self, flux: np.ndarray) -> Self:
         lc = copy_lightcurve(self.lc, with_flux=flux)
-        return LightCurvePlus(lc)
+        return LightCurvePlus(lc, obs_id=self._obs_id)
+
+    def find_time_gaps_i(self, greater_than_median: float = 10.0) -> list[tuple[int, int]]:
+        """
+        Find time gaps in the lightcurve based on time step analysis.
+
+        Identifies locations where the time difference between consecutive points
+        exceeds the median time step by a specified factor, indicating data gaps
+        or interruptions in observations.
+
+        Args:
+            greater_than_median: Threshold multiplier for gap detection. Gaps are
+                identified where time_diff > median_time_step * greater_than_median.
+
+
+        Returns:
+            List of index tuples (i, i+1) where each tuple represents the indices
+            immediately before and after a detected gap. The gap occurs between
+            time[i] and time[i+1].
+        """
+        return get_gaps_interval_indices(x=self.time_x, greater_than_median=greater_than_median)
+
+    def find_time_gaps_x(self, greater_than_median: float = 10.0) -> list[tuple[float, float]]:
+        """
+        Find time gaps in the lightcurve and return actual time values.
+
+        Identifies locations where the time difference between consecutive points
+        exceeds the median time step by a specified factor, returning the actual
+        time values at gap boundaries rather than indices.
+
+        Args:
+            greater_than_median: Threshold multiplier for gap detection. Gaps are
+                identified where time_diff > median_time_step * greater_than_median.
+
+        Returns:
+            List of time value tuples (t1, t2) where each tuple represents the
+            actual time values immediately before and after a detected gap.
+            The gap occurs between time t1 and time t2.
+
+        See Also:
+            find_time_gaps_i: Returns the same gaps as index pairs instead of time values.
+        """
+        return get_gaps_intervals(x=self.time_x, greater_than_median=greater_than_median)
+
+    def find_contiguous_time_i(self, greater_than_median: float = 10.0) -> list[tuple[int, int]]:
+        """
+        Find contiguous time intervals in the lightcurve based on time step analysis.
+
+        Identifies regions where time differences between consecutive points remain
+        below the threshold, indicating continuous observation periods without
+        significant gaps.
+
+        Args:
+            greater_than_median: Threshold multiplier for gap detection. Contiguous
+                intervals are where time_diff <= median_time_step * greater_than_median.
+
+        Returns:
+            List of index tuples (start, end) where each tuple represents the start
+            and end indices (inclusive) of a contiguous time interval.
+        """
+        return get_contiguous_interval_indices(x=self.time_x, greater_than_median=greater_than_median)
+
+    def find_contiguous_time_x(self, greater_than_median: float = 10.0) -> list[tuple[float, float]]:
+        """
+        Find contiguous time intervals in the lightcurve and return actual time values.
+
+        Identifies regions where time differences between consecutive points remain
+        below the threshold, returning the actual time values at the boundaries
+        of contiguous intervals.
+
+        Args:
+            greater_than_median: Threshold multiplier for gap detection. Contiguous
+                intervals are where time_diff <= median_time_step * greater_than_median.
+
+        Returns:
+            List of time value tuples (t_start, t_end) where each tuple represents
+            the actual time values at the start and end of a contiguous interval.
+        """
+        return get_contiguous_intervals(x=self.time_x, greater_than_median=greater_than_median)
+
+    def to_jd_time(self) -> Self:
+        """Convert the lightcurve time to Julian Date (JD) format in place.
+
+        Returns:
+            Self: Returns self for method chaining.
+        """
+        if self.lc.time.format != "jd":
+            self.lc = _convert_time_to_jd(self.lc)
+        return self
+
+    def to_btjd_time(self) -> Self:
+        """Convert the lightcurve time to Barycentric TESS Julian Date (BTJD) format in place.
+
+        Returns:
+            Self: Returns self for method chaining.
+        """
+        if self.lc.time.format != "btjd":
+            self.lc = _convert_time_to_btjd(self.lc)
+        return self
+
+    def to_bjd_time(self) -> Self:
+        """Convert the lightcurve time to Barycentric Julian Date (BJD) format in place.
+
+        Returns:
+            Self: Returns self for method chaining.
+        """
+        if self.lc.time.format != "jd":  # BJD is same as JD for TDB scale
+            self.lc = _convert_time_to_bjd(self.lc)
+        return self
 
     def _get_aligned_midpoint(self, planet: Planet) -> float:
         return (planet.transit_midpoint.central + self._time_shift).value
@@ -191,7 +343,7 @@ class LightCurvePlus:
         return LightCurvePlus(lightcurve=self.lc + other)
 
     def __getitem__(self, index) -> Self:
-        return LightCurvePlus(self.lc[index])
+        return LightCurvePlus(self.lc[index], obs_id=self._obs_id)
 
 
 def copy_lightcurve(lightcurve: LightCurve, with_flux: Optional[np.ndarray] = None) -> LightCurve:
@@ -217,6 +369,29 @@ def _convert_time_to_jd(lc: LightCurve) -> LightCurve:
         new_t = _btjd_to_jd_time(lc.time)
         return LightCurve(time=new_t, flux=lc.flux, flux_err=lc.flux_err, meta=lc.meta)
     raise ValueError(f"Time format {lc.time.format} unknown/unsupported.")
+
+
+def _convert_time_to_btjd(lc: LightCurve) -> LightCurve:
+    """Convert lightcurve time to BTJD format."""
+    if lc.time.scale != "tdb":
+        raise ValueError(f"Time scale {lc.time.scale} unknown/unsupported.")
+
+    if lc.time.format == "btjd":
+        return lc
+    elif lc.time.format == "jd":
+        # Convert JD to BTJD by subtracting reference
+        refi = lc.meta.get("BJDREFI", 2457000)
+        reff = lc.meta.get("BJDREFF", 0.0)
+        bjd_ref = float(refi) + float(reff)
+        new_t = Time(lc.time.value - bjd_ref, format="btjd", scale="tdb")
+        return LightCurve(time=new_t, flux=lc.flux, flux_err=lc.flux_err, meta=lc.meta)
+    raise ValueError(f"Time format {lc.time.format} unknown/unsupported.")
+
+
+def _convert_time_to_bjd(lc: LightCurve) -> LightCurve:
+    """Convert lightcurve time to BJD format (same as JD for TDB scale)."""
+    # For TDB scale, BJD is the same as JD
+    return _convert_time_to_jd(lc)
 
 
 def _get_phase(time: np.ndarray, period: float, midpoint: float) -> np.ndarray:

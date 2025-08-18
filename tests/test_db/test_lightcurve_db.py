@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 from astropy.table import QTable
+from astropy.time import Time
 from lightkurve import LightCurve
 
 from exotools import LightcurveDB
@@ -172,7 +173,7 @@ class TestLightcurveDb:
             assert result == mock_stitched_lcp
 
             # Verify that load_by_tic was called with the correct parameters
-            mock_load_by_tic.assert_called_once_with(100, start_time_at_zero=False)
+            mock_load_by_tic.assert_called_once_with(100, start_time_at_zero=False, load_in_jd_time=False)
 
             # Verify that stitch was called
             mock_stitch.assert_called_once()
@@ -214,3 +215,126 @@ class TestLightcurveDb:
             # Verify the result
             assert result == mock_lcp_instance
             assert mock_lcp_instance.start_at_zero.call_count == 1
+
+    def test_load_lightcurve_time_format_detection(self):
+        """Test that load_lightcurve correctly detects time format from FITS metadata."""
+        # Test BTJD format detection
+        with patch("astropy.io.fits.open") as mock_fits_open:
+            # Mock FITS file structure for BTJD format
+            mock_hdul = MagicMock()
+            mock_hdul.__enter__.return_value = mock_hdul
+            mock_hdul.__exit__.return_value = None
+
+            # Create proper structured array for FITS data
+            time_data = np.array([1599.8, 1599.9, 1600.0])
+            flux_data = np.array([1000.0, 1001.0, 1002.0])
+            flux_err_data = np.array([10.0, 10.1, 10.2])
+
+            # Mock the data access properly
+            mock_hdul["LIGHTCURVE"].data = {
+                "TIME": time_data,
+                "PDCSAP_FLUX": flux_data,
+                "PDCSAP_FLUX_ERR": flux_err_data,
+            }
+
+            # Mock headers with BTJD format
+            mock_header0 = {"TELESCOP": "TESS"}
+            mock_header1 = {
+                "TUNIT1": "BJD - 2457000, days",
+                "TIMESYS": "TDB",
+                "TIMEUNIT": "d",
+                "TIMEREF": "SOLARSYSTEM",
+                "BJDREFI": 2457000,
+                "BJDREFF": 0.0,
+            }
+            mock_hdul[0].header = mock_header0
+            mock_hdul[1].header = mock_header1
+
+            mock_fits_open.return_value = mock_hdul
+
+            # Test with load_in_jd_time=False (should preserve BTJD)
+            lc = LightcurveDB.load_lightcurve("test.fits", load_in_jd_time=False)
+            assert lc.time.format == "btjd"
+            assert lc.time.scale == "tdb"
+            assert lc.meta["_ORIGINAL_TIME_FORMAT"] == "btjd"
+            np.testing.assert_array_almost_equal(lc.time.value, [1599.8, 1599.9, 1600.0])
+
+            # Test with load_in_jd_time=True (should convert to JD)
+            lc_jd = LightcurveDB.load_lightcurve("test.fits", load_in_jd_time=True)
+            assert lc_jd.time.format == "jd"
+            assert lc_jd.time.scale == "tdb"
+            assert lc_jd.meta["_ORIGINAL_TIME_FORMAT"] == "btjd"
+            # JD values should be BTJD + 2457000
+            expected_jd = np.array([1599.8, 1599.9, 1600.0]) + 2457000
+            np.testing.assert_array_almost_equal(lc_jd.time.value, expected_jd)
+
+    def test_load_lightcurve_plus_with_time_format(self):
+        """Test that load_lightcurve_plus correctly handles load_in_jd_time parameter."""
+        with patch.object(LightcurveDB, "load_lightcurve") as mock_load_lc:
+            with patch("exotools.db.lightcurve_db.LightCurvePlus") as mock_lcp_class:
+                # Mock lightcurve
+                mock_lc = MagicMock()
+                mock_load_lc.return_value = mock_lc
+
+                # Mock LightCurvePlus instance
+                mock_lcp = MagicMock()
+                mock_lcp_class.return_value = mock_lcp
+
+                # Test with load_in_jd_time=False
+                result = LightcurveDB.load_lightcurve_plus("test.fits", load_in_jd_time=False)
+
+                # Verify correct parameters were passed
+                mock_load_lc.assert_called_once_with("test.fits", load_in_jd_time=False)
+                mock_lcp_class.assert_called_once_with(mock_lc)
+                assert result == mock_lcp
+
+                # Reset mocks and test with load_in_jd_time=True
+                mock_load_lc.reset_mock()
+                mock_lcp_class.reset_mock()
+
+                _ = LightcurveDB.load_lightcurve_plus("test.fits", load_in_jd_time=True)
+
+                # Verify correct parameters were passed
+                mock_load_lc.assert_called_once_with("test.fits", load_in_jd_time=True)
+                mock_lcp_class.assert_called_once_with(mock_lc)
+
+    def test_instance_methods_with_load_in_jd_time(self, lightcurve_db):
+        """Test that instance methods correctly pass load_in_jd_time parameter."""
+        with patch.object(LightcurveDB, "load_lightcurve") as mock_load_lc:
+            with patch("exotools.db.lightcurve_db.LightCurvePlus") as mock_lcp_class:
+                # Mock lightcurve and LightCurvePlus
+                mock_lc = MagicMock()
+                mock_load_lc.return_value = mock_lc
+                mock_lcp = MagicMock()
+                mock_lcp.time = [Time(2458000.0, format="jd")]
+                mock_lcp_class.return_value = mock_lcp
+
+                # Test load_by_obs_id with load_in_jd_time=True
+                _ = lightcurve_db.load_by_obs_id(1, load_in_jd_time=True)
+
+                # Verify parameters were passed correctly
+                mock_load_lc.assert_called_with("path/to/lc1.fits", load_in_jd_time=True)
+                mock_lcp_class.assert_called_with(mock_lc)
+
+                # Verify that to_jd_time() was not called when load_in_jd_time=True
+                assert mock_lcp.to_jd_time.call_count == 0
+
+                # Reset mocks and test load_by_tic
+                mock_load_lc.reset_mock()
+                mock_lcp_class.reset_mock()
+                mock_lcp.to_jd_time.reset_mock()
+
+                _ = lightcurve_db.load_by_tic(100, load_in_jd_time=True)
+
+                # Should be called twice for TIC 100 (has 2 observations)
+                assert mock_load_lc.call_count == 2
+                assert mock_lcp_class.call_count == 2
+
+                # Verify load_in_jd_time=True was passed to load_lightcurve calls
+                for call in mock_load_lc.call_args_list:
+                    assert call[1]["load_in_jd_time"]
+                # Verify LightCurvePlus constructor was called without load_in_jd_time
+                for call in mock_lcp_class.call_args_list:
+                    assert len(call[1]) == 1  # Only obs_id parameter
+                # Verify to_jd_time() was not called, since load_in_jd_time=True
+                assert mock_lcp.to_jd_time.call_count == 0
