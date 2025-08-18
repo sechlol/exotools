@@ -37,6 +37,10 @@ class LightcurveDB(BaseDB):
         return self.view["obs_id"].value
 
     @property
+    def all_paths(self) -> np.ndarray:
+        return self.view["path"].value
+
+    @property
     def unique_tic_ids(self) -> np.ndarray:
         return np.unique(self.tic_ids)
 
