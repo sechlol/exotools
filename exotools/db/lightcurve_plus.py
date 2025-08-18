@@ -288,32 +288,96 @@ class LightCurvePlus:
         return get_contiguous_intervals(x=self.time_x, greater_than_median=greater_than_median)
 
     def to_jd_time(self) -> Self:
-        """Convert the lightcurve time to Julian Date (JD) format in place.
+        """Convert the light curve time to plain Julian Date (JD) *representation* in place.
 
-        Returns:
-            Self: Returns self for method chaining.
+        JD is the continuous count of days since 4713 BCE (noon), independent of location;
+        the *scale* (UTC, TT, TDB, …) is tracked separately. This method puts the times
+        in `format="jd"` while preserving the existing time *scale* and reference frame.
+
+        When your times are already barycentric (e.g., TESS BJD_TDB), converting to JD
+        does not change the numeric values—it only standardizes the representation.
+
+        Examples
+        --------
+        Suppose your first cadence is BJD_TDB = 2458354.123456:
+        >>> lc.time.format, lc.time.scale
+        ('jd', 'tdb')
+        >>> lc.time[0].value
+        2458354.123456
+        >>> lc.to_jd_time().lc.time[0].value  # still JD in TDB scale
+        2458354.123456
+
+        Returns
+        -------
+        Self
+            Returns self for method chaining.
         """
         if self.lc.time.format != "jd":
-            self.lc = _convert_time_to_jd(self.lc)
+            self.lc = _convert_time_to_bjd(self.lc)
         return self
 
     def to_btjd_time(self) -> Self:
-        """Convert the lightcurve time to Barycentric TESS Julian Date (BTJD) format in place.
+        """Convert the light curve time to BTJD (Barycentric TESS Julian Date) in place.
 
-        Returns:
-            Self: Returns self for method chaining.
+        BTJD is a TESS-specific convenience: BTJD ≡ BJD_TDB − (BJDREFI + BJDREFF).
+        For standard SPOC products, (BJDREFI, BJDREFF) = (2457000, 0), so BTJD = BJD_TDB − 2457000.
+        This keeps the *barycentric* reference and the TDB time scale, but shifts
+        the zero-point so numbers are ~10^3 instead of ~2.4×10^6.
+
+        Examples
+        --------
+        >>> # Starting from BJD_TDB = 2458354.123456 (TESS Year 1)
+        >>> lc.to_btjd_time().lc.time[0].value
+        1354.123456      # 2458354.123456 - 2457000.0
+
+        >>> # Converting back to BJD_TDB (see to_bjd_time) restores the 2.458e6 magnitude.
+        >>> lc.to_bjd_time().lc.time[0].value
+        2458354.123456
+
+        Returns
+        -------
+        Self
+            Returns self for method chaining.
         """
         if self.lc.time.format != "btjd":
             self.lc = _convert_time_to_btjd(self.lc)
         return self
 
     def to_bjd_time(self) -> Self:
-        """Convert the lightcurve time to Barycentric Julian Date (BJD) format in place.
+        """Convert the light curve time to Barycentric Julian Date (BJD_TDB) in place.
 
-        Returns:
-            Self: Returns self for method chaining.
+        **BJD** is simply JD evaluated at the Solar System Barycenter (SSB).
+        For TESS, timestamps are already referenced to the SSB with `TIMESYS='TDB'`
+        and `TIMEREF='SOLARSYSTEM'`, so BJD_TDB is the physically correct absolute time.
+        Numerically, BJD_TDB equals JD in the TDB scale when the reference location is barycentric.
+
+        This method ensures the output is **BJD_TDB** (absolute, not offset), which is
+        what you want for comparing absolute epochs (e.g., transit mid-times) across sectors
+        or with literature ephemerides.
+
+        Examples
+        --------
+        >>> # From BTJD back to absolute BJD_TDB:
+        >>> lc.to_btjd_time().lc.time[0].value
+        1354.123456
+        >>> lc.to_bjd_time().lc.time[0].value
+        2458354.123456  # adds back (BJDREFI + BJDREFF) = 2457000.0
+
+        >>> # If already BJD_TDB, calling again is a no-op:
+        >>> lc.time.format, lc.time.scale
+        ('jd', 'tdb')
+        >>> lc.to_bjd_time().lc.time.format
+        'jd'
+
+        Returns
+        -------
+        Self
+            Returns self for method chaining.
         """
-        if self.lc.time.format != "jd":  # BJD is same as JD for TDB scale
+        # BJD_TDB is represented as JD in the TDB scale with a barycentric reference.
+        # If your internal representation uses a custom 'btjd' format, this will add back
+        # the header offset (BJDREFI + BJDREFF). Otherwise, it's effectively a no-op.
+        if self.lc.time.format != "jd":
             self.lc = _convert_time_to_bjd(self.lc)
         return self
 
