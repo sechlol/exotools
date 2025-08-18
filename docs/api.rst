@@ -2,7 +2,7 @@ API Reference
 =============
 
 Main Dataset Classes
--------------------
+--------------------
 
 .. automodule:: exotools
    :members: KnownExoplanetsDataset, CandidateExoplanetsDataset, TicCatalogDataset, GaiaParametersDataset, TicObservationsDataset, LightcurveDataset
@@ -10,7 +10,7 @@ Main Dataset Classes
    :show-inheritance:
 
 Database Classes
----------------
+----------------
 
 .. automodule:: exotools.db
    :members: CandidateDB, ExoDB, GaiaDB, StarSystemDB, LightcurveDB, LightCurvePlus, TicDB, TicObsDB
@@ -18,7 +18,7 @@ Database Classes
    :show-inheritance:
 
 Star System Types
-----------------
+-----------------
 
 .. automodule:: exotools.db.star_system
    :members: Star, Planet, StarSystem, UncertainValue, UncertainDataSource
@@ -26,7 +26,7 @@ Star System Types
    :show-inheritance:
 
 Utility Types
-------------
+-------------
 
 .. automodule:: exotools.utils.download
    :members: DownloadParams

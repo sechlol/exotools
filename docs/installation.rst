@@ -2,7 +2,7 @@ Installation
 ============
 
 Requirements
------------
+------------
 
 exotools requires Python 3.10 or later.
 
@@ -18,7 +18,7 @@ The recommended way to install exotools is from PyPI:
 This will install the latest stable release along with all required dependencies.
 
 From Source
-----------
+------------
 
 You can also install the development version directly from GitHub:
 
@@ -29,7 +29,7 @@ You can also install the development version directly from GitHub:
     pip install -e ".[dev]"
 
 Dependencies
------------
+------------
 
 exotools depends on the following packages:
 

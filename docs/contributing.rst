@@ -4,7 +4,7 @@ Contributing
 Contributions to exotools are welcome! Here's how you can help:
 
 Development Setup
----------------
+------------------
 
 1. Fork the repository on GitHub
 2. Clone your fork locally:
@@ -27,14 +27,14 @@ Development Setup
        git checkout -b feature-name
 
 Coding Standards
---------------
+----------------
 
 * We use ruff for code formatting and linting
 * All code should include appropriate type hints
 * New features should include tests
 
 Testing
-------
+--------
 
 Run the test suite with pytest:
 
@@ -43,7 +43,7 @@ Run the test suite with pytest:
     pytest
 
 Pull Requests
------------
+-------------
 
 1. Update the documentation to reflect any changes
 2. Update the CHANGELOG.md file
@@ -51,7 +51,7 @@ Pull Requests
 4. Submit a pull request to the main repository
 
 Releasing
---------
+----------
 
 For maintainers, to release a new version:
 

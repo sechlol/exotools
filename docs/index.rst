@@ -1,5 +1,5 @@
 Welcome to exotools's documentation!
-==================================
+====================================
 
 .. toctree::
    :maxdepth: 2
@@ -19,12 +19,12 @@ Indices and tables
 * :ref:`search`
 
 About exotools
-=============
+===============
 
 Tools for working with exoplanet data. This package provides utilities for accessing and analyzing exoplanet datasets.
 
 Main Features
-------------
+-------------
 
 * Access to known exoplanet catalogs
 * Tools for working with candidate exoplanets
