@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "exotools"
-version = "0.0.3"
+version = "0.0.4"
 description = "Tools for working with exoplanet data"
 readme = "README.md"
 requires-python = ">=3.10"
