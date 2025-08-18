@@ -48,6 +48,9 @@ dev = [
     "pytest-cov",
     "python-dotenv",
     "ruff",
+    "sphinx",
+    "sphinx_rtd_theme",
+    "myst-parser",
 ]
 
 [project.urls]

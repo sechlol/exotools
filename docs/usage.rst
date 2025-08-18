@@ -2,7 +2,7 @@ Usage
 =====
 
 Getting Started
---------------
+---------------
 
 To use exotools in a project:
 
@@ -11,7 +11,7 @@ To use exotools in a project:
     import exotools
 
 Working with Exoplanet Datasets
-------------------------------
+-------------------------------
 
 exotools provides several dataset classes for working with exoplanet data:
 
@@ -29,7 +29,7 @@ exotools provides several dataset classes for working with exoplanet data:
     lc = LightcurveDataset()
 
 Database Utilities
------------------
+------------------
 
 exotools provides database classes for efficient data management:
 
