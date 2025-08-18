@@ -33,7 +33,7 @@ Main Features
 * Database utilities for astronomical data
 
 Installation
------------
+------------
 
 .. code-block:: bash
 

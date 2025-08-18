@@ -50,7 +50,7 @@ exotools provides database classes for efficient data management:
     tic_db = TicDB()
 
 Star System Components
----------------------
+----------------------
 
 exotools provides classes for working with star systems:
 
@@ -68,7 +68,7 @@ exotools provides classes for working with star systems:
     system = StarSystem(star=star, planets=[planet])
 
 Download Utilities
------------------
+------------------
 
 For downloading data:
 
