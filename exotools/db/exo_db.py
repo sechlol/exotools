@@ -3,7 +3,6 @@ import logging
 import astropy.units as u
 import numpy as np
 from astropy.table import QTable, join
-from astropy.time import Time
 from typing_extensions import Self
 
 from .base_db import BaseDB
@@ -126,41 +125,3 @@ class ExoDB(BaseDB):
             joined["pl_orbsmax"][recoverable_ratdor].to(u.solRad) / joined["radius"][recoverable_ratdor]
         )
         dataset["st_rad_gaia"] = joined["radius"]
-
-    @staticmethod
-    def compute_bounds(dataset: QTable):
-        # Set all the missing error fields to be 0
-        for err_param in _get_error_bounds_from_table(dataset):
-            dataset[err_param].fill_value = 0
-
-        parameters_with_err = [c.removesuffix("err1") for c in dataset.colnames if "err1" in c]
-        for c in parameters_with_err:
-            try:
-                dataset[f"{c}_upper"] = dataset[c] + dataset[f"{c}err1"]
-                dataset[f"{c}_lower"] = dataset[c] + dataset[f"{c}err2"]
-            except ValueError:
-                logger.error(f"Could not compute bounds for {c}")
-
-    @staticmethod
-    def convert_time_columns(dataset: QTable):
-        columns_to_convert = _get_limits_from_table(_PARAMETER_JD, include_input=True)
-        for c in columns_to_convert:
-            dataset[c] = Time(dataset[c], format="jd", scale="tdb")
-
-
-# TODO: find a better name for these methods
-def _get_limits_from_table(columns: list[str], include_input: bool = False) -> list[str]:
-    all_columns = []
-    for c in columns:
-        all_columns.extend([f"{c}_upper", f"{c}_lower"])
-    if include_input:
-        all_columns.extend(columns)
-    return all_columns
-
-
-def _get_columns_with_error_bounds(dataset: QTable) -> list[str]:
-    return [c.removesuffix("err1") for c in dataset.colnames if "err1" in c]
-
-
-def _get_error_bounds_from_table(dataset: QTable) -> list[str]:
-    return [c for c in dataset.colnames if c.endswith("err1") or c.endswith("err2")]

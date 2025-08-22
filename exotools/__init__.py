@@ -24,6 +24,7 @@ from .datasets import (
     GaiaParametersDataset,
     KnownExoplanetsDataset,
     LightcurveDataset,
+    PlanetarySystemsCompositeDataset,
     TicCatalogDataset,
     TicObservationsDataset,
 )
@@ -35,6 +36,7 @@ __all__ = [
     # Main dataset classes
     "KnownExoplanetsDataset",
     "CandidateExoplanetsDataset",
+    "PlanetarySystemsCompositeDataset",
     "TicCatalogDataset",
     "GaiaParametersDataset",
     "TicObservationsDataset",

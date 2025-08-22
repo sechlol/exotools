@@ -23,7 +23,7 @@ class UncertainDataSource:
             c = self._row[parameter_name]
             self._value_cache[parameter_name] = UncertainValue(
                 central=c,
-                lower=min(c, self._row[f"{parameter_name}_lower"]),
-                upper=max(c, self._row[f"{parameter_name}_upper"]),
+                lower=c - self._row[f"{parameter_name}err1"].filled(0),
+                upper=c + self._row[f"{parameter_name}err2"].filled(0),
             )
         return self._value_cache[parameter_name]

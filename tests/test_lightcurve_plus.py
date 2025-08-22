@@ -16,7 +16,7 @@ class TestLightcurvePlus:
     @pytest.fixture
     def sample_lc_plus(self, all_test_lightcurves) -> LightCurvePlus:
         """Get a sample LightCurvePlus object with a valid observation ID."""
-        obs_id = 65149728  # next(iter(all_test_lightcurves))
+        obs_id = next(iter(all_test_lightcurves.keys()))
         return LightCurvePlus(copy_lightcurve(all_test_lightcurves[obs_id]), obs_id=obs_id)
 
     @pytest.fixture

@@ -16,7 +16,7 @@ from .tap_service import ExoService, TapService
 logger = logging.getLogger(__name__)
 
 
-def _get_error_parameters(parameters: list[str], include_original: Optional[bool] = False) -> list[str]:
+def get_error_parameters(parameters: list[str], include_original: Optional[bool] = False) -> list[str]:
     errs = [f"{p}err{i}" for p in parameters for i in [1, 2]]
     if include_original:
         return parameters + errs
@@ -38,7 +38,7 @@ class KnownExoplanetsDownloader(DatasetDownloader):
 
     # NOTE: the units of pl_tranmid and its boundaries are mistakenly labelled as "day". It should be "hours"
     #   see https://exoplanetarchive.ipac.caltech.edu/docs/API_PS_columns.html
-    _unit_overrides = {p: u.hour for p in _get_error_parameters(["pl_trandur"], True)}
+    _unit_overrides = {p: u.hour for p in get_error_parameters(["pl_trandur"], True)}
 
     _exo_service: Optional[TapService] = None
 
@@ -80,14 +80,15 @@ class KnownExoplanetsDownloader(DatasetDownloader):
         return dataset
 
     def _clean_and_fix(self, table: QTable) -> QTable:
-        _parse_ids(table)
+        parse_ids(table)
+        fill_error_bounds(table)
         fix_unrecognized_units(table=table, units_map=UNIT_MAPPER)
         override_units(table=table, unit_overrides=self._unit_overrides)
 
         return table
 
     def _get_table_header(self, table: QTable) -> QTableHeader:
-        return _get_fixed_table_header(table=table, table_name=self._table_name, tap_service=self._exo_service)
+        return get_fixed_table_header(table=table, table_name=self._table_name, tap_service=self._exo_service)
 
     def _download_by_id(self, ids: Sequence[int], **kwargs) -> QTable:
         raise NotImplementedError("KnownExoplanetsDownloader does not support download_by_id() method")
@@ -106,7 +107,7 @@ class KnownExoplanetsDownloader(DatasetDownloader):
         return ",".join(fields)
 
 
-def _get_fixed_table_header(table: QTable, table_name: str, tap_service: TapService) -> QTableHeader:
+def get_fixed_table_header(table: QTable, table_name: str, tap_service: TapService) -> QTableHeader:
     descriptions = tap_service.get_field_descriptions(table_name)
     return {
         c: TableColumnInfo(
@@ -119,7 +120,7 @@ def _get_fixed_table_header(table: QTable, table_name: str, tap_service: TapServ
     }
 
 
-def _parse_ids(table: QTable):
+def parse_ids(table: QTable):
     """
     Parses some relevant IDs to their numerical representation, from string to masked integer
     """
@@ -131,8 +132,8 @@ def _parse_ids(table: QTable):
     tic_id_extracted = [int(item[1]) if len(item) > 1 else fill_value for item in tic_ids]
     gaia_id_extracted = [int(item[2]) if len(item) > 2 else fill_value for item in gaia_ids]
 
-    table["tic_id"] = MaskedColumn(tic_id_extracted, fill_value=fill_value, dtype="int64")
-    table["gaia_id"] = MaskedColumn(gaia_id_extracted, fill_value=fill_value, dtype="int64")
+    table["tic_id"] = MaskedColumn(tic_id_extracted, fill_value=fill_value, dtype=np.int64)
+    table["gaia_id"] = MaskedColumn(gaia_id_extracted, fill_value=fill_value, dtype=np.int64)
 
 
 def _get_where_clause(where: Optional[dict[str, Any | list[Any]]]) -> str:
@@ -159,6 +160,14 @@ def _get_where_clause(where: Optional[dict[str, Any | list[Any]]]) -> str:
 
     condition_str = " and ".join(conditions)
     return f"where {condition_str}"
+
+
+def fill_error_bounds(dataset: QTable):
+    """Set all the missing error fields to be 0"""
+    # err1: lower bound
+    # err2: upper bound
+    for err_param in [c for c in dataset.colnames if c.endswith("err1") or c.endswith("err2")]:
+        dataset[err_param].fill_value = 0
 
 
 # TODO: Slim down the field list to only the ones we need

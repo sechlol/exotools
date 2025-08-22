@@ -4,7 +4,7 @@ from typing import Optional
 from astropy.table import QTable
 
 from exotools.datasets.base_dataset import BaseDataset
-from exotools.db import CandidateDB, ExoDB
+from exotools.db import CandidateDB
 from exotools.downloaders import CandidateExoplanetsDownloader
 from exotools.io import BaseStorage
 
@@ -91,5 +91,4 @@ class CandidateExoplanetsDataset(BaseDataset):
 
 
 def _create_candidate_db(candidate_dataset: QTable) -> CandidateDB:
-    ExoDB.compute_bounds(candidate_dataset)
     return CandidateDB(candidate_dataset)

@@ -30,8 +30,8 @@ def _get_subset_df(table: QTable) -> pd.DataFrame:
     ]
     fields = dataset_columns + star_columns + planet_columns
     for p in fields:
-        if f"{p}_lower" in table.colnames:
-            err_cols.extend([f"{p}_lower", f"{p}_upper"])
+        if f"{p}err1" in table.colnames:
+            err_cols.extend([f"{p}err1", f"{p}err2"])
     return table[fields + err_cols].to_pandas()
 
 

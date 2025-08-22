@@ -11,7 +11,12 @@ def fix_unrecognized_units(table: QTable, units_map: dict[str, u.Unit]):
     for c in table.colnames:
         unit = table[c].unit
         if isinstance(unit, UnrecognizedUnit) and unit.name in units_map:
-            table[c] = table[c].value * units_map[unit.name]
+            try:
+                if mapped_unit := units_map[unit.name] is not None:
+                    table[c] = table[c].value * mapped_unit
+            except Exception as e:
+                print(e)
+                raise
 
 
 def override_units(table: QTable, unit_overrides: dict[str, u.Unit]):
