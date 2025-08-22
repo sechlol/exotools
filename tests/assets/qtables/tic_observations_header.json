@@ -1,10 +1,4 @@
 {
-    "sequence_number": {
-        "description": "---",
-        "unit": null,
-        "dtype": null,
-        "time_info": null
-    },
     "t_max": {
         "description": "---",
         "unit": null,
@@ -23,13 +17,19 @@
         "dtype": null,
         "time_info": null
     },
-    "t_obs_release": {
+    "sequence_number": {
         "description": "---",
         "unit": null,
         "dtype": null,
         "time_info": null
     },
     "obs_id": {
+        "description": "---",
+        "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "t_obs_release": {
         "description": "---",
         "unit": null,
         "dtype": null,

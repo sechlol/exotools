@@ -20,6 +20,12 @@ class TestLightcurvePlus:
         return LightCurvePlus(copy_lightcurve(all_test_lightcurves[obs_id]), obs_id=obs_id)
 
     @pytest.fixture
+    def static_lc_plus(self, static_test_lightcurves) -> LightCurvePlus:
+        """Get a known, unchanging lightcurve with known properties."""
+        obs_id = next(iter(static_test_lightcurves.keys()))
+        return LightCurvePlus(copy_lightcurve(static_test_lightcurves[obs_id]), obs_id=obs_id)
+
+    @pytest.fixture
     def lc_and_planet(
         self, star_system_test_db: StarSystemDB, lc_test_db: LightcurveDB
     ) -> tuple[Planet, LightCurvePlus]:
@@ -152,16 +158,16 @@ class TestLightcurvePlus:
         assert sample_lc_plus.obs_id is not None
         assert cleaned_lc.obs_id == sample_lc_plus.obs_id
 
-    def test_remove_outliers(self, sample_lc_plus):
+    def test_remove_outliers(self, static_lc_plus):
         """Test remove_outliers method."""
-        cleaned_lc = sample_lc_plus.remove_outliers()
+        cleaned_lc = static_lc_plus.remove_outliers()
         assert isinstance(cleaned_lc, LightCurvePlus)
 
         # The cleaned lightcurve should have fewer points
-        assert len(cleaned_lc) < len(sample_lc_plus)
-        assert len(cleaned_lc) == 13745  # Specific value for the test sample
-        assert sample_lc_plus.obs_id is not None
-        assert cleaned_lc.obs_id == sample_lc_plus.obs_id
+        assert len(cleaned_lc) < len(static_lc_plus)
+        assert len(cleaned_lc) == 15879  # Specific value for the test sample
+        assert static_lc_plus.obs_id is not None
+        assert cleaned_lc.obs_id == static_lc_plus.obs_id
 
     def test_normalize(self, sample_lc_plus):
         """Test normalize method."""

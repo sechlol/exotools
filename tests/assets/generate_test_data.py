@@ -8,6 +8,7 @@ from exotools import (
     CandidateExoplanetsDataset,
     KnownExoplanetsDataset,
     LightcurveDataset,
+    PlanetarySystemsCompositeDataset,
     TicCatalogDataset,
     TicObservationsDataset,
 )
@@ -18,10 +19,12 @@ from tests.utils.table_comparison import compare_qtables
 logger = logging.getLogger(__name__)
 
 _HOSTNAME_FILE = _TEST_ASSETS_DIR / "planet_hostnames.txt"
+_LIMIT = 150
 
 
 def generate_test_qtables():
     known_ds = KnownExoplanetsDataset(storage=TEST_STORAGE)
+    composite_ds = PlanetarySystemsCompositeDataset(storage=TEST_STORAGE)
     candidates_ds = CandidateExoplanetsDataset(storage=TEST_STORAGE)
     gaia_dataset = GaiaParametersDataset(storage=TEST_STORAGE)
     tic_obs_dataset = TicObservationsDataset(storage=TEST_STORAGE)
@@ -40,8 +43,9 @@ def generate_test_qtables():
         with_gaia_star_data=True,
         store=True,
     )
-    candidates = candidates_ds.download_candidate_exoplanets(limit=150, store=True)
-    all_tic_ids = np.concatenate([known.unique_tic_ids[:150], candidates.unique_tic_ids])
+    candidates = candidates_ds.download_candidate_exoplanets(limit=_LIMIT, store=True)
+    composites = composite_ds.download_composite_dataset(limit=_LIMIT, store=True)
+    all_tic_ids = np.concatenate([known.unique_tic_ids[:_LIMIT], candidates.unique_tic_ids])
 
     # Download TESS datasets
     tic_obs = tic_obs_dataset.download_observation_metadata(targets_tic_id=all_tic_ids, store=True)
@@ -50,12 +54,13 @@ def generate_test_qtables():
 
     # Gaia dataset
     gaia_db = gaia_dataset.download_gaia_parameters(tic_catalog.gaia_ids, store=True)
-    originals = [known, candidates, tic_obs, tic_catalog, gaia_db]
+    originals = [known, candidates, composites, tic_obs, tic_catalog, gaia_db]
 
     # Reload datasets to compare them
     loaded = [
         known_ds.load_known_exoplanets_dataset(),
         candidates_ds.load_candidate_exoplanets_dataset(),
+        composite_ds.load_composite_dataset(),
         tic_obs_dataset.load_observation_metadata(),
         tic_dataset.load_tic_target_dataset(),
         gaia_dataset.load_gaia_parameters_dataset(),

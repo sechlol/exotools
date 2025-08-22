@@ -1,7 +1,6 @@
 import logging
 from typing import Any, Optional, Sequence
 
-import pandas as pd
 from astropy.table import QTable
 
 from exotools.utils.qtable_utils import QTableHeader
@@ -14,6 +13,7 @@ from .exoplanets_downloader import _get_where_clause, fill_error_bounds, get_fix
 from .tap_service import ExoService, TapService
 
 logger = logging.getLogger(__name__)
+_forbidden_suffixes = ["_str", "str", "ymerr", "lim", "format", "_solnid", "_reflink"]
 
 
 def _get_error_parameters(parameters: list[str], include_original: Optional[bool] = False) -> list[str]:
@@ -56,16 +56,15 @@ class PlanetarySystemsCompositeDownloader(DatasetDownloader):
     ) -> QTable:
         limit_clause = f"top {limit}" if limit else ""
         where_clause = _get_where_clause(where=where)
-        fields = self._get_fields_to_query(columns=columns, use_cached_fields=True)
+        fields = self._get_fields_to_query(columns=columns)
 
         query_str = f"select {limit_clause} {fields} from {self._table_name} {where_clause}"
 
         logger.info("Downloading Candidate exoplanets...")
         with silence_warnings():
             dataset = self._exo_service.query(query_str)
-        n_unique = len(pd.unique(dataset["objectid"]))
 
-        logger.info(f"DONE! Collected {n_unique} unique planets.")
+        logger.info(f"DONE! Collected {len(dataset)} unique planets.")
         return dataset
 
     def _clean_and_fix(self, table: QTable) -> QTable:
@@ -80,16 +79,15 @@ class PlanetarySystemsCompositeDownloader(DatasetDownloader):
         fix_unrecognized_units(table=table, units_map=UNIT_MAPPER)
         return table
 
-    def _get_fields_to_query(self, use_cached_fields: bool = False, columns: Optional[Sequence[str]] = None) -> str:
+    def _get_fields_to_query(self, columns: Optional[Sequence[str]] = None) -> str:
         if columns:
             col_set = set(columns)
             col_set.update(self._mandatory_fields)
             fields = list(col_set)
-        elif use_cached_fields:
-            fields = "*"
         else:
-            # There are some unnecessary fields that cause troubles when saving the DF, we should remove them
-            fields = [f for f in self._exo_service.get_field_names(self._table_name) if not f.endswith("str")]
+            # Skim down the fields to fetch
+            all_fields = self._exo_service.get_field_names(self._table_name)
+            fields = filter(lambda f: all([not f.endswith(suffix) for suffix in _forbidden_suffixes]), all_fields)
 
         return ",".join(fields)
 

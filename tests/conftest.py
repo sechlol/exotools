@@ -19,6 +19,8 @@ TEST_ASSETS_QTABLES = _TEST_ASSETS_DIR / "qtables"
 TEST_ASSETS_LC = _TEST_ASSETS_DIR / "lightcurves"
 TEST_STORAGE = EcsvStorage(TEST_ASSETS_QTABLES)
 
+STATIC_ASSETS_LC = _TEST_ASSETS_DIR / "static" / "lightcurves"
+
 
 @pytest.fixture(scope="module")
 def all_test_qtables() -> dict[str, QTable]:
@@ -37,7 +39,12 @@ def all_test_qtables_and_headers() -> dict[str, tuple[QTable, QTableHeader]]:
 
 @pytest.fixture(scope="module")
 def all_test_lightcurves() -> dict[int, LightCurve]:
-    return load_all_test_lightcurves()
+    return load_all_test_lightcurves(parent_dir=TEST_ASSETS_LC)
+
+
+@pytest.fixture(scope="module")
+def static_test_lightcurves() -> dict[int, LightCurve]:
+    return load_all_test_lightcurves(parent_dir=STATIC_ASSETS_LC)
 
 
 def load_all_test_qtables() -> dict[str, QTable]:
@@ -49,9 +56,9 @@ def load_all_test_qtables() -> dict[str, QTable]:
     return qtables
 
 
-def load_all_test_lightcurves() -> dict[int, LightCurve]:
+def load_all_test_lightcurves(parent_dir: Path) -> dict[int, LightCurve]:
     all_data = {}
-    for path, dirs, files in os.walk(TEST_ASSETS_LC):
+    for path, dirs, files in os.walk(parent_dir):
         for file_name in files:
             if ".fits" in file_name:
                 file_path = Path(path) / file_name

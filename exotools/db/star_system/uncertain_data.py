@@ -21,9 +21,10 @@ class UncertainDataSource:
     def _uncertain_value_from_cache(self, parameter_name: str) -> UncertainValue:
         if parameter_name not in self._value_cache:
             c = self._row[parameter_name]
+            lower, upper = self._row[f"{parameter_name}err1"], self._row[f"{parameter_name}err2"]
             self._value_cache[parameter_name] = UncertainValue(
                 central=c,
-                lower=c - self._row[f"{parameter_name}err1"].filled(0),
-                upper=c + self._row[f"{parameter_name}err2"].filled(0),
+                lower=c - (lower if lower is not None else 0),
+                upper=c + (upper if upper is not None else 0),
             )
         return self._value_cache[parameter_name]

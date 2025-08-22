@@ -11,15 +11,15 @@
         "dtype": null,
         "time_info": null
     },
-    "ra": {
-        "description": "Star right ascension [deg]",
-        "unit": "deg",
-        "dtype": null,
-        "time_info": null
-    },
     "priority": {
         "description": "Higher priority is assigned to the TESS team to targets that are likely to host planets",
         "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "ra": {
+        "description": "Star right ascension [deg]",
+        "unit": "deg",
         "dtype": null,
         "time_info": null
     },
