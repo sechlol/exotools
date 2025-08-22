@@ -9,7 +9,7 @@ from exotools.utils.warning_utils import silence_warnings
 
 from ._utils import fix_unrecognized_units
 from .dataset_downloader import DatasetDownloader
-from .exoplanets_downloader import _get_where_clause, fill_error_bounds, get_fixed_table_header, parse_ids
+from .ps_downloader import _get_where_clause, fill_error_bounds, get_fixed_table_header, parse_ids
 from .tap_service import ExoService, TapService
 
 logger = logging.getLogger(__name__)
@@ -36,8 +36,6 @@ class PlanetarySystemsCompositeDownloader(DatasetDownloader):
     """
 
     _table_name = "pscomppars"
-    _mandatory_fields = ["tic_id", "gaia_id", "hostname", "pl_name"]
-
     _exo_service: Optional[TapService] = None
 
     def _initialize_services(self):
@@ -82,7 +80,7 @@ class PlanetarySystemsCompositeDownloader(DatasetDownloader):
     def _get_fields_to_query(self, columns: Optional[Sequence[str]] = None) -> str:
         if columns:
             col_set = set(columns)
-            col_set.update(self._mandatory_fields)
+            col_set.update(_MANDATORY_FIELDS)
             fields = list(col_set)
         else:
             # Skim down the fields to fetch
@@ -93,3 +91,30 @@ class PlanetarySystemsCompositeDownloader(DatasetDownloader):
 
     def _get_table_header(self, table: QTable) -> QTableHeader:
         return get_fixed_table_header(table=table, table_name=self._table_name, tap_service=self._exo_service)
+
+
+_MANDATORY_FIELDS = [
+    "tic_id",
+    "gaia_id",
+    "hostname",
+    "pl_name",
+    "pl_orbeccen",
+    "pl_orbsmax",
+    "pl_tranmid",
+    "pl_ratdor",
+    "pl_imppar",
+    "pl_orblper",
+    "pl_masse",
+    "pl_trandep",
+    "pl_dens",
+    "pl_orbincl",
+    "pl_rade",
+    "pl_orbper",
+    "pl_trandur",
+    "pl_ratror",
+    "st_mass",
+    "st_rad",
+    "tran_flag",
+    "default_flag",
+    "disc_telescope",
+]

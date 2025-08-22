@@ -6,8 +6,8 @@ import pytest
 from exotools.datasets import (
     CandidateExoplanetsDataset,
     GaiaParametersDataset,
-    KnownExoplanetsDataset,
     LightcurveDataset,
+    PlanetarySystemsDataset,
     TicCatalogDataset,
 )
 from exotools.datasets.tic_observations import TicObservationsDataset
@@ -21,14 +21,14 @@ class TestDatasets:
     def teardown_method():
         TicCatalogDataset._catalog_downloader = None
 
-    def test_known_exoplanets_dataset(self, known_exoplanets_test_data, gaia_parameters_test_data):
-        """Test KnownExoplanetsDataset with mocked downloader"""
-        qtable, header = known_exoplanets_test_data
+    def test_planetary_systems_dataset(self, planetary_systems_test_data, gaia_parameters_test_data):
+        """Test PlanetarySystemsDataset with mocked downloader"""
+        qtable, header = planetary_systems_test_data
         gaia_qtable, gaia_header = gaia_parameters_test_data
         storage = MemoryStorage()
 
         # Mock the downloader
-        with patch("exotools.datasets.known_exoplanets.KnownExoplanetsDownloader") as mock_downloader_class:
+        with patch("exotools.datasets.planetary_systems.PlanetarySystemsDownloader") as mock_downloader_class:
             mock_downloader = MagicMock()
             mock_downloader.download.return_value = (qtable, header)
             mock_downloader_class.return_value = mock_downloader
@@ -40,7 +40,7 @@ class TestDatasets:
                 mock_gaia_downloader_class.return_value = mock_gaia_downloader
 
                 # Test dataset
-                dataset = KnownExoplanetsDataset(storage=storage)
+                dataset = PlanetarySystemsDataset(storage=storage)
 
                 # Test download without Gaia data
                 exo_db = dataset.download_known_exoplanets(with_gaia_star_data=False, store=True, limit=10)

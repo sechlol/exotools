@@ -37,10 +37,10 @@ pip install -e .
 The simplest way to get started is using the default in-memory storage:
 
 ```python
-from exotools import KnownExoplanetsDataset
+from exotools import PlanetarySystemsDataset
 
 # Create dataset with default in-memory storage
-dataset = KnownExoplanetsDataset()
+dataset = PlanetarySystemsDataset()
 
 # Download a small sample of known exoplanets
 exo_db = dataset.download_known_exoplanets(limit=10, store=True)
@@ -59,12 +59,12 @@ print(df.head())
 For larger datasets or persistent storage, use one of the available storage backends:
 
 ```python
-from exotools import KnownExoplanetsDataset
+from exotools import PlanetarySystemsDataset
 from exotools.io import Hdf5Storage
 
 # Create HDF5 storage backend
 storage = Hdf5Storage("exoplanet_data.h5")
-dataset = KnownExoplanetsDataset(storage=storage)
+dataset = PlanetarySystemsDataset(storage=storage)
 
 # Download and store data persistently
 exo_db = dataset.download_known_exoplanets(limit=100, store=True)
@@ -81,10 +81,10 @@ ExoTools supports multiple storage backends to fit different use cases:
 Fast but temporary storage - data is lost when the program ends:
 
 ```python
-from exotools import KnownExoplanetsDataset
+from exotools import PlanetarySystemsDataset
 
 # Uses MemoryStorage by default
-dataset = KnownExoplanetsDataset()
+dataset = PlanetarySystemsDataset()
 ```
 
 ### Feather Storage (Recommended for Local Use)
@@ -92,10 +92,10 @@ dataset = KnownExoplanetsDataset()
 
 ```python
 from exotools.io import FeatherStorage
-from exotools import KnownExoplanetsDataset
+from exotools import PlanetarySystemsDataset
 
 storage = FeatherStorage("data_directory")
-dataset = KnownExoplanetsDataset(storage=storage)
+dataset = PlanetarySystemsDataset(storage=storage)
 ```
 
 ### HDF5 Storage (Recommended for Portability)
@@ -103,10 +103,10 @@ dataset = KnownExoplanetsDataset(storage=storage)
 
 ```python
 from exotools.io import Hdf5Storage
-from exotools import KnownExoplanetsDataset
+from exotools import PlanetarySystemsDataset
 
 storage = Hdf5Storage("my_data.h5")
-dataset = KnownExoplanetsDataset(storage=storage)
+dataset = PlanetarySystemsDataset(storage=storage)
 ```
 
 ### ECSV Storage (Maximum Compatibility)
@@ -114,10 +114,10 @@ Human-readable CSV format with metadata - slower but offers maximum portability 
 
 ```python
 from exotools.io import EcsvStorage
-from exotools import KnownExoplanetsDataset
+from exotools import PlanetarySystemsDataset
 
 storage = EcsvStorage("data_directory")
-dataset = KnownExoplanetsDataset(storage=storage)
+dataset = PlanetarySystemsDataset(storage=storage)
 ```
 
 ## Available Datasets
@@ -127,11 +127,11 @@ dataset = KnownExoplanetsDataset(storage=storage)
 Access confirmed exoplanets from NASA's Exoplanet Archive:
 
 ```python
-from exotools import KnownExoplanetsDataset
+from exotools import PlanetarySystemsDataset
 from exotools.io import Hdf5Storage
 
 storage = Hdf5Storage("exoplanet_data.h5")
-dataset = KnownExoplanetsDataset(storage=storage)
+dataset = PlanetarySystemsDataset(storage=storage)
 
 # Download confirmed exoplanets
 exo_db = dataset.download_known_exoplanets(store=True)
@@ -279,9 +279,9 @@ lc_db = lc_dataset.load_lightcurve_dataset()
 Access exoplanet data through an intuitive object-oriented interface:
 
 ```python
-from exotools import KnownExoplanetsDataset
+from exotools import PlanetarySystemsDataset
 
-dataset = KnownExoplanetsDataset(storage=storage)
+dataset = PlanetarySystemsDataset(storage=storage)
 
 # Download data with Gaia cross-matching (required for star systems)
 exo_db = dataset.download_known_exoplanets(with_gaia_star_data=True, store=True)
@@ -312,7 +312,7 @@ for planet in kepler_system.planets:
 
 ```python
 from exotools import (
-    KnownExoplanetsDataset,
+    PlanetarySystemsDataset,
     CandidateExoplanetsDataset,
     TicObservationsDataset,
     LightcurveDataset
@@ -324,7 +324,7 @@ from pathlib import Path
 storage = Hdf5Storage("exoplanet_data.h5")
 
 # Download known exoplanets
-known_dataset = KnownExoplanetsDataset(storage=storage)
+known_dataset = PlanetarySystemsDataset(storage=storage)
 exo_db = known_dataset.download_known_exoplanets(limit=50, store=True)
 
 # Download candidates
@@ -347,7 +347,7 @@ lc_db = lc_dataset.download_lightcurves_from_tic_db(obs_db)
 
 ```python
 from exotools.io import Hdf5Storage, FeatherStorage
-from exotools import KnownExoplanetsDataset
+from exotools import PlanetarySystemsDataset
 
 # Configure HDF5 storage with custom path
 hdf5_storage = Hdf5Storage("custom/path/exodata.h5")
@@ -356,7 +356,7 @@ hdf5_storage = Hdf5Storage("custom/path/exodata.h5")
 feather_storage = FeatherStorage("custom/data/directory")
 
 # Use different storage for different datasets
-exo_dataset = KnownExoplanetsDataset(storage=hdf5_storage)
+exo_dataset = PlanetarySystemsDataset(storage=hdf5_storage)
 candidate_dataset = CandidateExoplanetsDataset(storage=feather_storage)
 ```
 

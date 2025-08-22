@@ -10,7 +10,7 @@ from exotools.utils.unit_mapper import UNIT_MAPPER
 
 from ._utils import fix_unrecognized_units, override_units
 from .dataset_downloader import DatasetDownloader
-from .exoplanets_downloader import fill_error_bounds, get_error_parameters, get_fixed_table_header
+from .ps_downloader import fill_error_bounds, get_error_parameters, get_fixed_table_header
 from .tap_service import ExoService, TapService
 
 logger = logging.getLogger(__name__)

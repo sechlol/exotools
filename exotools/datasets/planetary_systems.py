@@ -6,7 +6,7 @@ from astropy.table import QTable
 
 from exotools.datasets.gaia_parameters import GaiaParametersDataset
 from exotools.db import ExoDB, GaiaDB, StarSystemDB
-from exotools.downloaders import KnownExoplanetsDownloader
+from exotools.downloaders import PlanetarySystemsDownloader
 from exotools.io import BaseStorage
 
 from ._exoplanet_dataset_reducer import reduce_exoplanet_dataset
@@ -15,7 +15,7 @@ from .base_dataset import BaseDataset
 logger = logging.getLogger(__name__)
 
 
-class KnownExoplanetsDataset(BaseDataset):
+class PlanetarySystemsDataset(BaseDataset):
     """
     Dataset class for accessing and managing confirmed exoplanets data.
 
@@ -25,19 +25,19 @@ class KnownExoplanetsDataset(BaseDataset):
     and stellar information.
     """
 
-    _DATASET_EXO = "known_exoplanets"
+    _DATASET_NAME = "ps"
 
     def __init__(self, dataset_tag: Optional[str] = None, storage: Optional[BaseStorage] = None):
         """
-        Initialize a KnownExoplanetsDataset instance.
+        Initialize a PlanetarySystemsDataset instance.
 
         Args:
             dataset_tag: Tag to identify this specific dataset instance, it will be used as a postfix
                 for all the storage keys.
             storage: Storage backend for persisting dataset information. Defaults to in-memory storage.
         """
-        super().__init__(dataset_name=self._DATASET_EXO, dataset_tag=dataset_tag, storage=storage)
-        self._gaia_dataset = GaiaParametersDataset(dataset_tag=self._DATASET_EXO, storage=storage)
+        super().__init__(dataset_name=self._DATASET_NAME, dataset_tag=dataset_tag, storage=storage)
+        self._gaia_dataset = GaiaParametersDataset(dataset_tag=self._DATASET_NAME, storage=storage)
         self._reduced_dataset_name = self.name + "_reduced"
 
     def load_known_exoplanets_dataset(
@@ -166,7 +166,7 @@ class KnownExoplanetsDataset(BaseDataset):
         """
         logger.info("Preparing to download known exoplanets dataset...")
         # TODO: some columns are mandatory for data processing, add an exception or add them as default
-        exo_qtable, exo_header = KnownExoplanetsDownloader().download(limit=limit, columns=columns, where=where)
+        exo_qtable, exo_header = PlanetarySystemsDownloader().download(limit=limit, columns=columns, where=where)
 
         if store:
             table_name = self.name + (f"_{with_name}" if with_name else "")

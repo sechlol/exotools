@@ -23,18 +23,18 @@ class PlanetarySystemsCompositeDataset(BaseDataset):
     and stellar information.
     """
 
-    _DATASET_COMP = "ps_composite"
+    _DATASET_NAME = "ps_composite"
 
     def __init__(self, dataset_tag: Optional[str] = None, storage: Optional[BaseStorage] = None):
         """
-        Initialize a KnownExoplanetsDataset instance.
+        Initialize a PlanetarySystemsDataset instance.
 
         Args:
             dataset_tag: Tag to identify this specific dataset instance, it will be used as a postfix
                 for all the storage keys.
             storage: Storage backend for persisting dataset information. Defaults to in-memory storage.
         """
-        super().__init__(dataset_name=self._DATASET_COMP, dataset_tag=dataset_tag, storage=storage)
+        super().__init__(dataset_name=self._DATASET_NAME, dataset_tag=dataset_tag, storage=storage)
         self._reduced_dataset_name = self.name + "_reduced"
 
     def load_composite_dataset(self, with_name: Optional[str] = None) -> Optional[ExoDB]:

@@ -23,7 +23,7 @@ def get_error_parameters(parameters: list[str], include_original: Optional[bool]
     return errs
 
 
-class KnownExoplanetsDownloader(DatasetDownloader):
+class PlanetarySystemsDownloader(DatasetDownloader):
     """
     Data source: Nasa Exoplanet Archive (table: Planetary Systems)
     https://exoplanetarchive.ipac.caltech.edu/docs/TAP/usingTAP.html
@@ -34,7 +34,6 @@ class KnownExoplanetsDownloader(DatasetDownloader):
     """
 
     _table_name = "ps"
-    _mandatory_fields = ["tic_id", "gaia_id", "hostname", "pl_name", "default_flag"]
 
     # NOTE: the units of pl_tranmid and its boundaries are mistakenly labelled as "day". It should be "hours"
     #   see https://exoplanetarchive.ipac.caltech.edu/docs/API_PS_columns.html
@@ -91,12 +90,12 @@ class KnownExoplanetsDownloader(DatasetDownloader):
         return get_fixed_table_header(table=table, table_name=self._table_name, tap_service=self._exo_service)
 
     def _download_by_id(self, ids: Sequence[int], **kwargs) -> QTable:
-        raise NotImplementedError("KnownExoplanetsDownloader does not support download_by_id() method")
+        raise NotImplementedError("PlanetarySystemsDownloader does not support download_by_id() method")
 
     def _get_fields_to_query(self, use_cached_fields: bool = False, columns: Optional[Sequence[str]] = None) -> str:
         if columns:
             col_set = set(columns)
-            col_set.update(self._mandatory_fields)
+            col_set.update(_MANDATORY_FIELDS)
             fields = list(col_set)
         elif use_cached_fields:
             fields = _ALL_FIELDS
@@ -170,7 +169,32 @@ def fill_error_bounds(dataset: QTable):
         dataset[err_param].fill_value = 0
 
 
-# TODO: Slim down the field list to only the ones we need
+_MANDATORY_FIELDS = [
+    "tic_id",
+    "gaia_id",
+    "hostname",
+    "pl_name",
+    "pl_orbeccen",
+    "pl_orbsmax",
+    "pl_tranmid",
+    "pl_ratdor",
+    "pl_imppar",
+    "pl_orblper",
+    "pl_masse",
+    "pl_trandep",
+    "pl_dens",
+    "pl_orbincl",
+    "pl_rade",
+    "pl_orbper",
+    "pl_trandur",
+    "pl_ratror",
+    "st_mass",
+    "st_rad",
+    "tran_flag",
+    "default_flag",
+    "disc_telescope",
+]
+# TODO: Maybe slim down the field list to only the relevant ones?
 _ALL_FIELDS = [
     "tic_id",
     "gaia_id",

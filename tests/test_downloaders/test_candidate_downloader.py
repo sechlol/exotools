@@ -4,7 +4,7 @@ import pytest
 from astropy.table import QTable
 
 from exotools.downloaders import CandidateExoplanetsDownloader
-from exotools.downloaders.exoplanets_downloader import get_error_parameters
+from exotools.downloaders.ps_downloader import get_error_parameters
 from exotools.utils.qtable_utils import QTableHeader
 
 

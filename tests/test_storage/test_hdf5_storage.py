@@ -126,7 +126,11 @@ class TestHdf5Storage:
     ):
         w = storage_wrapper
         for name, (test_qtable, test_header) in all_test_qtables_and_headers.items():
-            w.write_qtable(test_qtable, test_header, name)
+            try:
+                w.write_qtable(test_qtable, test_header, name)
+            except Exception as e:
+                print(e)
+                raise
             read_qtable = w.read_qtable(name)
             read_header = w.read_qtable_header(name)
             assert test_header == read_header

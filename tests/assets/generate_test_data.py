@@ -6,9 +6,9 @@ from dotenv import load_dotenv
 
 from exotools import (
     CandidateExoplanetsDataset,
-    KnownExoplanetsDataset,
     LightcurveDataset,
     PlanetarySystemsCompositeDataset,
+    PlanetarySystemsDataset,
     TicCatalogDataset,
     TicObservationsDataset,
 )
@@ -23,7 +23,7 @@ _LIMIT = 150
 
 
 def generate_test_qtables():
-    known_ds = KnownExoplanetsDataset(storage=TEST_STORAGE)
+    known_ds = PlanetarySystemsDataset(storage=TEST_STORAGE)
     composite_ds = PlanetarySystemsCompositeDataset(storage=TEST_STORAGE)
     candidates_ds = CandidateExoplanetsDataset(storage=TEST_STORAGE)
     gaia_dataset = GaiaParametersDataset(storage=TEST_STORAGE)
@@ -78,7 +78,7 @@ def generate_test_lightcurves():
     np.random.seed(42)
 
     tic_obs = TicObservationsDataset(storage=TEST_STORAGE).load_observation_metadata()
-    exo_db = KnownExoplanetsDataset(storage=TEST_STORAGE).load_known_exoplanets_dataset()
+    exo_db = PlanetarySystemsDataset(storage=TEST_STORAGE).load_known_exoplanets_dataset()
     lc_dataset = LightcurveDataset(lc_storage_path=TEST_ASSETS_LC, override_existing=True)
 
     small_meta = tic_obs.select_random_sample(n=5)

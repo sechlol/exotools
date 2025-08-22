@@ -17,10 +17,10 @@ exotools provides several dataset classes for working with exoplanet data:
 
 .. code-block:: python
 
-    from exotools import KnownExoplanetsDataset, CandidateExoplanetsDataset, LightcurveDataset
+    from exotools import PlanetarySystemsDataset, CandidateExoplanetsDataset, LightcurveDataset
 
     # Load known exoplanets
-    known = KnownExoplanetsDataset()
+    known = PlanetarySystemsDataset()
 
     # Access candidate exoplanets
     candidates = CandidateExoplanetsDataset()

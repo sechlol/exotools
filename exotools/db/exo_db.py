@@ -1,103 +1,20 @@
 import logging
 
 import astropy.units as u
-import numpy as np
 from astropy.table import QTable, join
 from typing_extensions import Self
 
-from .base_db import BaseDB
+from .ps_db import PsDB
 
 logger = logging.getLogger(__name__)
 
-_ID_FIELD = "tic_id"
-_PARAMETER_JD = ["pl_tranmid"]
 
-
-class ExoDB(BaseDB):
-    minimal_columns = [
-        [
-            "tic_id",
-            "gaia_id",
-            "hostname",
-            "pl_name",
-            "pl_orbeccen",
-            "pl_orbsmax",
-            "pl_tranmid",
-            "pl_ratdor",
-            "pl_imppar",
-            "pl_orblper",
-            "pl_masse",
-            "pl_trandep",
-            "pl_dens",
-            "pl_orbincl",
-            "pl_rade",
-            "pl_orbper",
-            "pl_trandur",
-            "pl_ratror",
-            "st_mass",
-            "st_rad",
-            "tran_flag",
-            "default_flag",
-            "disc_telescope",
-        ]
-    ]
-
-    def __init__(self, exoplanets_dataset: QTable):
-        super().__init__(exoplanets_dataset, id_field=_ID_FIELD)
-
-    @property
-    def tic_ids(self) -> np.ndarray:
-        return self.view["tic_id"].value
-
-    @property
-    def gaia_ids(self) -> np.ndarray:
-        return self.view["gaia_id"].value
-
-    @property
-    def unique_tic_ids(self) -> np.ndarray:
-        return np.unique(self.tic_ids)
-
-    @property
-    def unique_gaia_ids(self) -> np.ndarray:
-        return np.unique(self.gaia_ids)
-
+class ExoDB(PsDB):
     def _factory(self, dataset: QTable) -> Self:
         return ExoDB(dataset)
 
-    def get_star_names(self) -> list[str]:
-        return np.unique(self.view["hostname"]).tolist()
-
     def get_default_records(self) -> Self:
         return self._factory(self.view[self.view["default_flag"] == 1])
-
-    def get_tess_planets(self) -> Self:
-        # Create a boolean mask for rows where disc_telescope contains "TESS"
-        mask_tess = np.char.find(self.view["disc_telescope"].value.astype("U"), "TESS") != -1
-        return self._factory(self.view[mask_tess])
-
-    def get_kepler_planets(self) -> Self:
-        # Create a boolean mask for rows where disc_telescope contains "Kepler"
-        mask_kepler = np.char.find(self.view["disc_telescope"].value.astype("U"), "Kepler") != -1
-        mask_k2 = np.char.find(self.view["disc_telescope"].value.astype("U"), "K2") != -1
-        return self._factory(self.view[mask_kepler | mask_k2])
-
-    def get_transiting_planets(self, kepler_or_tess_only: bool = False) -> Self:
-        condition = self.view["tran_flag"] == 1
-        if kepler_or_tess_only:
-            # Create a boolean mask for rows where disc_telescope contains "TESS" or "Kepler"
-            mask_tess = np.char.find(self.view["disc_telescope"].value.astype("U"), "TESS") != -1
-            mask_kepler = np.char.find(self.view["disc_telescope"].value.astype("U"), "Kepler") != -1
-            mask_k2 = np.char.find(self.view["disc_telescope"].value.astype("U"), "K2") != -1
-            telescope_mask = mask_tess | mask_kepler | mask_k2
-
-            # Apply the mask
-            condition &= telescope_mask
-        return self._factory(self.view[condition])
-
-    @staticmethod
-    def preprocess_dataset(dataset: QTable):
-        # Set lowercase hostname for faster retrieval
-        dataset["hostname_lowercase"] = np.char.lower(dataset["hostname"].tolist())
 
     @staticmethod
     def impute_stellar_parameters(dataset: QTable, gaia_data: QTable):

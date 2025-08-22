@@ -5,7 +5,7 @@ import pytest
 from astropy.table import QTable
 from lightkurve import LightCurve
 
-from exotools import ExoDB, GaiaDB, KnownExoplanetsDataset, LightcurveDataset, StarSystemDB
+from exotools import ExoDB, GaiaDB, LightcurveDataset, PlanetarySystemsDataset, StarSystemDB
 from exotools.datasets import GaiaParametersDataset
 from exotools.db.lightcurve_db import LightcurveDB
 from exotools.io import EcsvStorage
@@ -91,9 +91,9 @@ def load_all_test_qtables_and_headers() -> dict[str, tuple[QTable, QTableHeader]
 
 # Dataset-specific fixtures for testing
 @pytest.fixture(scope="module")
-def known_exoplanets_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
+def planetary_systems_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
     """Test data for known exoplanets dataset"""
-    return all_test_qtables_and_headers["known_exoplanets"]
+    return all_test_qtables_and_headers["ps"]
 
 
 @pytest.fixture(scope="module")
@@ -123,7 +123,7 @@ def tic_catalog_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableH
 @pytest.fixture(scope="module")
 def star_system_test_db() -> StarSystemDB:
     """Test data for StarSystem dataset"""
-    return KnownExoplanetsDataset(storage=TEST_STORAGE).load_star_system_dataset()
+    return PlanetarySystemsDataset(storage=TEST_STORAGE).load_star_system_dataset()
 
 
 @pytest.fixture(scope="module")
@@ -135,7 +135,7 @@ def gaia_test_db() -> GaiaDB:
 @pytest.fixture(scope="module")
 def exo_test_db() -> ExoDB:
     """Test data for ExoDB dataset"""
-    return KnownExoplanetsDataset(storage=TEST_STORAGE).load_known_exoplanets_dataset()
+    return PlanetarySystemsDataset(storage=TEST_STORAGE).load_known_exoplanets_dataset()
 
 
 @pytest.fixture(scope="module")

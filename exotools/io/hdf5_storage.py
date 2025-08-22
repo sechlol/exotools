@@ -99,6 +99,11 @@ class Hdf5Storage(BaseStorage):
                 append=True,
                 overwrite=True,  # Always use overwrite=True since we've already handled the override logic
                 serialize_meta=True,
+                chunks=True,
+                track_order=True,
+                fletcher32=False,
+                # object_header_size_limit=16384,
+                # **{'chunks': True, 'track_order': True, 'fletcher32': False, 'object_header_size_limit': 16384}
             )
 
     def read_qtable(self, table_name: str) -> Optional[QTable]:

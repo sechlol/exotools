@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class GaiaParametersDataset(BaseDataset):
-    _DATASET_GAIA = "gaia"
+    _DATASET_NAME = "gaia"
 
     def __init__(self, dataset_tag: Optional[str] = None, storage: Optional[BaseStorage] = None):
-        super().__init__(dataset_name=self._DATASET_GAIA, dataset_tag=dataset_tag, storage=storage)
+        super().__init__(dataset_name=self._DATASET_NAME, dataset_tag=dataset_tag, storage=storage)
 
     @staticmethod
     def authenticate(username: str, password: str):

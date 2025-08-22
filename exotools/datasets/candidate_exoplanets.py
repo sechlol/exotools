@@ -20,7 +20,7 @@ class CandidateExoplanetsDataset(BaseDataset):
     that have not yet been confirmed as actual exoplanets.
     """
 
-    _DATASET_NAME_CANDIDATES = "candidate_exoplanets"
+    _DATASET_NAME = "candidate_exoplanets"
 
     def __init__(self, dataset_tag: Optional[str] = None, storage: Optional[BaseStorage] = None):
         """
@@ -31,7 +31,7 @@ class CandidateExoplanetsDataset(BaseDataset):
                 for all the storage keys.
             storage: Storage backend for persisting dataset information. Defaults to in-memory storage.
         """
-        super().__init__(dataset_name=self._DATASET_NAME_CANDIDATES, dataset_tag=dataset_tag, storage=storage)
+        super().__init__(dataset_name=self._DATASET_NAME, dataset_tag=dataset_tag, storage=storage)
 
     def load_candidate_exoplanets_dataset(self, with_name: Optional[str] = None) -> Optional[CandidateDB]:
         """

@@ -1,20 +1,18 @@
 import numpy as np
 import pytest
-from astropy.table import QTable
 
 from exotools import ExoDB
-from exotools.utils.qtable_utils import QTableHeader
 
 
 class TestExoplanetDb:
     @pytest.fixture
-    def exo_db(self, known_exoplanets_test_data: tuple[QTable, QTableHeader]) -> ExoDB:
-        return ExoDB(exoplanets_dataset=known_exoplanets_test_data[0])
+    def exo_db(self, planetary_systems_test_data) -> ExoDB:
+        return ExoDB(exoplanets_dataset=planetary_systems_test_data[0])
 
-    def test_init(self, exo_db, known_exoplanets_test_data):
+    def test_init(self, exo_db, planetary_systems_test_data):
         """Test initialization of ExoDB."""
         # Check that the dataset was properly set
-        assert len(exo_db) == len(known_exoplanets_test_data[0])
+        assert len(exo_db) == len(planetary_systems_test_data[0])
         assert exo_db._id_column == "tic_id"
 
     def test_tic_ids_property(self, exo_db):
@@ -100,10 +98,10 @@ class TestExoplanetDb:
         # Verify that kepler_or_tess_only=True returns a subset of all transiting planets
         assert len(kepler_tess_transiting) <= len(transiting_planets)
 
-    def test_impute_stellar_parameters(self, known_exoplanets_test_data, gaia_test_db):
+    def test_impute_stellar_parameters(self, planetary_systems_test_data, gaia_test_db):
         """Test the impute_stellar_parameters method."""
         # Make a copy of the data to avoid modifying the original
-        exo_data = known_exoplanets_test_data[0].copy()
+        exo_data = planetary_systems_test_data[0].copy()
         gaia_data = gaia_test_db.view.copy()
 
         # Count initial masked values
