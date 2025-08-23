@@ -34,7 +34,7 @@ dependencies = [
     "pydantic",
     "oktopus",
     "lightkurve",
-    "astropy",
+    "astropy[recommended]",
     "astroquery",
     "casjobs",
     "tqdm",

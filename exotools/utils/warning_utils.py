@@ -2,7 +2,16 @@ import contextlib
 import logging
 import warnings
 
-from astropy.units import UnitParserWarning, UnitsWarning
+from astropy.units import UnitsWarning
+
+# Check if UnitParserWarning is available in astropy.units (available from v7.0.1)
+try:
+    from astropy.units import UnitParserWarning
+
+    HAS_UNIT_PARSER_WARNING = True
+except ImportError:
+    # UnitParserWarning is not available in this version of astropy
+    HAS_UNIT_PARSER_WARNING = False
 
 
 @contextlib.contextmanager
@@ -23,7 +32,8 @@ def units_warnings_as_exceptions():
     """
     with warnings.catch_warnings():
         warnings.filterwarnings("error", category=UnitsWarning)
-        warnings.filterwarnings("error", category=UnitParserWarning)
+        if HAS_UNIT_PARSER_WARNING:
+            warnings.filterwarnings("error", category=UnitParserWarning)
         yield
 
 
@@ -49,6 +59,8 @@ def silence_warnings(warning_types=None):
     with warnings.catch_warnings():
         if warning_types:
             for warning_type in warning_types:
+                if warning_type == UnitParserWarning and not HAS_UNIT_PARSER_WARNING:
+                    continue
                 warnings.filterwarnings("ignore", category=warning_type)
         else:
             warnings.filterwarnings("ignore")
@@ -91,6 +103,8 @@ def warnings_as_exceptions(warning_types=None, log_level=logging.WARNING):
     with warnings.catch_warnings():
         if warning_types:
             for warning_type in warning_types:
+                if warning_type == UnitParserWarning and not HAS_UNIT_PARSER_WARNING:
+                    continue
                 warnings.filterwarnings("error", category=warning_type)
         else:
             warnings.filterwarnings("error")
