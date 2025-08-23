@@ -97,6 +97,12 @@ def planetary_systems_test_data(all_test_qtables_and_headers) -> tuple[QTable, Q
 
 
 @pytest.fixture(scope="module")
+def planetary_systems_composite_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
+    """Test data for known exoplanets dataset"""
+    return all_test_qtables_and_headers["ps_composite"]
+
+
+@pytest.fixture(scope="module")
 def candidate_exoplanets_test_data(all_test_qtables_and_headers) -> tuple[QTable, QTableHeader]:
     """Test data for candidate exoplanets dataset"""
     return all_test_qtables_and_headers["candidate_exoplanets"]

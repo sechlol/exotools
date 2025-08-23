@@ -1,8 +1,10 @@
 from unittest.mock import MagicMock, patch
 
+import astropy.units as u
 import numpy as np
 import pytest
 
+from exotools import PlanetarySystemsCompositeDataset
 from exotools.datasets import (
     CandidateExoplanetsDataset,
     GaiaParametersDataset,
@@ -62,6 +64,51 @@ class TestDatasets:
                 loaded_db = dataset.load_known_exoplanets_dataset(with_gaia_star_data=False)
                 assert loaded_db is not None
                 assert len(loaded_db._ds) == len(qtable)
+
+    def test_planetary_systems_composite_dataset(self, planetary_systems_composite_test_data):
+        """Test PlanetarySystemsDataset with mocked downloader"""
+        qtable, header = planetary_systems_composite_test_data
+        storage = MemoryStorage()
+
+        # Mock the downloader
+        with patch(
+            "exotools.datasets.planetary_composite.PlanetarySystemsCompositeDownloader"
+        ) as mock_downloader_class:
+            mock_downloader = MagicMock()
+            mock_downloader.download.return_value = (qtable, header)
+            mock_downloader_class.return_value = mock_downloader
+
+            # Test dataset
+            dataset = PlanetarySystemsCompositeDataset(storage=storage)
+
+            # Test download without Gaia data
+            exo_db = dataset.download_composite_dataset(store=True, limit=10)
+
+            # Verify downloader was called correctly
+            mock_downloader.download.assert_called_once_with(limit=10, columns=None, where=None)
+
+            # Verify data was stored in memory
+            data_key = storage._get_prefixed_key(dataset.name, ".qtable")
+            assert data_key in storage._memory
+            stored_qtable = storage._memory[data_key]
+            assert len(stored_qtable) == len(qtable)
+
+            # Verify ExoDB was created
+            assert exo_db is not None
+            assert len(exo_db._ds) == len(qtable)
+
+            # Test loading stored dataset
+            loaded_db = dataset.load_composite_dataset()
+            assert loaded_db is not None
+            assert len(loaded_db._ds) == len(qtable)
+
+            # Assert that pl_trandur units are restored to hours
+            loaded_qtable = loaded_db.view
+            for col_name in loaded_qtable.colnames:
+                if col_name in ["pl_trandur", "pl_trandurerr1", "pl_trandurerr2"]:
+                    assert hasattr(loaded_qtable[col_name], "unit")
+                    assert loaded_qtable[col_name].unit is not None
+                    assert loaded_qtable[col_name].unit == u.hour
 
     def test_candidate_exoplanets_dataset(self, candidate_exoplanets_test_data):
         """Test CandidateExoplanetsDataset with mocked downloader"""
