@@ -178,7 +178,7 @@ class TestLightcurvePlus:
         assert normalized_lc.obs_id == sample_lc_plus.obs_id
 
         # Check that the normalized flux has mean close to 1
-        assert 0.9 <= np.mean(normalized_lc.flux_y) <= 1.1
+        assert 0.9 <= np.median(normalized_lc.flux_y) <= 1.1
 
     def test_shift_time(self, sample_lc_plus):
         """Test shift_time method."""
