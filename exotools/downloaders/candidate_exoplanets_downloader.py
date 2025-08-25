@@ -9,14 +9,14 @@ from exotools.utils.qtable_utils import QTableHeader
 from exotools.utils.unit_mapper import UNIT_MAPPER
 
 from ._utils import fix_unrecognized_units, override_units
-from .dataset_downloader import DatasetDownloader
+from .base_downloader import BaseDownloader
 from .ps_downloader import fill_error_bounds, get_error_parameters, get_fixed_table_header
 from .tap_service import ExoService, TapService
 
 logger = logging.getLogger(__name__)
 
 
-class CandidateExoplanetsDownloader(DatasetDownloader):
+class CandidateExoplanetsDownloader(BaseDownloader):
     """
     Data source: Nasa Exoplanet Archive (table: TESS Objects of Interest Table Data Columns)
     https://exoplanetarchive.ipac.caltech.edu/docs/TAP/usingTAP.html

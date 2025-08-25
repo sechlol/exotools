@@ -8,7 +8,7 @@ from exotools.utils.unit_mapper import UNIT_MAPPER
 from exotools.utils.warning_utils import silence_warnings
 
 from ._utils import fix_unrecognized_units
-from .dataset_downloader import DatasetDownloader
+from .base_downloader import BaseDownloader
 from .ps_downloader import _get_where_clause, fill_error_bounds, get_fixed_table_header, parse_ids
 from .tap_service import ExoService, TapService
 
@@ -23,7 +23,7 @@ def _get_error_parameters(parameters: list[str], include_original: Optional[bool
     return errs
 
 
-class PlanetarySystemsCompositeDownloader(DatasetDownloader):
+class PlanetarySystemsCompositeDownloader(BaseDownloader):
     """
     Data source: Nasa Exoplanet Archive (table: Planetary Systems Composite Parameters [PSCompPars])
     https://exoplanetarchive.ipac.caltech.edu/docs/API_PSCompPars_columns.html

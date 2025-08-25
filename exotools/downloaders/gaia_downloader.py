@@ -7,13 +7,13 @@ from tqdm import tqdm
 
 from exotools.utils.qtable_utils import QTableHeader
 
-from .dataset_downloader import DatasetDownloader, iterate_chunks
+from .base_downloader import BaseDownloader, iterate_chunks
 from .tap_service import GaiaService, TapService
 
 logger = logging.getLogger(__name__)
 
 
-class GaiaDownloader(DatasetDownloader):
+class GaiaDownloader(BaseDownloader):
     """
     Archive: https://gea.esac.esa.int/archive/
     gaia_source table documentation:

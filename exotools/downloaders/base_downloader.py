@@ -8,7 +8,7 @@ from exotools.utils.qtable_utils import QTableHeader
 _DEFAULT_FILENAME = "dataset"
 
 
-class DatasetDownloader(ABC):
+class BaseDownloader(ABC):
     @abstractmethod
     def _download(self, limit: Optional[int] = None, **kwargs) -> QTable:
         """

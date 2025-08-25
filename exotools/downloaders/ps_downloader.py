@@ -10,7 +10,7 @@ from exotools.utils.qtable_utils import QTableHeader, TableColumnInfo
 from exotools.utils.unit_mapper import UNIT_MAPPER
 
 from ._utils import fix_unrecognized_units, override_units
-from .dataset_downloader import DatasetDownloader
+from .base_downloader import BaseDownloader
 from .tap_service import ExoService, TapService
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def get_error_parameters(parameters: list[str], include_original: Optional[bool]
     return errs
 
 
-class PlanetarySystemsDownloader(DatasetDownloader):
+class PlanetarySystemsDownloader(BaseDownloader):
     """
     Data source: Nasa Exoplanet Archive (table: Planetary Systems)
     https://exoplanetarchive.ipac.caltech.edu/docs/TAP/usingTAP.html

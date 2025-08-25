@@ -11,13 +11,13 @@ from exotools.constants import NAN_VALUE
 from exotools.utils.qtable_utils import QTableHeader, get_empty_table_header
 
 from ._utils import override_units
-from .dataset_downloader import DatasetDownloader, iterate_chunks
+from .base_downloader import BaseDownloader, iterate_chunks
 from .tap_service import TapService, TicService
 
 logger = logging.getLogger(__name__)
 
 
-class TessCatalogDownloader(DatasetDownloader):
+class TessCatalogDownloader(BaseDownloader):
     """
     This class uses CasJobs interface to query the service at https://mastweb.stsci.edu/mcasjobs/services/jobs.asmx
     A Web interface is available at https://mastweb.stsci.edu/mcasjobs/SubmitJob.aspx
