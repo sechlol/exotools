@@ -9,14 +9,14 @@ from exotools.utils.qtable_utils import QTableHeader
 from exotools.utils.unit_mapper import UNIT_MAPPER
 
 from ._utils import fix_unrecognized_units, override_units
-from .dataset_downloader import DatasetDownloader
-from .exoplanets_downloader import _get_error_parameters, _get_fixed_table_header
+from .base_downloader import BaseDownloader
+from .ps_downloader import fill_error_bounds, get_error_parameters, get_fixed_table_header
 from .tap_service import ExoService, TapService
 
 logger = logging.getLogger(__name__)
 
 
-class CandidateExoplanetsDownloader(DatasetDownloader):
+class CandidateExoplanetsDownloader(BaseDownloader):
     """
     Data source: Nasa Exoplanet Archive (table: TESS Objects of Interest Table Data Columns)
     https://exoplanetarchive.ipac.caltech.edu/docs/TAP/usingTAP.html
@@ -27,7 +27,7 @@ class CandidateExoplanetsDownloader(DatasetDownloader):
     _index_col = "tid"
 
     # "pl_trandep" unit is "ppm", but it's not a recognized unit
-    _unit_overrides = {p: (u.Unit("%") * 1e-6) for p in _get_error_parameters(["pl_trandep"], True)}
+    _unit_overrides = {p: (u.Unit("%") * 1e-6) for p in get_error_parameters(["pl_trandep"], True)}
 
     _exo_service: Optional[TapService] = None
 
@@ -57,10 +57,11 @@ class CandidateExoplanetsDownloader(DatasetDownloader):
         return dataset
 
     def _clean_and_fix(self, table: QTable) -> QTable:
+        fill_error_bounds(table)
         fix_unrecognized_units(table=table, units_map=UNIT_MAPPER)
         override_units(table=table, unit_overrides=self._unit_overrides)
         table.rename_column(self._index_col, "tic_id")
         return table
 
     def _get_table_header(self, table: QTable) -> QTableHeader:
-        return _get_fixed_table_header(table=table, table_name=self._table_name, tap_service=self._exo_service)
+        return get_fixed_table_header(table=table, table_name=self._table_name, tap_service=self._exo_service)

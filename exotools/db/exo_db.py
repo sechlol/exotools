@@ -1,104 +1,20 @@
 import logging
 
 import astropy.units as u
-import numpy as np
 from astropy.table import QTable, join
-from astropy.time import Time
 from typing_extensions import Self
 
-from .base_db import BaseDB
+from .ps_db import PsDB
 
 logger = logging.getLogger(__name__)
 
-_ID_FIELD = "tic_id"
-_PARAMETER_JD = ["pl_tranmid"]
 
-
-class ExoDB(BaseDB):
-    minimal_columns = [
-        [
-            "tic_id",
-            "gaia_id",
-            "hostname",
-            "pl_name",
-            "pl_orbeccen",
-            "pl_orbsmax",
-            "pl_tranmid",
-            "pl_ratdor",
-            "pl_imppar",
-            "pl_orblper",
-            "pl_masse",
-            "pl_trandep",
-            "pl_dens",
-            "pl_orbincl",
-            "pl_rade",
-            "pl_orbper",
-            "pl_trandur",
-            "pl_ratror",
-            "st_mass",
-            "st_rad",
-            "tran_flag",
-            "default_flag",
-            "disc_telescope",
-        ]
-    ]
-
-    def __init__(self, exoplanets_dataset: QTable):
-        super().__init__(exoplanets_dataset, id_field=_ID_FIELD)
-
-    @property
-    def tic_ids(self) -> np.ndarray:
-        return self.view["tic_id"].value
-
-    @property
-    def gaia_ids(self) -> np.ndarray:
-        return self.view["gaia_id"].value
-
-    @property
-    def unique_tic_ids(self) -> np.ndarray:
-        return np.unique(self.tic_ids)
-
-    @property
-    def unique_gaia_ids(self) -> np.ndarray:
-        return np.unique(self.gaia_ids)
-
+class ExoDB(PsDB):
     def _factory(self, dataset: QTable) -> Self:
         return ExoDB(dataset)
 
-    def get_star_names(self) -> list[str]:
-        return np.unique(self.view["hostname"]).tolist()
-
     def get_default_records(self) -> Self:
         return self._factory(self.view[self.view["default_flag"] == 1])
-
-    def get_tess_planets(self) -> Self:
-        # Create a boolean mask for rows where disc_telescope contains "TESS"
-        mask_tess = np.char.find(self.view["disc_telescope"].value.astype("U"), "TESS") != -1
-        return self._factory(self.view[mask_tess])
-
-    def get_kepler_planets(self) -> Self:
-        # Create a boolean mask for rows where disc_telescope contains "Kepler"
-        mask_kepler = np.char.find(self.view["disc_telescope"].value.astype("U"), "Kepler") != -1
-        mask_k2 = np.char.find(self.view["disc_telescope"].value.astype("U"), "K2") != -1
-        return self._factory(self.view[mask_kepler | mask_k2])
-
-    def get_transiting_planets(self, kepler_or_tess_only: bool = False) -> Self:
-        condition = self.view["tran_flag"] == 1
-        if kepler_or_tess_only:
-            # Create a boolean mask for rows where disc_telescope contains "TESS" or "Kepler"
-            mask_tess = np.char.find(self.view["disc_telescope"].value.astype("U"), "TESS") != -1
-            mask_kepler = np.char.find(self.view["disc_telescope"].value.astype("U"), "Kepler") != -1
-            mask_k2 = np.char.find(self.view["disc_telescope"].value.astype("U"), "K2") != -1
-            telescope_mask = mask_tess | mask_kepler | mask_k2
-
-            # Apply the mask
-            condition &= telescope_mask
-        return self._factory(self.view[condition])
-
-    @staticmethod
-    def preprocess_dataset(dataset: QTable):
-        # Set lowercase hostname for faster retrieval
-        dataset["hostname_lowercase"] = np.char.lower(dataset["hostname"].tolist())
 
     @staticmethod
     def impute_stellar_parameters(dataset: QTable, gaia_data: QTable):
@@ -126,41 +42,3 @@ class ExoDB(BaseDB):
             joined["pl_orbsmax"][recoverable_ratdor].to(u.solRad) / joined["radius"][recoverable_ratdor]
         )
         dataset["st_rad_gaia"] = joined["radius"]
-
-    @staticmethod
-    def compute_bounds(dataset: QTable):
-        # Set all the missing error fields to be 0
-        for err_param in _get_error_bounds_from_table(dataset):
-            dataset[err_param].fill_value = 0
-
-        parameters_with_err = [c.removesuffix("err1") for c in dataset.colnames if "err1" in c]
-        for c in parameters_with_err:
-            try:
-                dataset[f"{c}_upper"] = dataset[c] + dataset[f"{c}err1"]
-                dataset[f"{c}_lower"] = dataset[c] + dataset[f"{c}err2"]
-            except ValueError:
-                logger.error(f"Could not compute bounds for {c}")
-
-    @staticmethod
-    def convert_time_columns(dataset: QTable):
-        columns_to_convert = _get_limits_from_table(_PARAMETER_JD, include_input=True)
-        for c in columns_to_convert:
-            dataset[c] = Time(dataset[c], format="jd", scale="tdb")
-
-
-# TODO: find a better name for these methods
-def _get_limits_from_table(columns: list[str], include_input: bool = False) -> list[str]:
-    all_columns = []
-    for c in columns:
-        all_columns.extend([f"{c}_upper", f"{c}_lower"])
-    if include_input:
-        all_columns.extend(columns)
-    return all_columns
-
-
-def _get_columns_with_error_bounds(dataset: QTable) -> list[str]:
-    return [c.removesuffix("err1") for c in dataset.colnames if "err1" in c]
-
-
-def _get_error_bounds_from_table(dataset: QTable) -> list[str]:
-    return [c for c in dataset.colnames if c.endswith("err1") or c.endswith("err2")]

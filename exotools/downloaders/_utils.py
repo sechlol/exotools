@@ -1,6 +1,10 @@
+import logging
+
 from astropy import units as u
 from astropy.table import QTable
 from astropy.units import UnrecognizedUnit
+
+logger = logging.getLogger("downloaders")
 
 
 def fix_unrecognized_units(table: QTable, units_map: dict[str, u.Unit]):
@@ -11,7 +15,11 @@ def fix_unrecognized_units(table: QTable, units_map: dict[str, u.Unit]):
     for c in table.colnames:
         unit = table[c].unit
         if isinstance(unit, UnrecognizedUnit) and unit.name in units_map:
-            table[c] = table[c].value * units_map[unit.name]
+            try:
+                table[c] = table[c].value * units_map[unit.name]
+            except Exception as e:
+                logger.warning(f"Failed to set unit for column {c}: {e}")
+                continue
 
 
 def override_units(table: QTable, unit_overrides: dict[str, u.Unit]):

@@ -1,3 +1,4 @@
+import logging
 import warnings
 from math import ceil
 from typing import Any, Optional
@@ -17,6 +18,8 @@ from exotools.utils.array_utils import (
 
 from .star_system import Planet
 
+logger = logging.getLogger(__name__)
+
 
 class LightCurvePlus:
     def __init__(self, lightcurve: LightCurve, obs_id: Optional[int] = None):
@@ -30,6 +33,9 @@ class LightCurvePlus:
         self._time_shift = TimeDelta(0, format="sec", scale=self.lc.time.scale)
         self._obs_id = obs_id
         self._warn_if_not_barycentric()
+
+    def __len__(self) -> int:
+        return len(self.lc.time)
 
     @property
     def time_system(self) -> str:
@@ -51,6 +57,19 @@ class LightCurvePlus:
     @property
     def flux(self) -> np.ndarray:
         return self.lc.flux
+
+    @property
+    def standardized_flux(self) -> np.ndarray:
+        flux = self.lc.flux.value
+        return (flux - flux.mean()) / flux.std()
+
+    @property
+    def normalized_flux(self) -> np.ndarray:
+        flux = self.lc.flux.value
+        median = np.median(flux)
+        if median < 1e-6:
+            logger.warning("LightCurvePlus.normalized_flux(): trying to normalize flux by a median near zero.")
+        return flux / median - 1
 
     @property
     def tic_id(self) -> int:
@@ -392,22 +411,6 @@ class LightCurvePlus:
             wrap_phase=wrap_phase,
             normalize_phase=normalize_phase,
         )
-
-    def __len__(self) -> int:
-        return len(self.time_x)
-
-    def __sub__(self, other):
-        if isinstance(other, LightCurvePlus):
-            return LightCurvePlus(lightcurve=self.lc - other.lc)
-        return LightCurvePlus(lightcurve=self.lc - other)
-
-    def __add__(self, other):
-        if isinstance(other, LightCurvePlus):
-            return LightCurvePlus(lightcurve=self.lc + other.lc)
-        return LightCurvePlus(lightcurve=self.lc + other)
-
-    def __getitem__(self, index) -> Self:
-        return LightCurvePlus(self.lc[index], obs_id=self._obs_id)
 
 
 def copy_lightcurve(lightcurve: LightCurve, with_flux: Optional[np.ndarray] = None) -> LightCurve:

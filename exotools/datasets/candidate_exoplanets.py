@@ -4,7 +4,7 @@ from typing import Optional
 from astropy.table import QTable
 
 from exotools.datasets.base_dataset import BaseDataset
-from exotools.db import CandidateDB, ExoDB
+from exotools.db import CandidateDB
 from exotools.downloaders import CandidateExoplanetsDownloader
 from exotools.io import BaseStorage
 
@@ -20,7 +20,7 @@ class CandidateExoplanetsDataset(BaseDataset):
     that have not yet been confirmed as actual exoplanets.
     """
 
-    _DATASET_NAME_CANDIDATES = "candidate_exoplanets"
+    _DATASET_NAME = "candidate_exoplanets"
 
     def __init__(self, dataset_tag: Optional[str] = None, storage: Optional[BaseStorage] = None):
         """
@@ -31,7 +31,7 @@ class CandidateExoplanetsDataset(BaseDataset):
                 for all the storage keys.
             storage: Storage backend for persisting dataset information. Defaults to in-memory storage.
         """
-        super().__init__(dataset_name=self._DATASET_NAME_CANDIDATES, dataset_tag=dataset_tag, storage=storage)
+        super().__init__(dataset_name=self._DATASET_NAME, dataset_tag=dataset_tag, storage=storage)
 
     def load_candidate_exoplanets_dataset(self, with_name: Optional[str] = None) -> Optional[CandidateDB]:
         """
@@ -57,8 +57,8 @@ class CandidateExoplanetsDataset(BaseDataset):
     def download_candidate_exoplanets(
         self,
         limit: Optional[int] = None,
-        store: bool = True,
         with_name: Optional[str] = None,
+        store: bool = True,
     ) -> CandidateDB:
         """
         Retrieves candidate exoplanets data from NASA Exoplanet Archive and optionally
@@ -66,8 +66,8 @@ class CandidateExoplanetsDataset(BaseDataset):
 
         Args:
             limit: Maximum number of candidates to retrieve. Default is None (no limit).
-            store: Whether to store the downloaded data in the storage backend. Default is True.
             with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name
+            store: Whether to store the downloaded data in the storage backend. Default is True.
 
         Returns:
             Database object containing the downloaded candidate exoplanets data.
@@ -91,5 +91,4 @@ class CandidateExoplanetsDataset(BaseDataset):
 
 
 def _create_candidate_db(candidate_dataset: QTable) -> CandidateDB:
-    ExoDB.compute_bounds(candidate_dataset)
     return CandidateDB(candidate_dataset)

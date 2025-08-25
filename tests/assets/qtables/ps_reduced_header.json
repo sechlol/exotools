@@ -143,193 +143,193 @@
         "dtype": null,
         "time_info": null
     },
-    "st_rad_lower": {
+    "st_raderr1": {
         "description": "---",
         "unit": "solRad",
         "dtype": null,
         "time_info": null
     },
-    "st_rad_upper": {
+    "st_raderr2": {
         "description": "---",
         "unit": "solRad",
         "dtype": null,
         "time_info": null
     },
-    "st_mass_lower": {
+    "st_masserr1": {
         "description": "---",
         "unit": "solMass",
         "dtype": null,
         "time_info": null
     },
-    "st_mass_upper": {
+    "st_masserr2": {
         "description": "---",
         "unit": "solMass",
         "dtype": null,
         "time_info": null
     },
-    "pl_rade_lower": {
+    "pl_radeerr1": {
         "description": "---",
         "unit": "earthRad",
         "dtype": null,
         "time_info": null
     },
-    "pl_rade_upper": {
+    "pl_radeerr2": {
         "description": "---",
         "unit": "earthRad",
         "dtype": null,
         "time_info": null
     },
-    "pl_masse_lower": {
+    "pl_masseerr1": {
         "description": "---",
         "unit": "earthMass",
         "dtype": null,
         "time_info": null
     },
-    "pl_masse_upper": {
+    "pl_masseerr2": {
         "description": "---",
         "unit": "earthMass",
         "dtype": null,
         "time_info": null
     },
-    "pl_dens_lower": {
+    "pl_denserr1": {
         "description": "---",
         "unit": null,
         "dtype": null,
         "time_info": null
     },
-    "pl_dens_upper": {
+    "pl_denserr2": {
         "description": "---",
         "unit": null,
         "dtype": null,
         "time_info": null
     },
-    "pl_orbeccen_lower": {
+    "pl_orbeccenerr1": {
         "description": "---",
         "unit": null,
         "dtype": null,
         "time_info": null
     },
-    "pl_orbeccen_upper": {
+    "pl_orbeccenerr2": {
         "description": "---",
         "unit": null,
         "dtype": null,
         "time_info": null
     },
-    "pl_orbper_lower": {
+    "pl_orbpererr1": {
         "description": "---",
         "unit": "d",
         "dtype": null,
         "time_info": null
     },
-    "pl_orbper_upper": {
+    "pl_orbpererr2": {
         "description": "---",
         "unit": "d",
         "dtype": null,
         "time_info": null
     },
-    "pl_orblper_lower": {
+    "pl_orblpererr1": {
         "description": "---",
         "unit": "deg",
         "dtype": null,
         "time_info": null
     },
-    "pl_orblper_upper": {
+    "pl_orblpererr2": {
         "description": "---",
         "unit": "deg",
         "dtype": null,
         "time_info": null
     },
-    "pl_orbincl_lower": {
+    "pl_orbinclerr1": {
         "description": "---",
         "unit": "deg",
         "dtype": null,
         "time_info": null
     },
-    "pl_orbincl_upper": {
+    "pl_orbinclerr2": {
         "description": "---",
         "unit": "deg",
         "dtype": null,
         "time_info": null
     },
-    "pl_orbsmax_lower": {
+    "pl_orbsmaxerr1": {
         "description": "---",
         "unit": "AU",
         "dtype": null,
         "time_info": null
     },
-    "pl_orbsmax_upper": {
+    "pl_orbsmaxerr2": {
         "description": "---",
         "unit": "AU",
         "dtype": null,
         "time_info": null
     },
-    "pl_tranmid_lower": {
+    "pl_tranmiderr1": {
         "description": "---",
         "unit": "d",
         "dtype": null,
         "time_info": null
     },
-    "pl_tranmid_upper": {
+    "pl_tranmiderr2": {
         "description": "---",
         "unit": "d",
         "dtype": null,
         "time_info": null
     },
-    "pl_trandur_lower": {
+    "pl_trandurerr1": {
         "description": "---",
         "unit": "h",
         "dtype": null,
         "time_info": null
     },
-    "pl_trandur_upper": {
+    "pl_trandurerr2": {
         "description": "---",
         "unit": "h",
         "dtype": null,
         "time_info": null
     },
-    "pl_trandep_lower": {
+    "pl_trandeperr1": {
         "description": "---",
         "unit": "percent",
         "dtype": null,
         "time_info": null
     },
-    "pl_trandep_upper": {
+    "pl_trandeperr2": {
         "description": "---",
         "unit": "percent",
         "dtype": null,
         "time_info": null
     },
-    "pl_imppar_lower": {
+    "pl_impparerr1": {
         "description": "---",
         "unit": null,
         "dtype": null,
         "time_info": null
     },
-    "pl_imppar_upper": {
+    "pl_impparerr2": {
         "description": "---",
         "unit": null,
         "dtype": null,
         "time_info": null
     },
-    "pl_ratror_lower": {
+    "pl_ratrorerr1": {
         "description": "---",
         "unit": null,
         "dtype": null,
         "time_info": null
     },
-    "pl_ratror_upper": {
+    "pl_ratrorerr2": {
         "description": "---",
         "unit": null,
         "dtype": null,
         "time_info": null
     },
-    "pl_ratdor_lower": {
+    "pl_ratdorerr1": {
         "description": "---",
         "unit": null,
         "dtype": null,
         "time_info": null
     },
-    "pl_ratdor_upper": {
+    "pl_ratdorerr2": {
         "description": "---",
         "unit": null,
         "dtype": null,

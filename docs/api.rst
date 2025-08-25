@@ -5,7 +5,7 @@ Main Dataset Classes
 --------------------
 
 .. automodule:: exotools
-   :members: KnownExoplanetsDataset, CandidateExoplanetsDataset, TicCatalogDataset, GaiaParametersDataset, TicObservationsDataset, LightcurveDataset
+   :members: PlanetarySystemsDataset, CandidateExoplanetsDataset, TicCatalogDataset, GaiaParametersDataset, TicObservationsDataset, LightcurveDataset
    :undoc-members:
    :show-inheritance:
 

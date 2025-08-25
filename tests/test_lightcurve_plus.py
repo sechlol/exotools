@@ -16,8 +16,14 @@ class TestLightcurvePlus:
     @pytest.fixture
     def sample_lc_plus(self, all_test_lightcurves) -> LightCurvePlus:
         """Get a sample LightCurvePlus object with a valid observation ID."""
-        obs_id = 65149728  # next(iter(all_test_lightcurves))
+        obs_id = next(iter(all_test_lightcurves.keys()))
         return LightCurvePlus(copy_lightcurve(all_test_lightcurves[obs_id]), obs_id=obs_id)
+
+    @pytest.fixture
+    def static_lc_plus(self, static_test_lightcurves) -> LightCurvePlus:
+        """Get a known, unchanging lightcurve with known properties."""
+        obs_id = next(iter(static_test_lightcurves.keys()))
+        return LightCurvePlus(copy_lightcurve(static_test_lightcurves[obs_id]), obs_id=obs_id)
 
     @pytest.fixture
     def lc_and_planet(
@@ -152,16 +158,16 @@ class TestLightcurvePlus:
         assert sample_lc_plus.obs_id is not None
         assert cleaned_lc.obs_id == sample_lc_plus.obs_id
 
-    def test_remove_outliers(self, sample_lc_plus):
+    def test_remove_outliers(self, static_lc_plus):
         """Test remove_outliers method."""
-        cleaned_lc = sample_lc_plus.remove_outliers()
+        cleaned_lc = static_lc_plus.remove_outliers()
         assert isinstance(cleaned_lc, LightCurvePlus)
 
         # The cleaned lightcurve should have fewer points
-        assert len(cleaned_lc) < len(sample_lc_plus)
-        assert len(cleaned_lc) == 13745  # Specific value for the test sample
-        assert sample_lc_plus.obs_id is not None
-        assert cleaned_lc.obs_id == sample_lc_plus.obs_id
+        assert len(cleaned_lc) < len(static_lc_plus)
+        assert len(cleaned_lc) == 15879  # Specific value for the test sample
+        assert static_lc_plus.obs_id is not None
+        assert cleaned_lc.obs_id == static_lc_plus.obs_id
 
     def test_normalize(self, sample_lc_plus):
         """Test normalize method."""
@@ -172,7 +178,7 @@ class TestLightcurvePlus:
         assert normalized_lc.obs_id == sample_lc_plus.obs_id
 
         # Check that the normalized flux has mean close to 1
-        assert 0.9 <= np.mean(normalized_lc.flux_y) <= 1.1
+        assert 0.9 <= np.median(normalized_lc.flux_y) <= 1.1
 
     def test_shift_time(self, sample_lc_plus):
         """Test shift_time method."""
@@ -300,43 +306,6 @@ class TestLightcurvePlus:
     def test_len(self, sample_lc_plus):
         """Test __len__ method."""
         assert len(sample_lc_plus) == len(sample_lc_plus.lc)
-
-    def test_getitem(self, sample_lc_plus):
-        """Test __getitem__ method."""
-        # Test with a slice
-        slice_lc = sample_lc_plus[0:10]
-        assert isinstance(slice_lc, LightCurvePlus)
-        assert len(slice_lc) == 10
-
-        # Test with a boolean mask
-        mask = np.zeros(len(sample_lc_plus), dtype=bool)
-        mask[0:5] = True
-        masked_lc = sample_lc_plus[mask]
-        assert isinstance(masked_lc, LightCurvePlus)
-        assert len(masked_lc) == 5
-
-    def test_arithmetic_operations(self, sample_lc_plus):
-        """Test __add__ and __sub__ methods."""
-        # Test addition with a scalar
-        added_lc = sample_lc_plus + 1.0
-        assert isinstance(added_lc, LightCurvePlus)
-        assert np.allclose(added_lc.flux_y, sample_lc_plus.flux_y + 1.0)
-
-        # Test subtraction with a scalar
-        subtracted_lc = sample_lc_plus - 1.0
-        assert isinstance(subtracted_lc, LightCurvePlus)
-        assert np.allclose(subtracted_lc.flux_y, sample_lc_plus.flux_y - 1.0)
-
-        # Test addition with another LightCurvePlus
-        lc_copy = LightCurvePlus(sample_lc_plus.lc.copy())
-        added_lc = sample_lc_plus + lc_copy
-        assert isinstance(added_lc, LightCurvePlus)
-        assert np.allclose(added_lc.flux_y, sample_lc_plus.flux_y + lc_copy.flux_y)
-
-        # Test subtraction with another LightCurvePlus
-        subtracted_lc = sample_lc_plus - lc_copy
-        assert isinstance(subtracted_lc, LightCurvePlus)
-        assert np.allclose(subtracted_lc.flux_y, sample_lc_plus.flux_y - lc_copy.flux_y)
 
     def test_get_first_transit_value(self, lc_and_planet: tuple[Planet, LightCurvePlus]):
         """Test get_first_transit_value method."""

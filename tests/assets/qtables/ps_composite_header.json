@@ -1,0 +1,1364 @@
+{
+    "pl_name": {
+        "description": "Planet Name",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "pl_letter": {
+        "description": "Planet Letter",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "hostname": {
+        "description": "Host Name",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "hd_name": {
+        "description": "HD ID",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "hip_name": {
+        "description": "HIP ID",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "tic_id": {
+        "description": "TIC ID",
+        "unit": null,
+        "dtype": "<i8",
+        "time_info": null
+    },
+    "disc_pubdate": {
+        "description": "Discovery Publication Date",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "disc_year": {
+        "description": "Discovery Year",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "discoverymethod": {
+        "description": "Discovery Method",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "disc_locale": {
+        "description": "Discovery Locale",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "disc_facility": {
+        "description": "Discovery Facility",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "disc_instrument": {
+        "description": "Discovery Instrument",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "disc_telescope": {
+        "description": "Discovery Telescope",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "disc_refname": {
+        "description": "Discovery Reference",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "ra": {
+        "description": "RA [decimal]",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "dec": {
+        "description": "Dec [decimal]",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "glon": {
+        "description": "Galactic Longitude",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "glat": {
+        "description": "Galactic Latitude",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_angsep": {
+        "description": "Angular Separation",
+        "unit": "mas",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_angseperr1": {
+        "description": "Angular Separation Upper Unc",
+        "unit": "mas",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_angseperr2": {
+        "description": "Angular Separation Lower Unc",
+        "unit": "mas",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "elon": {
+        "description": "Ecliptic Longitude",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "elat": {
+        "description": "Ecliptic Latitude",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbper": {
+        "description": "Orbital Period",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbpererr1": {
+        "description": "Orbital Period Upper Unc.",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbpererr2": {
+        "description": "Orbital Period Lower Unc.",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orblpererr1": {
+        "description": "Argument of Periastron Upper Unc.",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orblper": {
+        "description": "Argument of Periastron",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orblpererr2": {
+        "description": "Argument of Periastron Lower Unc.",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbsmax": {
+        "description": "Orbit Semi-Major Axis [au])",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbsmaxerr1": {
+        "description": "Orbit Semi-Major Axis Upper Unc.",
+        "unit": "AU",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbsmaxerr2": {
+        "description": "Orbit Semi-Major Axis Lower Unc.",
+        "unit": "AU",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbincl": {
+        "description": "Inclination",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbinclerr1": {
+        "description": "Inclination Upper Unc.",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbinclerr2": {
+        "description": "Inclination Lower Unc.",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbtper": {
+        "description": "Epoch of Periastron",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbtpererr1": {
+        "description": "Epoch of Periastron Upper Unc.",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbtpererr2": {
+        "description": "Epoch of Periastron Lower Unc.",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbeccen": {
+        "description": "Eccentricity",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbeccenerr1": {
+        "description": "Eccentricity Upper Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_orbeccenerr2": {
+        "description": "Eccentricity Lower Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_eqt": {
+        "description": "Equilibrium Temperature",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_eqterr1": {
+        "description": "Equilibrium Temperature Upper Unc.",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_eqterr2": {
+        "description": "Equilibrium Temperature Lower Unc.",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_occdep": {
+        "description": "Occultation Depth",
+        "unit": "%",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_occdeperr1": {
+        "description": "Occultation Depth Upper Unc.",
+        "unit": "%",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_occdeperr2": {
+        "description": "Occultation Depth Lower Unc.",
+        "unit": "%",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_insol": {
+        "description": "Insolation Flux",
+        "unit": "solLum / AU2",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_insolerr1": {
+        "description": "Insolation Flux Upper Unc.",
+        "unit": "solLum / AU2",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_insolerr2": {
+        "description": "Insolation Flux Lower Unc.",
+        "unit": "solLum / AU2",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_dens": {
+        "description": "Planet Density",
+        "unit": "g / cm3",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_denserr1": {
+        "description": "Planet Density Upper Unc.",
+        "unit": "g / cm3",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_denserr2": {
+        "description": "Planet Density Lower Unc.",
+        "unit": "g / cm3",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandep": {
+        "description": "Transit Depth",
+        "unit": "%",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandeperr1": {
+        "description": "Transit Depth Upper Unc.",
+        "unit": "%",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandeperr2": {
+        "description": "Transit Depth Lower Unc.",
+        "unit": "%",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_tranmid": {
+        "description": "Transit Midpoint",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_tranmiderr1": {
+        "description": "Transit Midpoint Upper Unc.",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_tranmiderr2": {
+        "description": "Transit Midpoint Lower Unc.",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandur": {
+        "description": "Transit Duration",
+        "unit": "h",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandurerr1": {
+        "description": "Transit Duration Upper Unc.",
+        "unit": "h",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trandurerr2": {
+        "description": "Transit Duration Lower Unc.",
+        "unit": "h",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_rvamp": {
+        "description": "Radial Velocity Amplitude",
+        "unit": "m / s",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_rvamperr1": {
+        "description": "Radial Velocity Amplitude Upper Unc.",
+        "unit": "m / s",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_rvamperr2": {
+        "description": "Radial Velocity Amplitude Lower Unc.",
+        "unit": "m / s",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_radj": {
+        "description": "Planet Radius",
+        "unit": "jupiterRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_radjerr1": {
+        "description": "Planet Radius Upper Unc.",
+        "unit": "jupiterRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_radjerr2": {
+        "description": "Planet Radius Lower Unc.",
+        "unit": "jupiterRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_rade": {
+        "description": "Planet Radius",
+        "unit": "earthRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_radeerr1": {
+        "description": "Planet Radius Upper Unc.",
+        "unit": "earthRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_radeerr2": {
+        "description": "Planet Radius Lower Unc.",
+        "unit": "earthRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_ratror": {
+        "description": "Ratio of Planet to Stellar Radius",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_ratrorerr1": {
+        "description": "Ratio of Planet to Stellar Radius Upper Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_ratrorerr2": {
+        "description": "Ratio of Planet to Stellar Radius Lower Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_ratdor": {
+        "description": "Ratio of Semi-Major Axis to Stellar Radius",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_ratdorerr1": {
+        "description": "Ratio of Semi-Major Axis to Stellar Radius Upper Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_ratdorerr2": {
+        "description": "Ratio of Semi-Major Axis to Stellar Radius Lower Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_imppar": {
+        "description": "Impact Parameter",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_impparerr1": {
+        "description": "Impact Parameter Upper Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_impparerr2": {
+        "description": "Impact Parameter Lower Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_bmassj": {
+        "description": "Planet Mass or Mass*sin(i)",
+        "unit": "jupiterMass",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_bmassjerr1": {
+        "description": "Planet Mass or Mass*sin(i) [Jupiter Mass] Upper Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_bmassjerr2": {
+        "description": "Planet Mass or Mass*sin(i) [Jupiter Mass] Lower Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_bmasse": {
+        "description": "Planet Mass or Mass*sin(i)",
+        "unit": "earthMass",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_bmasseerr1": {
+        "description": "Planet Mass or Mass*sin(i) [Earth Mass] Upper Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_bmasseerr2": {
+        "description": "Planet Mass or Mass*sin(i) [Earth Mass] Lower Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_bmassprov": {
+        "description": "Planet Mass or Mass*sin(i) Provenance",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "st_teff": {
+        "description": "Stellar Effective Temperature",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_tefferr1": {
+        "description": "Stellar Effective Temperature Upper Upper Unc.",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_tefferr2": {
+        "description": "Stellar Effective Temperature Lower Lower Unc.",
+        "unit": "K",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_met": {
+        "description": "Stellar Metallicity",
+        "unit": "dex",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_meterr1": {
+        "description": "Stellar Metallicity Upper Unc.",
+        "unit": "dex",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_meterr2": {
+        "description": "Stellar Metallicity Lower Unc.",
+        "unit": "dex",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_radv": {
+        "description": "Systemic Radial Velocity",
+        "unit": "km / s",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_radverr1": {
+        "description": "Systemic Radial Velocity Upper Unc.",
+        "unit": "km / s",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_radverr2": {
+        "description": "Systemic Radial Velocity Lower Unc.",
+        "unit": "km / s",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_vsin": {
+        "description": "Stellar Rotational Velocity",
+        "unit": "km / s",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_vsinerr1": {
+        "description": "Stellar Rotational Velocity [km/s] Upper Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_vsinerr2": {
+        "description": "Stellar Rotational Velocity [km/s] Lower Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_lum": {
+        "description": "Stellar Luminosity",
+        "unit": "dex(solLum)",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_lumerr1": {
+        "description": "Stellar Luminosity Upper Unc.",
+        "unit": "dex(solLum)",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_lumerr2": {
+        "description": "Stellar Luminosity Lower Unc.",
+        "unit": "dex(solLum)",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_logg": {
+        "description": "Stellar Surface Gravity",
+        "unit": "dex(cm / s2)",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_loggerr1": {
+        "description": "Stellar Surface Gravity Upper Unc.",
+        "unit": "dex(cm / s2)",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_loggerr2": {
+        "description": "Stellar Surface Gravity Lower Unc.",
+        "unit": "dex(cm / s2)",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_age": {
+        "description": "Stellar Age",
+        "unit": "Gyr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_ageerr1": {
+        "description": "Stellar Age Upper Unc.",
+        "unit": "Gyr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_ageerr2": {
+        "description": "Stellar Age Lower Unc.",
+        "unit": "Gyr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_mass": {
+        "description": "Stellar Mass",
+        "unit": "solMass",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_masserr1": {
+        "description": "Stellar Mass Upper Unc.",
+        "unit": "solMass",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_masserr2": {
+        "description": "Stellar Mass Lower Unc.",
+        "unit": "solMass",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_dens": {
+        "description": "Stellar Density",
+        "unit": "g / cm3",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_denserr1": {
+        "description": "Stellar Density Upper Unc.",
+        "unit": "g / cm3",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_denserr2": {
+        "description": "Stellar Density Lower Unc.",
+        "unit": "g / cm3",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_rad": {
+        "description": "Stellar Radius",
+        "unit": "solRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_raderr1": {
+        "description": "Stellar Radius Upper Unc.",
+        "unit": "solRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_raderr2": {
+        "description": "Stellar Radius Lower Unc.",
+        "unit": "solRad",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "ttv_flag": {
+        "description": "Data show Transit Timing Variations",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "ptv_flag": {
+        "description": "Detected by Pulsation Timing Variations",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "tran_flag": {
+        "description": "Detected by Transits",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "rv_flag": {
+        "description": "Detected by Radial Velocity Variations",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "ast_flag": {
+        "description": "Detected by Astrometric Variations",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "obm_flag": {
+        "description": "Detected by Orbital Brightness Modulations",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "micro_flag": {
+        "description": "Detected by Microlensing",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "etv_flag": {
+        "description": "Detected by Eclipse Timing Variations",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "ima_flag": {
+        "description": "Detected by Imaging",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pul_flag": {
+        "description": "Detected by Pulsar Timing Variations",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "sy_snum": {
+        "description": "Number of Stars",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "sy_pnum": {
+        "description": "Number of Planets",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "sy_mnum": {
+        "description": "Number of Moons",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_nphot": {
+        "description": "Number of Photometry Time Series",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_nrvc": {
+        "description": "Number of Radial Velocity Time Series",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "st_nspec": {
+        "description": "Number of Stellar Spectra Measurements",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_nnotes": {
+        "description": "Number of Notes",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_ntranspec": {
+        "description": "Number of Transmission Spectra",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_nespec": {
+        "description": "Number of Eclipse Spectra",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_ndispec": {
+        "description": "Number of Direct Imaging Spectra",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "sy_pm": {
+        "description": "Total Proper Motion",
+        "unit": "mas / yr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_pmerr1": {
+        "description": "Total Proper Motion Upper Unc",
+        "unit": "mas / yr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_pmerr2": {
+        "description": "Total Proper Motion Lower Unc",
+        "unit": "mas / yr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_pmra": {
+        "description": "Proper Motion (RA)",
+        "unit": "mas / yr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_pmraerr1": {
+        "description": "Proper Motion (RA) [mas/yr] Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_pmraerr2": {
+        "description": "Proper Motion (RA) [mas/yr] Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_pmdec": {
+        "description": "Proper Motion (Dec)",
+        "unit": "mas / yr",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_pmdecerr1": {
+        "description": "Proper Motion (Dec) [mas/yr] Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_pmdecerr2": {
+        "description": "Proper Motion (Dec) [mas/yr] Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_plx": {
+        "description": "Parallax",
+        "unit": "mas",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_plxerr1": {
+        "description": "Parallax [mas] Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_plxerr2": {
+        "description": "Parallax [mas] Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_dist": {
+        "description": "Distance",
+        "unit": "pc",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_disterr1": {
+        "description": "Distance [pc] Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_disterr2": {
+        "description": "Distance [pc] Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_bmag": {
+        "description": "B (Johnson) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_bmagerr1": {
+        "description": "B (Johnson) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_bmagerr2": {
+        "description": "B (Johnson) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_vmag": {
+        "description": "V (Johnson) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_vmagerr1": {
+        "description": "V (Johnson) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_vmagerr2": {
+        "description": "V (Johnson) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_jmag": {
+        "description": "J (2MASS) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_jmagerr1": {
+        "description": "J (2MASS) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_jmagerr2": {
+        "description": "J (2MASS) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_hmag": {
+        "description": "H (2MASS) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_hmagerr1": {
+        "description": "H (2MASS) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_hmagerr2": {
+        "description": "H (2MASS) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_kmag": {
+        "description": "Ks (2MASS) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_kmagerr1": {
+        "description": "Ks (2MASS) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_kmagerr2": {
+        "description": "Ks (2MASS) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_umag": {
+        "description": "u (Sloan) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_umagerr1": {
+        "description": "u (Sloan) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_umagerr2": {
+        "description": "u (Sloan) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_rmag": {
+        "description": "r (Sloan) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_rmagerr1": {
+        "description": "r (Sloan) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_rmagerr2": {
+        "description": "r (Sloan) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_imag": {
+        "description": "i (Sloan) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_imagerr1": {
+        "description": "i (Sloan) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_imagerr2": {
+        "description": "i (Sloan) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_zmag": {
+        "description": "z (Sloan) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_zmagerr1": {
+        "description": "z (Sloan) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_zmagerr2": {
+        "description": "z (Sloan) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w1mag": {
+        "description": "W1 (WISE) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w1magerr1": {
+        "description": "W1 (WISE) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w1magerr2": {
+        "description": "W1 (WISE) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w2mag": {
+        "description": "W2 (WISE) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w2magerr1": {
+        "description": "W2 (WISE) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w2magerr2": {
+        "description": "W2 (WISE) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w3mag": {
+        "description": "W3 (WISE) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w3magerr1": {
+        "description": "W3 (WISE) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w3magerr2": {
+        "description": "W3 (WISE) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w4mag": {
+        "description": "W4 (WISE) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w4magerr1": {
+        "description": "W4 (WISE) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_w4magerr2": {
+        "description": "W4 (WISE) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_gmag": {
+        "description": "g (Sloan) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_gmagerr1": {
+        "description": "g (Sloan) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_gmagerr2": {
+        "description": "g (Sloan) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_gaiamag": {
+        "description": "Gaia Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_gaiamagerr1": {
+        "description": "Gaia Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_gaiamagerr2": {
+        "description": "Gaia Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_tmag": {
+        "description": "TESS Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_tmagerr1": {
+        "description": "TESS Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_tmagerr2": {
+        "description": "TESS Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_controv_flag": {
+        "description": "Controversial Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "pl_tranmid_systemref": {
+        "description": "Time Reference Frame and Standard",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "pl_orbtper_systemref": {
+        "description": "Time Solnid Frame and Standard",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "st_metratio": {
+        "description": "Stellar Metallicity Ratio",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "st_spectype": {
+        "description": "Spectral Type",
+        "unit": null,
+        "dtype": "|O",
+        "time_info": null
+    },
+    "sy_kepmag": {
+        "description": "Kepler Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_kepmagerr1": {
+        "description": "Kepler Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_kepmagerr2": {
+        "description": "Kepler Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_rotp": {
+        "description": "Stellar Rotational Period",
+        "unit": "d",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_rotperr1": {
+        "description": "Stellar Rotational Period [days] Upper Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "st_rotperr2": {
+        "description": "Stellar Rotational Period [days] Lower Unc.",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_projobliq": {
+        "description": "Projected Obliquity",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_projobliqerr1": {
+        "description": "Projected Obliquity Upper Unc.",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_projobliqerr2": {
+        "description": "Projected Obliquity Lower Unc.",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trueobliq": {
+        "description": "True Obliquity",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "x": {
+        "description": "Spatial Coordinate X",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trueobliqerr1": {
+        "description": "True Obliquity Upper Unc.",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "y": {
+        "description": "Spatial Coordinate Y",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "pl_trueobliqerr2": {
+        "description": "True Obliquity Lower Unc.",
+        "unit": "deg",
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "z": {
+        "description": "Spatial Coordinate Z",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "htm20": {
+        "description": "Spatial Index",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "gaia_id": {
+        "description": "GAIA ID",
+        "unit": null,
+        "dtype": "<i8",
+        "time_info": null
+    },
+    "cb_flag": {
+        "description": "Circumbinary Flag",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    },
+    "sy_icmag": {
+        "description": "I (Cousins) Magnitude",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_icmagerr1": {
+        "description": "I (Cousins) Magnitude Upper Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "sy_icmagerr2": {
+        "description": "I (Cousins) Magnitude Lower Unc",
+        "unit": null,
+        "dtype": "<f8",
+        "time_info": null
+    },
+    "dkin_flag": {
+        "description": "Detected by Disk Kinematics",
+        "unit": null,
+        "dtype": "<i4",
+        "time_info": null
+    }
+}

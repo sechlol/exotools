@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "exotools"
-version = "0.0.4"
+version = "0.0.5"
 description = "Tools for working with exoplanet data"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -34,7 +34,7 @@ dependencies = [
     "pydantic",
     "oktopus",
     "lightkurve",
-    "astropy",
+    "astropy[recommended]",
     "astroquery",
     "casjobs",
     "tqdm",

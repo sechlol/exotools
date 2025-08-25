@@ -20,7 +20,7 @@ class LightcurveDataset(BaseDataset):
     as FITS files in the filesystem.
     """
 
-    _DATASET_LIGHTCURVES = "lightcurves"
+    _DATASET_NAME = "lightcurves"
 
     def __init__(
         self,
@@ -41,7 +41,7 @@ class LightcurveDataset(BaseDataset):
             verbose: Whether to output detailed progress information during downloads.
                 Default is False.
         """
-        super().__init__(dataset_name=self._DATASET_LIGHTCURVES, dataset_tag=dataset_tag, storage=None)
+        super().__init__(dataset_name=self._DATASET_NAME, dataset_tag=dataset_tag, storage=None)
         self._folder_path = lc_storage_path / self.name
         self._downloader = LightcurveDownloader(override_existing=override_existing, verbose=verbose)
 

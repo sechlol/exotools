@@ -22,8 +22,9 @@ except importlib.metadata.PackageNotFoundError:
 from .datasets import (
     CandidateExoplanetsDataset,
     GaiaParametersDataset,
-    KnownExoplanetsDataset,
     LightcurveDataset,
+    PlanetarySystemsCompositeDataset,
+    PlanetarySystemsDataset,
     TicCatalogDataset,
     TicObservationsDataset,
 )
@@ -33,8 +34,9 @@ from .utils.download import DownloadParams
 
 __all__ = [
     # Main dataset classes
-    "KnownExoplanetsDataset",
+    "PlanetarySystemsDataset",
     "CandidateExoplanetsDataset",
+    "PlanetarySystemsCompositeDataset",
     "TicCatalogDataset",
     "GaiaParametersDataset",
     "TicObservationsDataset",

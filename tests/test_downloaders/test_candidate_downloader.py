@@ -4,14 +4,14 @@ import pytest
 from astropy.table import QTable
 
 from exotools.downloaders import CandidateExoplanetsDownloader
-from exotools.downloaders.exoplanets_downloader import _get_error_parameters
+from exotools.downloaders.ps_downloader import get_error_parameters
 from exotools.utils.qtable_utils import QTableHeader
 
 
 class TestCandidateDownloader:
     @pytest.fixture
     def columns_with_units_to_fix(self) -> list[str]:
-        return _get_error_parameters(["pl_trandep"], True)
+        return get_error_parameters(["pl_trandep"], True)
 
     @pytest.fixture
     def tap_qtable_data(
