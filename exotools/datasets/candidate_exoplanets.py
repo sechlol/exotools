@@ -57,8 +57,8 @@ class CandidateExoplanetsDataset(BaseDataset):
     def download_candidate_exoplanets(
         self,
         limit: Optional[int] = None,
-        store: bool = True,
         with_name: Optional[str] = None,
+        store: bool = True,
     ) -> CandidateDB:
         """
         Retrieves candidate exoplanets data from NASA Exoplanet Archive and optionally
@@ -66,8 +66,8 @@ class CandidateExoplanetsDataset(BaseDataset):
 
         Args:
             limit: Maximum number of candidates to retrieve. Default is None (no limit).
-            store: Whether to store the downloaded data in the storage backend. Default is True.
             with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name
+            store: Whether to store the downloaded data in the storage backend. Default is True.
 
         Returns:
             Database object containing the downloaded candidate exoplanets data.

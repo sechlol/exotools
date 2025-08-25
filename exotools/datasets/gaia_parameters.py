@@ -42,15 +42,18 @@ class GaiaParametersDataset(BaseDataset):
             return None
 
     def download_gaia_parameters(
-        self, gaia_ids: Sequence[int], store: bool = True, with_name: Optional[str] = None
+        self,
+        gaia_ids: Sequence[int],
+        with_name: Optional[str] = None,
+        store: bool = True,
     ) -> GaiaDB:
         """
         Download Gaia DR3 data for the given Gaia IDs.
 
         Args:
             gaia_ids: Sequence of Gaia IDs to download data for.
-            store: Whether to store the downloaded data.
             with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
+            store: Whether to store the downloaded data.
 
         Returns:
             GaiaDB: Database containing the downloaded Gaia parameters.

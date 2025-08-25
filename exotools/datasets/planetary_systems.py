@@ -137,11 +137,11 @@ class PlanetarySystemsDataset(BaseDataset):
     def download_known_exoplanets(
         self,
         with_gaia_star_data: bool = False,
-        store: bool = True,
         limit: Optional[int] = None,
         columns: Optional[Sequence[str]] = None,
         where: Optional[dict[str, Any | list[Any]]] = None,
         with_name: Optional[str] = None,
+        store: bool = True,
     ) -> ExoDB:
         """
         Download known exoplanets data from NASA Exoplanet Archive.
@@ -151,11 +151,11 @@ class PlanetarySystemsDataset(BaseDataset):
 
         Args:
             with_gaia_star_data: Whether to also download Gaia data for the host stars. Default is False.
-            store: Whether to store the downloaded data in the storage backend. Default is True.
             limit: Maximum number of exoplanets to retrieve. Default is None (no limit).
             columns: Specific columns to retrieve. Default is None (all available columns).
             where: Additional filters to apply to the data.
             with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
+            store: Whether to store the downloaded data in the storage backend. Default is True.
 
         Returns:
             Database object containing the downloaded exoplanets data.

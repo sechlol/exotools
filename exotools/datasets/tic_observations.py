@@ -35,8 +35,8 @@ class TicObservationsDataset(BaseDataset):
     def download_observation_metadata(
         self,
         targets_tic_id: Sequence[int],
-        store: bool = True,
         with_name: Optional[str] = None,
+        store: bool = True,
     ) -> TicObsDB:
         """
         Download TESS observation metadata for specified TIC IDs.
@@ -46,8 +46,8 @@ class TicObservationsDataset(BaseDataset):
 
         Args:
             targets_tic_id: List of TIC IDs to retrieve observation metadata for.
-            store: Whether to store the downloaded data in the storage backend. Default is True.
             with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
+            store: Whether to store the downloaded data in the storage backend. Default is True.
 
         Returns:
             TicObsDB: Database object containing the downloaded observation metadata.

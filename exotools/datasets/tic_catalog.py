@@ -56,8 +56,8 @@ class TicCatalogDataset(BaseDataset):
         limit: Optional[int] = None,
         star_mass_range: Optional[tuple[float, float]] = None,
         priority_threshold: Optional[float] = None,
-        store: bool = False,
         with_name: Optional[str] = None,
+        store: bool = False,
     ) -> TicDB:
         """
         Searches the TESS Input Catalog for targets matching the given criteria
@@ -69,9 +69,9 @@ class TicCatalogDataset(BaseDataset):
                 specified as (min_mass, max_mass) in solar masses. Default is None (no filtering).
             priority_threshold: Minimum priority value for targets.
                 Default is None (no filtering).
+            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
             store (bool): Whether to store the search results in the storage backend.
                 Default is False.
-            with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
 
         Returns:
             TicDB: Database object containing the search results.
@@ -97,7 +97,10 @@ class TicCatalogDataset(BaseDataset):
         return TicDB(dataset=catalog_qtable)
 
     def download_tic_targets_by_ids(
-        self, tic_ids: Sequence[int], store: bool = True, with_name: Optional[str] = None
+        self,
+        tic_ids: Sequence[int],
+        with_name: Optional[str] = None,
+        store: bool = True,
     ) -> TicDB:
         """
         Download TIC target information for specific TIC IDs.
@@ -107,8 +110,8 @@ class TicCatalogDataset(BaseDataset):
 
         Args:
             tic_ids: List of TIC IDs to retrieve information for.
-            store: Whether to store the downloaded data in the storage backend. Default is True.
             with_name: A distinctive name to give the dataset, it will be used as a postfix for the artifact name.
+            store: Whether to store the downloaded data in the storage backend. Default is True.
 
         Returns:
             TicDB: Database object containing the downloaded TIC target information.
