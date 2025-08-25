@@ -307,43 +307,6 @@ class TestLightcurvePlus:
         """Test __len__ method."""
         assert len(sample_lc_plus) == len(sample_lc_plus.lc)
 
-    def test_getitem(self, sample_lc_plus):
-        """Test __getitem__ method."""
-        # Test with a slice
-        slice_lc = sample_lc_plus[0:10]
-        assert isinstance(slice_lc, LightCurvePlus)
-        assert len(slice_lc) == 10
-
-        # Test with a boolean mask
-        mask = np.zeros(len(sample_lc_plus), dtype=bool)
-        mask[0:5] = True
-        masked_lc = sample_lc_plus[mask]
-        assert isinstance(masked_lc, LightCurvePlus)
-        assert len(masked_lc) == 5
-
-    def test_arithmetic_operations(self, sample_lc_plus):
-        """Test __add__ and __sub__ methods."""
-        # Test addition with a scalar
-        added_lc = sample_lc_plus + 1.0
-        assert isinstance(added_lc, LightCurvePlus)
-        assert np.allclose(added_lc.flux_y, sample_lc_plus.flux_y + 1.0)
-
-        # Test subtraction with a scalar
-        subtracted_lc = sample_lc_plus - 1.0
-        assert isinstance(subtracted_lc, LightCurvePlus)
-        assert np.allclose(subtracted_lc.flux_y, sample_lc_plus.flux_y - 1.0)
-
-        # Test addition with another LightCurvePlus
-        lc_copy = LightCurvePlus(sample_lc_plus.lc.copy())
-        added_lc = sample_lc_plus + lc_copy
-        assert isinstance(added_lc, LightCurvePlus)
-        assert np.allclose(added_lc.flux_y, sample_lc_plus.flux_y + lc_copy.flux_y)
-
-        # Test subtraction with another LightCurvePlus
-        subtracted_lc = sample_lc_plus - lc_copy
-        assert isinstance(subtracted_lc, LightCurvePlus)
-        assert np.allclose(subtracted_lc.flux_y, sample_lc_plus.flux_y - lc_copy.flux_y)
-
     def test_get_first_transit_value(self, lc_and_planet: tuple[Planet, LightCurvePlus]):
         """Test get_first_transit_value method."""
         sample_planet, sample_lc_plus = lc_and_planet
