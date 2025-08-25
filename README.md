@@ -22,19 +22,12 @@ Install exotools with pip:
 pip install exotools
 ```
 
-For development or the latest features, install from source:
-
-```bash
-git clone https://github.com/sechlol/exotools.git
-cd exotools
-pip install -e .
-```
 
 ## Getting Started
 
 ### Basic Usage with Default Storage
 
-The simplest way to get started is using the default in-memory storage:
+The simplest way to get started is using the default in-memory storage. Data will be cached in memory, and lost at the termination of the program.
 
 ```python
 from exotools import PlanetarySystemsDataset
@@ -43,7 +36,7 @@ from exotools import PlanetarySystemsDataset
 dataset = PlanetarySystemsDataset()
 
 # Download a small sample of known exoplanets
-exo_db = dataset.download_known_exoplanets(limit=10, store=True)
+exo_db = dataset.download_known_exoplanets(limit=10)
 
 # Access the data
 print(f"Downloaded {len(exo_db)} exoplanet records")
@@ -67,7 +60,7 @@ storage = Hdf5Storage("exoplanet_data.h5")
 dataset = PlanetarySystemsDataset(storage=storage)
 
 # Download and store data persistently
-exo_db = dataset.download_known_exoplanets(limit=100, store=True)
+exo_db = dataset.download_known_exoplanets(limit=100)
 
 # Later, load the same data from storage
 exo_db = dataset.load_known_exoplanets_dataset()
@@ -150,7 +143,7 @@ Cross-match with Gaia DR3 stellar parameters:
 
 ```python
 # Download with Gaia stellar data
-exo_db = dataset.download_known_exoplanets(with_gaia_star_data=True, store=True)
+exo_db = dataset.download_known_exoplanets(with_gaia_star_data=True)
 
 # Load Gaia data separately
 gaia_db = dataset.load_gaia_dataset_of_known_exoplanets()
@@ -192,7 +185,7 @@ dataset = GaiaParametersDataset(storage=storage)
 
 # Download Gaia data for specific Gaia source IDs
 gaia_ids = [1234567890123456789, 2345678901234567890]
-gaia_db = dataset.download_gaia_parameters(gaia_ids, store=True)
+gaia_db = dataset.download_gaia_parameters(gaia_ids)
 
 # Load from storage
 gaia_db = dataset.load_gaia_parameters_dataset()
@@ -229,7 +222,7 @@ tic_db = dataset.download_tic_targets(
 
 # Download specific TIC targets by ID
 tic_ids = [1234567, 2345678, 3456789]
-tic_db = dataset.download_tic_targets_by_ids(tic_ids, store=True)
+tic_db = dataset.download_tic_targets_by_ids(tic_ids)
 ```
 
 ### TESS Observation Metadata
@@ -245,8 +238,8 @@ TicObservationsDataset.authenticate_mast("your_mast_token")
 dataset = TicObservationsDataset(storage=storage)
 
 # Get observation metadata for specific TIC IDs
-tic_ids = exo_db.unique_tic_ids[:10]  # First 10 TIC IDs
-obs_db = dataset.download_observation_metadata(tic_ids, store=True)
+tic_ids = exo_db.view["tic_id"][:10]  # First 10 TIC IDs
+obs_db = dataset.download_observation_metadata(tic_ids)
 
 print(f"Found {len(obs_db)} TESS observations")
 ```
@@ -272,6 +265,20 @@ print(f"Downloaded {len(lc_db)} lightcurves")
 
 # Load previously downloaded lightcurves
 lc_db = lc_dataset.load_lightcurve_dataset()
+
+# Work with individual lightcurves and time conversions
+for lc_plus in lc_db.lightcurves[:3]:  # First 3 lightcurves
+    print(f"Original time system: {lc_plus.time_system}")
+
+    # Convert time formats in place (new API)
+    lc_plus.to_jd_time()     # Convert to Julian Date
+    print(f"After JD conversion: {lc_plus.time_system}")
+
+    lc_plus.to_btjd_time()   # Convert to Barycentric TESS Julian Date
+    print(f"After BTJD conversion: {lc_plus.time_system}")
+
+    lc_plus.to_bjd_time()    # Convert to Barycentric Julian Date
+    print(f"After BJD conversion: {lc_plus.time_system}")
 ```
 
 ## Object-Oriented Star System Interface
@@ -284,7 +291,7 @@ from exotools import PlanetarySystemsDataset
 dataset = PlanetarySystemsDataset(storage=storage)
 
 # Download data with Gaia cross-matching (required for star systems)
-exo_db = dataset.download_known_exoplanets(with_gaia_star_data=True, store=True)
+exo_db = dataset.download_known_exoplanets(with_gaia_star_data=True)
 
 # Load star system representation
 star_systems = dataset.load_star_system_dataset()
@@ -325,18 +332,15 @@ storage = Hdf5Storage("exoplanet_data.h5")
 
 # Download known exoplanets
 known_dataset = PlanetarySystemsDataset(storage=storage)
-exo_db = known_dataset.download_known_exoplanets(limit=50, store=True)
+exo_db = known_dataset.download_known_exoplanets(limit=50)
 
 # Download candidates
 candidate_dataset = CandidateExoplanetsDataset(storage=storage)
-candidates_db = candidate_dataset.download_candidate_exoplanets(limit=50, store=True)
+candidates_db = candidate_dataset.download_candidate_exoplanets(limit=50)
 
 # Get TESS observations for known exoplanets
 obs_dataset = TicObservationsDataset(storage=storage)
-obs_db = obs_dataset.download_observation_metadata(
-    exo_db.unique_tic_ids[:10],
-    store=True
-)
+obs_db = obs_dataset.download_observation_metadata(exo_db.view["tic_id"][:10])
 
 # Download lightcurves
 lc_dataset = LightcurveDataset(Path("lightcurves"))
@@ -379,7 +383,3 @@ If you use exotools in your research, please cite it as follows:
   note         = {Version 0.1.2},
 }
 ```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
