@@ -27,7 +27,7 @@ classifiers = [
 dependencies = [
     "numpy",
     "pandas[performance]",
-    "pyarrow==18.1.0",
+    "pyarrow==22.0.0",
     "tables",
     "tabulate",
     "h5py",
