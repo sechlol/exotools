@@ -102,9 +102,13 @@ class TestTessObservationsDownloader:
         # Create a list of 5000 IDs (should create 3 chunks with chunk_size=2000)
         many_ids = list(range(5000))
 
-        with patch("exotools.downloaders.tess_observations_downloader.Observations") as mock_observations, patch(
-            "exotools.downloaders.tess_observations_downloader.pd.concat", return_value=tess_observations_pandas_data
-        ) as mock_concat:
+        with (
+            patch("exotools.downloaders.tess_observations_downloader.Observations") as mock_observations,
+            patch(
+                "exotools.downloaders.tess_observations_downloader.pd.concat",
+                return_value=tess_observations_pandas_data,
+            ) as mock_concat,
+        ):
             # Mock Observations.query_criteria_columns_async to return our test data
             mock_observations.query_criteria_columns_async.return_value = tess_observations_pandas_data
 
@@ -122,9 +126,10 @@ class TestTessObservationsDownloader:
 
     def test_download_by_id_exception_handling(self, tess_ids: list[int]):
         """Test exception handling in download_by_id"""
-        with patch("exotools.downloaders.tess_observations_downloader.Observations") as mock_observations, patch(
-            "exotools.downloaders.tess_observations_downloader.logger"
-        ) as mock_logger:
+        with (
+            patch("exotools.downloaders.tess_observations_downloader.Observations") as mock_observations,
+            patch("exotools.downloaders.tess_observations_downloader.logger") as mock_logger,
+        ):
             # Mock Observations.query_criteria_columns_async to raise an exception
             mock_observations.query_criteria_columns_async.side_effect = Exception("Test exception")
 

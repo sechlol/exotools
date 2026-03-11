@@ -29,9 +29,10 @@ class TestTessCatalogDownloader:
 
     def test_download(self, tess_raw_data: QTable):
         """Test download functionality"""
-        with patch.object(TessCatalogDownloader, "_query_ctl_casjob") as mock_query, patch.object(
-            TessCatalogDownloader, "_get_table_header"
-        ) as mock_get_header:
+        with (
+            patch.object(TessCatalogDownloader, "_query_ctl_casjob") as mock_query,
+            patch.object(TessCatalogDownloader, "_get_table_header") as mock_get_header,
+        ):
             # Setup the mock to return our test data
             mock_query.return_value = tess_raw_data
 
@@ -76,9 +77,10 @@ class TestTessCatalogDownloader:
 
     def test_download_with_custom_params(self, tess_raw_data: QTable):
         """Test download with custom star mass range and priority threshold"""
-        with patch.object(TessCatalogDownloader, "_query_ctl_casjob") as mock_query, patch.object(
-            TessCatalogDownloader, "_get_table_header"
-        ) as mock_get_header:
+        with (
+            patch.object(TessCatalogDownloader, "_query_ctl_casjob") as mock_query,
+            patch.object(TessCatalogDownloader, "_get_table_header") as mock_get_header,
+        ):
             # Setup the mock to return our test data
             mock_query.return_value = tess_raw_data
 
@@ -165,9 +167,10 @@ class TestTessCatalogDownloader:
         # Create a list of 1000 IDs (should create 3 chunks with chunk_size=400)
         many_ids = list(range(1000))
 
-        with patch("exotools.downloaders.tess_catalog_downloader.TicService") as mock_tic_service_factory, patch(
-            "exotools.downloaders.tess_catalog_downloader.vstack", return_value=tess_raw_data
-        ) as mock_vstack:
+        with (
+            patch("exotools.downloaders.tess_catalog_downloader.TicService") as mock_tic_service_factory,
+            patch("exotools.downloaders.tess_catalog_downloader.vstack", return_value=tess_raw_data) as mock_vstack,
+        ):
             # Mock TicService
             mock_tic_service = MagicMock()
             mock_tic_service.query.return_value = tess_raw_data

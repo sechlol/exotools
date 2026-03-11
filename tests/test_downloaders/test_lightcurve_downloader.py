@@ -21,9 +21,11 @@ class TestLightcurveDownloader:
 
     def test_download_one_lc(self, download_params):
         """Test downloading a single lightcurve"""
-        with patch("exotools.downloaders.lightcurve_downloader.Observations") as mock_observations, patch(
-            "exotools.downloaders.lightcurve_downloader.Path.exists", return_value=False
-        ), patch("exotools.downloaders.lightcurve_downloader.Path.mkdir"):
+        with (
+            patch("exotools.downloaders.lightcurve_downloader.Observations") as mock_observations,
+            patch("exotools.downloaders.lightcurve_downloader.Path.exists", return_value=False),
+            patch("exotools.downloaders.lightcurve_downloader.Path.mkdir"),
+        ):
             # Mock the download_file method to return success
             mock_observations.download_file.return_value = ("COMPLETE", "Success", None)
 
@@ -42,9 +44,11 @@ class TestLightcurveDownloader:
 
     def test_download_one_lc_existing_file(self, download_params):
         """Test downloading a single lightcurve when the file already exists"""
-        with patch("exotools.downloaders.lightcurve_downloader.Observations") as mock_observations, patch(
-            "exotools.downloaders.lightcurve_downloader.Path.exists", return_value=True
-        ), patch("exotools.downloaders.lightcurve_downloader.Path.mkdir"):
+        with (
+            patch("exotools.downloaders.lightcurve_downloader.Observations") as mock_observations,
+            patch("exotools.downloaders.lightcurve_downloader.Path.exists", return_value=True),
+            patch("exotools.downloaders.lightcurve_downloader.Path.mkdir"),
+        ):
             # Create downloader and call download_one_lc
             downloader = LightcurveDownloader(override_existing=False)
             result = downloader.download_one_lc(download_params[0])
@@ -58,9 +62,11 @@ class TestLightcurveDownloader:
 
     def test_download_one_lc_override_existing(self, download_params):
         """Test downloading a single lightcurve with override_existing=True"""
-        with patch("exotools.downloaders.lightcurve_downloader.Observations") as mock_observations, patch(
-            "exotools.downloaders.lightcurve_downloader.Path.exists", return_value=True
-        ), patch("exotools.downloaders.lightcurve_downloader.Path.mkdir"):
+        with (
+            patch("exotools.downloaders.lightcurve_downloader.Observations") as mock_observations,
+            patch("exotools.downloaders.lightcurve_downloader.Path.exists", return_value=True),
+            patch("exotools.downloaders.lightcurve_downloader.Path.mkdir"),
+        ):
             # Mock the download_file method to return success
             mock_observations.download_file.return_value = ("COMPLETE", "Success", None)
 
@@ -77,11 +83,12 @@ class TestLightcurveDownloader:
 
     def test_download_one_lc_failure(self, download_params):
         """Test downloading a single lightcurve that fails"""
-        with patch("exotools.downloaders.lightcurve_downloader.Observations") as mock_observations, patch(
-            "exotools.downloaders.lightcurve_downloader.Path.exists", return_value=False
-        ), patch("exotools.downloaders.lightcurve_downloader.Path.mkdir"), patch(
-            "exotools.downloaders.lightcurve_downloader.logger"
-        ) as mock_logger:
+        with (
+            patch("exotools.downloaders.lightcurve_downloader.Observations") as mock_observations,
+            patch("exotools.downloaders.lightcurve_downloader.Path.exists", return_value=False),
+            patch("exotools.downloaders.lightcurve_downloader.Path.mkdir"),
+            patch("exotools.downloaders.lightcurve_downloader.logger") as mock_logger,
+        ):
             # Mock the download_file method to return failure
             mock_observations.download_file.return_value = ("ERROR", "Failed to download", None)
 
@@ -117,9 +124,11 @@ class TestLightcurveDownloader:
 
     def test_download_fits_parallel(self, download_params):
         """Test downloading multiple lightcurves in parallel"""
-        with patch("exotools.downloaders.lightcurve_downloader.Parallel") as mock_parallel, patch(
-            "exotools.downloaders.lightcurve_downloader.delayed"
-        ), patch("exotools.downloaders.lightcurve_downloader.os.cpu_count", return_value=4):
+        with (
+            patch("exotools.downloaders.lightcurve_downloader.Parallel") as mock_parallel,
+            patch("exotools.downloaders.lightcurve_downloader.delayed"),
+            patch("exotools.downloaders.lightcurve_downloader.os.cpu_count", return_value=4),
+        ):
             # Mock the parallel execution
             mock_generator = MagicMock()
             mock_generator.__iter__.return_value = [Path(p.download_path) for p in download_params]
@@ -139,9 +148,10 @@ class TestLightcurveDownloader:
 
     def test_search_available_lightcurve_data(self):
         """Test search_available_lightcurve_data function"""
-        with patch("exotools.downloaders.lightcurve_downloader._search_mast_target") as mock_search, patch(
-            "exotools.downloaders.lightcurve_downloader._download_lightcurve_data"
-        ) as mock_download:
+        with (
+            patch("exotools.downloaders.lightcurve_downloader._search_mast_target") as mock_search,
+            patch("exotools.downloaders.lightcurve_downloader._download_lightcurve_data") as mock_download,
+        ):
             # Mock the search and download functions
             mock_search_result = MagicMock()
             mock_search_result.__len__.return_value = 5
@@ -164,9 +174,10 @@ class TestLightcurveDownloader:
 
     def test_search_available_lightcurve_data_no_results(self):
         """Test search_available_lightcurve_data function with no results"""
-        with patch("exotools.downloaders.lightcurve_downloader._search_mast_target") as mock_search, patch(
-            "exotools.downloaders.lightcurve_downloader._download_lightcurve_data"
-        ) as mock_download:
+        with (
+            patch("exotools.downloaders.lightcurve_downloader._search_mast_target") as mock_search,
+            patch("exotools.downloaders.lightcurve_downloader._download_lightcurve_data") as mock_download,
+        ):
             # Mock the search function to return empty results
             mock_search_result = MagicMock()
             mock_search_result.__len__.return_value = 0
