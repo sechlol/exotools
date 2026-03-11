@@ -14,9 +14,9 @@ class TestGaiaDownloader:
         # Get test data and make a copy to modify
         in_table = gaia_parameters_test_data[0].copy()
 
-        # Rename gaia_id to source_id to match the raw data from the service
-        if "gaia_id" in in_table.colnames:
-            in_table.rename_column("gaia_id", "source_id")
+        # Rename gaia_dr3_id to source_id to match the raw data from the service
+        if "gaia_dr3_id" in in_table.colnames:
+            in_table.rename_column("gaia_dr3_id", "source_id")
 
         # Convert column names to uppercase to simulate raw Gaia data
         for col_name in list(in_table.colnames):
@@ -87,8 +87,8 @@ class TestGaiaDownloader:
             for col_name in result.colnames:
                 assert col_name.islower()
 
-            # Assert that source_id was renamed to gaia_id
-            assert "gaia_id" in result.colnames
+            # Assert that source_id was renamed to gaia_dr3_id
+            assert "gaia_dr3_id" in result.colnames
             assert "source_id" not in result.colnames
 
             # Assert that GaiaService.get_field_info was called for both tables

@@ -5,8 +5,14 @@
         "dtype": "<i8",
         "time_info": null
     },
-    "gaia_id": {
-        "description": "GAIA ID",
+    "gaia_dr2_id": {
+        "description": "Gaia DR2 ID",
+        "unit": null,
+        "dtype": "<i8",
+        "time_info": null
+    },
+    "gaia_dr3_id": {
+        "description": "Gaia DR3 ID",
         "unit": null,
         "dtype": "<i8",
         "time_info": null

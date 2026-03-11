@@ -107,7 +107,7 @@ def compare_qtables(expected_table: QTable, test_table: QTable, excluded_unit_ch
 
         # Check units match (if applicable)
         if hasattr(expected_col, "unit"):
-            if expected_col.unit != test_col.unit:
+            if expected_col.unit != test_col.unit and str(expected_col.unit) != str(test_col.unit):
                 # Check if this column/unit is in the excluded list
                 if col_name in excluded_unit_checks and (
                     excluded_unit_checks[col_name] is None or excluded_unit_checks[col_name] == test_col.unit

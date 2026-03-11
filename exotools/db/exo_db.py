@@ -18,11 +18,11 @@ class ExoDB(PsDB):
 
     @staticmethod
     def impute_stellar_parameters(dataset: QTable, gaia_data: QTable):
-        subset_exo = dataset["gaia_id", "st_rad", "pl_ratror", "pl_ratdor", "pl_rade", "pl_orbsmax"]
-        subset_gaia = gaia_data[["gaia_id", "radius"]]
+        subset_exo = dataset["gaia_dr3_id", "st_rad", "pl_ratror", "pl_ratdor", "pl_rade", "pl_orbsmax"]
+        subset_gaia = gaia_data[["gaia_dr3_id", "radius"]]
 
         # Join exoplanets dataset with Gaia dataset
-        joined = join(subset_exo, subset_gaia, keys="gaia_id", join_type="left")
+        joined = join(subset_exo, subset_gaia, keys="gaia_dr3_id", join_type="left")
         valid_radius = ~joined["radius"].mask
 
         # Find the properties that can be repaired
@@ -31,7 +31,7 @@ class ExoDB(PsDB):
         recoverable_ratdor = joined["pl_ratdor"].mask & ~joined["pl_orbsmax"].mask & valid_radius
 
         # Needs to sort the dataset, as the joined table gets sorted by key
-        dataset.sort(keys="gaia_id")
+        dataset.sort(keys="gaia_dr3_id")
 
         # Repair
         dataset["st_rad"][recoverable_radius] = joined["radius"][recoverable_radius]

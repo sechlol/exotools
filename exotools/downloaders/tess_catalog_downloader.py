@@ -30,7 +30,7 @@ class TessCatalogDownloader(BaseDownloader):
     _mandatory_fields = {"ra", "dec", "priority"}
     _extra_field_descriptions = {
         "tic_id": "Star TIC id [int64]",
-        "gaia_id": "Star GAIA id [int64]",
+        "gaia_dr3_id": "Star GAIA id [int64]",
         "ra": "Star right ascension [deg]",
         "dec": "Star declination [deg]",
         "priority": "Higher priority is assigned to the TESS team to targets that are likely to host planets",
@@ -85,12 +85,12 @@ class TessCatalogDownloader(BaseDownloader):
     def _clean_and_fix(self, table: QTable) -> QTable:
         override_units(table, self._units_override)
 
-        # Force gaia_id to be integer
-        column = table["gaia_id"]
+        # Force gaia_dr3_id to be integer
+        column = table["gaia_dr3_id"]
         if column.dtype != int:
             if isinstance(column, MaskedColumn):
                 column = column.filled(NAN_VALUE).value
-            table["gaia_id"] = column.astype(int)
+            table["gaia_dr3_id"] = column.astype(int)
         return table
 
     def _get_table_header(self, table: QTable) -> QTableHeader:
@@ -111,7 +111,7 @@ class TessCatalogDownloader(BaseDownloader):
         for i, ids in tqdm(enumerate(chunks), desc="Querying TIC chunks", total=len(chunks)):
             formatted_ids = ",".join([f"'{tid}'" for tid in ids])
 
-            query = f"""select id as tic_id, gaia as gaia_id, {fields}
+            query = f"""select id as tic_id, gaia as gaia_dr3_id, {fields}
                         from dbo.CatalogRecord
                         where gaia is not null and id IN ({formatted_ids})"""
             table = self._tic_service.query(query_string=query)
@@ -122,7 +122,7 @@ class TessCatalogDownloader(BaseDownloader):
     def _download(self, limit: Optional[int] = None, columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
         limit_clause = f"top {limit}" if limit else ""
         fields = ",".join(list(self._mandatory_fields | set(columns or [])))
-        query = f"""select {limit_clause} id as tic_id, gaia as gaia_id, {fields}
+        query = f"""select {limit_clause} id as tic_id, gaia as gaia_dr3_id, {fields}
                 from dbo.CatalogRecord
                 where gaia is not null
                     and priority > {self._priority_threshold}

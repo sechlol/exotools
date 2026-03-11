@@ -58,7 +58,7 @@ def generate_test_qtables():
 
     # Reload datasets to compare them
     loaded = [
-        known_ds.load_known_exoplanets_dataset(),
+        known_ds.load_known_exoplanets_dataset(with_gaia_star_data=True),
         candidates_ds.load_candidate_exoplanets_dataset(),
         composite_ds.load_composite_dataset(),
         tic_obs_dataset.load_observation_metadata(),

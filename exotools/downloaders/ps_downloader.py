@@ -121,18 +121,20 @@ def get_fixed_table_header(table: QTable, table_name: str, tap_service: TapServi
 
 def parse_ids(table: QTable):
     """
-    Parses some relevant IDs to their numerical representation, from string to masked integer
+    Parses some relevant IDs to their numerical representation, from string to masked integer.
     """
     fill_value = -1
     tic_ids = np.char.split(table["tic_id"].astype(str), " ")
-    gaia_ids = np.char.split(table["gaia_id"].astype(str), " ")
+    gaia_dr2_ids = np.char.split(table["gaia_dr2_id"].astype(str), " ")
+    gaia_dr3_ids = np.char.split(table["gaia_dr3_id"].astype(str), " ")
 
-    # Extract the desired elements and convert to pandas nullable integer type
     tic_id_extracted = [int(item[1]) if len(item) > 1 else fill_value for item in tic_ids]
-    gaia_id_extracted = [int(item[2]) if len(item) > 2 else fill_value for item in gaia_ids]
+    gaia_dr2_id_extracted = [int(item[2]) if len(item) > 2 else fill_value for item in gaia_dr2_ids]
+    gaia_dr3_id_extracted = [int(item[2]) if len(item) > 2 else fill_value for item in gaia_dr3_ids]
 
     table["tic_id"] = MaskedColumn(tic_id_extracted, fill_value=fill_value, dtype=np.int64)
-    table["gaia_id"] = MaskedColumn(gaia_id_extracted, fill_value=fill_value, dtype=np.int64)
+    table["gaia_dr2_id"] = MaskedColumn(gaia_dr2_id_extracted, fill_value=fill_value, dtype=np.int64)
+    table["gaia_dr3_id"] = MaskedColumn(gaia_dr3_id_extracted, fill_value=fill_value, dtype=np.int64)
 
 
 def _get_where_clause(where: Optional[dict[str, Any | list[Any]]]) -> str:
@@ -171,7 +173,8 @@ def fill_error_bounds(dataset: QTable):
 
 _MANDATORY_FIELDS = [
     "tic_id",
-    "gaia_id",
+    "gaia_dr2_id",
+    "gaia_dr3_id",
     "hostname",
     "pl_name",
     "pl_orbeccen",
@@ -197,7 +200,8 @@ _MANDATORY_FIELDS = [
 # TODO: Maybe slim down the field list to only the relevant ones?
 _ALL_FIELDS = [
     "tic_id",
-    "gaia_id",
+    "gaia_dr2_id",
+    "gaia_dr3_id",
     "pl_name",
     "pl_letter",
     "hostname",

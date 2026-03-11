@@ -95,7 +95,8 @@ class PlanetarySystemsCompositeDownloader(BaseDownloader):
 
 _MANDATORY_FIELDS = [
     "tic_id",
-    "gaia_id",
+    "gaia_dr2_id",
+    "gaia_dr3_id",
     "hostname",
     "pl_name",
     "pl_orbeccen",

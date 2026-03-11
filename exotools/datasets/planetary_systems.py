@@ -173,7 +173,7 @@ class PlanetarySystemsDataset(BaseDataset):
             self._storage.write_qtable(table=exo_qtable, header=exo_header, table_name=table_name, override=True)
 
         if with_gaia_star_data:
-            gaia_ids = np.unique(exo_qtable["gaia_id"].value).tolist()
+            gaia_ids = np.unique(exo_qtable["gaia_dr3_id"].value).tolist()
             gaia_db = self._gaia_dataset.download_gaia_parameters(gaia_ids=gaia_ids, store=store, with_name=with_name)
         else:
             gaia_db = None

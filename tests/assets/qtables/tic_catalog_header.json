@@ -5,9 +5,15 @@
         "dtype": null,
         "time_info": null
     },
-    "gaia_id": {
+    "gaia_dr3_id": {
         "description": "Star GAIA id [int64]",
         "unit": null,
+        "dtype": null,
+        "time_info": null
+    },
+    "ra": {
+        "description": "Star right ascension [deg]",
+        "unit": "deg",
         "dtype": null,
         "time_info": null
     },
@@ -20,12 +26,6 @@
     "priority": {
         "description": "Higher priority is assigned to the TESS team to targets that are likely to host planets",
         "unit": null,
-        "dtype": null,
-        "time_info": null
-    },
-    "ra": {
-        "description": "Star right ascension [deg]",
-        "unit": "deg",
         "dtype": null,
         "time_info": null
     }
