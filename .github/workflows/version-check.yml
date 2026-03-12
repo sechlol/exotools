@@ -1,0 +1,31 @@
+name: Version Check
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  version-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check PyPI versions
+        uses: maybe-hello-world/pyproject-check-version@v4
+        id: versioncheck
+        with:
+          pyproject-path: "./pyproject.toml"
+
+      - name: Check output
+        run: |
+          echo "Output: ${{ steps.versioncheck.outputs.local_version_is_higher }}"
+          echo "Local version: ${{ steps.versioncheck.outputs.local_version }}"
+          echo "Public version: ${{ steps.versioncheck.outputs.public_version }}"
+
+      - name: Fail if version not bumped
+        if: steps.versioncheck.outputs.local_version_is_higher != 'true'
+        run: exit 1

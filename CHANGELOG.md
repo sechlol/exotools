@@ -2,6 +2,20 @@
 
 All notable changes to the exotools package will be documented in this file.
 
+## [0.3.0] - 2026-03-12
+
+### Fixed
+- Fixed a breaking change with the PS table, removing `gaia_id` and replacing it with `gaia_dr2_id` and `gaia_dr3_id`
+- Add version check workflow
+
+
+## [0.2.0] - 2026-03-11
+
+### Changed
+- Start using `uv` for dependency tracking.
+- Deprecate Python 3.10 and 3.11
+
+
 ## [0.1.0] - 2025-07-28
 
 ### Added

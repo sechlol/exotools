@@ -9,7 +9,7 @@ from exotools.utils.qtable_utils import QTableHeader, TableColumnInfo, get_empty
 def _get_subset_df(table: QTable) -> pd.DataFrame:
     """Select a subset of data from the main exoplanet dataset, including upper and lower bounds"""
     err_cols = []
-    dataset_columns = ["tic_id", "gaia_id", "disc_telescope", "rowupdate"]
+    dataset_columns = ["tic_id", "gaia_dr3_id", "disc_telescope", "rowupdate"]
     star_columns = ["hostname", "hostname_lowercase", "st_rad", "st_rad_gaia", "st_mass"]
     planet_columns = [
         "pl_name",

@@ -12,7 +12,7 @@ class TicDB(BaseDB):
     Dtypes:
     -------------------
     tic_id        int64
-    gaia_id       int64
+    gaia_dr3_id   int64
     priority    float64
     ra          float64
     dec         float64
@@ -31,7 +31,7 @@ class TicDB(BaseDB):
 
     @property
     def gaia_ids(self) -> np.ndarray:
-        return self.view["gaia_id"].value
+        return self.view["gaia_dr3_id"].value
 
     @property
     def unique_tic_ids(self) -> np.ndarray:

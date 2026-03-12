@@ -9,7 +9,7 @@ class TestGaiaDb:
         """Test initialization of GaiaDB."""
         # Check that the dataset was properly set
         assert len(gaia_test_db) > 0
-        assert gaia_test_db._id_column == "gaia_id"
+        assert gaia_test_db._id_column == "gaia_dr3_id"
 
     def test_gaia_ids_property(self, gaia_test_db):
         """Test the gaia_ids property."""

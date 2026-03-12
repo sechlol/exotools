@@ -17,7 +17,11 @@ class PsDB(BaseDB, metaclass=ABCMeta):
 
     @property
     def gaia_ids(self) -> np.ndarray:
-        return self.view["gaia_id"].value
+        return self.view["gaia_dr3_id"].value
+
+    @property
+    def gaia_dr2_ids(self) -> np.ndarray:
+        return self.view["gaia_dr2_id"].value
 
     @property
     def unique_tic_ids(self) -> np.ndarray:
@@ -26,6 +30,10 @@ class PsDB(BaseDB, metaclass=ABCMeta):
     @property
     def unique_gaia_ids(self) -> np.ndarray:
         return np.unique(self.gaia_ids)
+
+    @property
+    def unique_gaia_dr2_ids(self) -> np.ndarray:
+        return np.unique(self.gaia_dr2_ids)
 
     def get_star_names(self) -> list[str]:
         return np.unique(self.view["hostname"]).tolist()

@@ -25,11 +25,12 @@ class TestPlanetarySystemsDownloader:
 
         # Modify the TIC and Gaia IDs to match the raw format from the service
         tic_ids = in_table["tic_id"]
-        gaia_ids = in_table["gaia_id"]
+        gaia_dr3_ids = in_table["gaia_dr3_id"]
 
-        # Convert to string format as they appear in raw data: "TIC 123456789" and "Gaia DR3 123456789"
+        # Convert to string format as they appear in raw data
         in_table["tic_id"] = Column(["TIC " + str(tid) if tid != -1 else "" for tid in tic_ids])
-        in_table["gaia_id"] = Column(["Gaia DR3 " + str(gid) if gid != -1 else "" for gid in gaia_ids])
+        in_table["gaia_dr2_id"] = Column(["Gaia DR2 " + str(gid) if gid != -1 else "" for gid in gaia_dr3_ids])
+        in_table["gaia_dr3_id"] = Column(["Gaia DR3 " + str(gid) if gid != -1 else "" for gid in gaia_dr3_ids])
 
         return in_table
 
@@ -77,9 +78,11 @@ class TestPlanetarySystemsDownloader:
 
             # Assert that TIC and Gaia IDs were parsed correctly
             assert isinstance(result["tic_id"], MaskedColumn)
-            assert isinstance(result["gaia_id"], MaskedColumn)
+            assert isinstance(result["gaia_dr2_id"], MaskedColumn)
+            assert isinstance(result["gaia_dr3_id"], MaskedColumn)
             assert result["tic_id"].dtype == np.dtype("int64")
-            assert result["gaia_id"].dtype == np.dtype("int64")
+            assert result["gaia_dr2_id"].dtype == np.dtype("int64")
+            assert result["gaia_dr3_id"].dtype == np.dtype("int64")
 
             # Assert that pl_trandur units are restored to hours
             for col_name in result.colnames:
@@ -111,7 +114,7 @@ class TestPlanetarySystemsDownloader:
     def test_with_columns(self, tap_qtable_data: QTable, descriptions: dict[str, str]):
         """Test download with columns parameter"""
         # Select a subset of columns, ensuring mandatory fields are included
-        mandatory_fields = ["tic_id", "gaia_id", "hostname", "pl_name", "default_flag"]
+        mandatory_fields = ["tic_id", "gaia_dr2_id", "gaia_dr3_id", "hostname", "pl_name", "default_flag"]
         additional_cols = ["pl_orbper", "pl_orbsmax", "pl_bmasse"]
         selected_cols = mandatory_fields + additional_cols
 

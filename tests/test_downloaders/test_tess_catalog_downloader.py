@@ -57,7 +57,7 @@ class TestTessCatalogDownloader:
             # Check that the query contains the expected elements
             assert "top 100" in query
             assert "id as tic_id" in query
-            assert "gaia as gaia_id" in query
+            assert "gaia as gaia_dr3_id" in query
             assert "priority > " in query
             assert "mass between " in query
 
@@ -67,10 +67,10 @@ class TestTessCatalogDownloader:
 
             # Assert that column names were converted correctly
             assert "tic_id" in result.colnames
-            assert "gaia_id" in result.colnames
+            assert "gaia_dr3_id" in result.colnames
 
-            # Assert that gaia_id was converted to integer
-            assert result["gaia_id"].dtype == np.int64
+            # Assert that gaia_dr3_id was converted to integer
+            assert result["gaia_dr3_id"].dtype == np.int64
 
             # Verify that _get_table_header was called
             mock_get_header.assert_called_once()
@@ -133,7 +133,7 @@ class TestTessCatalogDownloader:
             for tic_id in tess_ids:
                 assert f"'{tic_id}'" in query
             assert "id as tic_id" in query
-            assert "gaia as gaia_id" in query
+            assert "gaia as gaia_dr3_id" in query
 
             # Verify the result
             assert result is not None
@@ -141,7 +141,7 @@ class TestTessCatalogDownloader:
 
             # Assert that column names were converted correctly
             assert "tic_id" in result.colnames
-            assert "gaia_id" in result.colnames
+            assert "gaia_dr3_id" in result.colnames
 
     def test_download_by_id_with_columns(self, tess_raw_data: QTable, tess_ids: list[int]):
         """Test download_by_id with extra columns parameter"""

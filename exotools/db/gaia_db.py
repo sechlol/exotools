@@ -6,7 +6,7 @@ from exotools.utils.masked_operations import safe_average
 
 from .base_db import BaseDB
 
-_ID_FIELD = "gaia_id"
+_ID_FIELD = "gaia_dr3_id"
 
 
 class GaiaDB(BaseDB):
@@ -18,7 +18,7 @@ class GaiaDB(BaseDB):
 
     @property
     def gaia_ids(self) -> np.ndarray:
-        return self.view["gaia_id"].value
+        return self.view["gaia_dr3_id"].value
 
     @property
     def unique_gaia_ids(self) -> np.ndarray:

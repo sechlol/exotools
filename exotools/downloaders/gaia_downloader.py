@@ -56,8 +56,8 @@ class GaiaDownloader(BaseDownloader):
         # _, unique_indices = np.unique(table['source_id'], return_index=True)
         # unique_table = table[sorted(unique_indices)]
 
-        # Rename source_id -> gaia_id
-        table.rename_column("source_id", "gaia_id")
+        # Rename source_id -> gaia_dr3_id
+        table.rename_column("source_id", "gaia_dr3_id")
 
         return table
 
