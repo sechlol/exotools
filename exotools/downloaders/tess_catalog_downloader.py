@@ -40,7 +40,7 @@ class TessCatalogDownloader(BaseDownloader):
 
     def __init__(
         self,
-        username: str,
+        user_wsid: int,
         password: str,
         star_mass_range: tuple[float, float] = (0.7, 1.3),
         priority_threshold: float = 0.001,
@@ -49,14 +49,15 @@ class TessCatalogDownloader(BaseDownloader):
         """
         TODO: write docs for parmeters
         This class uses CasJobs interface to query the service, you need to create an account at
-        https://mastweb.stsci.edu/mcasjobs/CreateAccount.aspx and provide the username and password
+        https://mastweb.stsci.edu/mcasjobs/CreateAccount.aspx and provide your WSID and password.
+        The WSID can be found in your CasJobs profile at https://mastweb.stsci.edu/mcasjobs/changedetails.aspx
         """
         self._priority_threshold = priority_threshold
         self._star_mass_range = star_mass_range
 
         self._verbose_log = verbose_log
         self._casjob_api = CasJobs(
-            userid=username,
+            userid=user_wsid,
             password=password,
             base_url="https://mastweb.stsci.edu/mcasjobs/services/jobs.asmx",
             context=self._catalog,

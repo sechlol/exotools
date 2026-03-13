@@ -228,10 +228,10 @@ class TestDatasets:
                     catalog_dataset.download_tic_targets_by_ids(tic_ids=[123456])
 
                 # 3. Test that authentication enables TIC queries
-                TicCatalogDataset.authenticate_casjobs(username="test_user", password="test_pass")
+                TicCatalogDataset.authenticate_casjobs(user_wsid=12345, password="test_pass")
 
                 # Verify that the catalog downloader was created with the right credentials
-                mock_cat_downloader_class.assert_called_once_with(username="test_user", password="test_pass")
+                mock_cat_downloader_class.assert_called_once_with(user_wsid=12345, password="test_pass")
 
                 # Now TIC queries should work
                 catalog_dataset.download_tic_targets(limit=10)
@@ -288,7 +288,7 @@ class TestDatasets:
                 assert len(loaded_db._ds) == len(qtable)
 
                 # Test download_tic_targets
-                TicCatalogDataset.authenticate_casjobs("username", "password")
+                TicCatalogDataset.authenticate_casjobs(12345, "password")
 
                 test_limit = 50
                 test_mass_range = (0.8, 1.2)

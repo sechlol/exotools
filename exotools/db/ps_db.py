@@ -38,6 +38,9 @@ class PsDB(BaseDB, metaclass=ABCMeta):
     def get_star_names(self) -> list[str]:
         return np.unique(self.view["hostname"]).tolist()
 
+    def get_planet_names(self) -> list[str]:
+        return np.unique(self.view["pl_name"]).tolist()
+
     def get_tess_planets(self) -> Self:
         # Create a boolean mask for rows where disc_telescope contains "TESS"
         mask_tess = np.char.find(self.view["disc_telescope"].value.astype("U"), "TESS") != -1
