@@ -1,8 +1,6 @@
 import logging
-import os
 
 import numpy as np
-from dotenv import load_dotenv
 
 from exotools import (
     CandidateExoplanetsDataset,
@@ -13,6 +11,7 @@ from exotools import (
     TicObservationsDataset,
 )
 from exotools.datasets import GaiaParametersDataset
+from exotools.utils.secrets import load_secrets
 from tests.conftest import _TEST_ASSETS_DIR, TEST_ASSETS_LC, TEST_FOLDER_ROOT, TEST_STORAGE
 from tests.utils.table_comparison import compare_qtables
 
@@ -22,7 +21,7 @@ _HOSTNAME_FILE = _TEST_ASSETS_DIR / "planet_hostnames.txt"
 _LIMIT = 150
 
 
-def generate_test_qtables():
+def generate_test_qtables(secrets):
     known_ds = PlanetarySystemsDataset(storage=TEST_STORAGE)
     composite_ds = PlanetarySystemsCompositeDataset(storage=TEST_STORAGE)
     candidates_ds = CandidateExoplanetsDataset(storage=TEST_STORAGE)
@@ -31,8 +30,8 @@ def generate_test_qtables():
     tic_dataset = TicCatalogDataset(storage=TEST_STORAGE)
 
     TicCatalogDataset.authenticate_casjobs(
-        user_wsid=os.environ.get("CASJOB_WSID"),
-        password=os.environ.get("CASJOB_PASSWORD"),
+        user_wsid=secrets.casjob_wsid,
+        password=secrets.casjob_password,
     )
 
     planet_hostnames = _HOSTNAME_FILE.read_text().splitlines()
@@ -87,23 +86,10 @@ def generate_test_lightcurves():
     lc_dataset.download_lightcurves_from_tic_db(small_meta)
 
 
-def ensure_credentials():
-    required_credentials = ["CASJOB_USER", "CASJOB_PASSWORD", "MAST_TOKEN"]
-    for cred in required_credentials:
-        if os.environ.get(cred) is None:
-            raise ValueError(f"Missing required environment variable '{cred}', please set it and try again.")
-
-
-def load_secrets():
-    load_dotenv(dotenv_path=TEST_FOLDER_ROOT.parent / ".env")
-
-
 def main():
-    # Example way to set credentials
-    load_secrets()
-
-    ensure_credentials()
-    generate_test_qtables()
+    secrets = load_secrets(TEST_FOLDER_ROOT.parent / ".env")
+    TicObservationsDataset.authenticate_mast(mast_token=secrets.mast_token)
+    generate_test_qtables(secrets)
     generate_test_lightcurves()
     logger.info("Done!")
 
