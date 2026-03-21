@@ -105,11 +105,11 @@ class TapService:
             raise KeyError(f"{table_name} not in TapService {self._url}")
         return [c.name for c in tables[table_name].columns]
 
-    def query(self, query_string: str, timeout: float = 300.0) -> QTable:
+    def query(self, query_string: str, timeout: float = 300.0, maxrec: Optional[int] = None) -> QTable:
         last_error = None
         for attempt in range(1, self._max_retries + 1):
             try:
-                result = self._service.run_async(query_string, timeout=timeout)
+                result = self._service.run_async(query_string, timeout=timeout, maxrec=maxrec)
                 return result.to_qtable()
             except Exception as e:
                 last_error = e
@@ -145,7 +145,7 @@ class TapService:
 
         total_chunks = (total_records + self.MAX_CHUNK_SIZE - 1) // self.MAX_CHUNK_SIZE
         for offset in tqdm(range(0, total_records, self.MAX_CHUNK_SIZE), total=total_chunks, desc="Downloading chunks"):
-            yield self.query(query.format(offset=offset))
+            yield self.query(query.format(offset=offset), maxrec=self.MAX_CHUNK_SIZE)
 
     def query_chunks(
         self,

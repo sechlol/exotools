@@ -50,7 +50,7 @@ class CandidateExoplanetsDownloader(BaseDownloader):
         query_str = f"select {limit_clause} {fields} from {self._table_name}"
 
         logger.info("Downloading Candidate exoplanets...")
-        dataset = self._exo_service.query(query_str)
+        dataset = self._exo_service.query(query_str, maxrec=limit or 50_000)
         n_unique = len(pd.unique(dataset["toi"]))
 
         logger.info(f"DONE! Collected {n_unique} unique candidates, for a total of {len(dataset)} records.")

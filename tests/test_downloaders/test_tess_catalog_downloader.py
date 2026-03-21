@@ -164,7 +164,7 @@ class TestTessCatalogDownloader:
 
     def test_download_by_id_chunks(self, tess_raw_data: QTable):
         """Test download_by_id with many IDs that require chunking"""
-        # Create a list of 1000 IDs (should create 3 chunks with chunk_size=400)
+        # Create a list of 1000 IDs (should create 10 chunks with chunk_size=100)
         many_ids = list(range(1000))
 
         with (
@@ -181,7 +181,7 @@ class TestTessCatalogDownloader:
             result, _ = downloader.download_by_id(many_ids)
 
             # Assert that TicService.query was called multiple times (once per chunk)
-            assert mock_tic_service.query.call_count == 3  # 1000 IDs / 400 per chunk = 3 chunks (rounded up)
+            assert mock_tic_service.query.call_count == 10  # 1000 IDs / 100 per chunk = 10 chunks
 
             # Assert that vstack was called to combine the results
             mock_vstack.assert_called_once()

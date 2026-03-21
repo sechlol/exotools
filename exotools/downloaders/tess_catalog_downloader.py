@@ -103,8 +103,7 @@ class TessCatalogDownloader(BaseDownloader):
         return header
 
     def _download_by_id(self, ids: Sequence[int], columns: Optional[Sequence[str]] = None, **kwargs) -> QTable:
-        # Bigger chunk size will cause a server error, because the query becomes too big
-        chunk_size = 400
+        chunk_size = 100
         all_tables = []
         chunks = list(iterate_chunks(ids=ids, chunk_size=chunk_size))
 
@@ -115,7 +114,7 @@ class TessCatalogDownloader(BaseDownloader):
             query = f"""select id as tic_id, gaia as gaia_dr3_id, {fields}
                         from dbo.CatalogRecord
                         where gaia is not null and id IN ({formatted_ids})"""
-            table = self._tic_service.query(query_string=query)
+            table = self._tic_service.query(query_string=query, maxrec=chunk_size)
             all_tables.append(table)
 
         return QTable(vstack(all_tables))

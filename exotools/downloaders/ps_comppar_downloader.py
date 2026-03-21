@@ -60,7 +60,7 @@ class PlanetarySystemsCompositeDownloader(BaseDownloader):
 
         logger.info("Downloading Candidate exoplanets...")
         with silence_warnings():
-            dataset = self._exo_service.query(query_str)
+            dataset = self._exo_service.query(query_str, maxrec=limit or 50_000)
 
         logger.info(f"DONE! Collected {len(dataset)} unique planets.")
         return dataset
