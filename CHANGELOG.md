@@ -2,6 +2,14 @@
 
 All notable changes to the exotools package will be documented in this file.
 
+## [0.4.1] - 2026-03-21
+
+### Added
+- `TapService.check_availability()` calls the VOSI `{url}/availability` endpoint and returns True when the VOSI availability document marks the service as available.
+
+### Changed
+- `TapService.query` uses asynchronous TAP execution (`run_async`) instead of `run_sync`, adds a `timeout` argument (default 300 seconds), and retries failed queries with the same backoff policy as table metadata loading.
+
 ## [0.4.0] - 2026-03-21
 
 ### Changed
