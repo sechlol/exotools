@@ -71,7 +71,7 @@ class PlanetarySystemsDownloader(BaseDownloader):
         query_str = f"select {limit_clause} {fields} from {self._table_name} {where_clause}"
 
         logger.info(f"Querying {self._exo_service.url}...")
-        dataset = self._exo_service.query(query_str)
+        dataset = self._exo_service.query(query_str, maxrec=limit or 50_000)
         n_planets = len(pd.unique(dataset["pl_name"]))
         n_records = len(dataset)
 
