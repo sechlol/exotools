@@ -1,7 +1,10 @@
 import logging
 import time
+import xml.etree.ElementTree as ET
 from functools import cache
 from typing import Iterable, Iterator, Optional
+from urllib.error import HTTPError, URLError
+from urllib.request import urlopen
 
 import pyvo as vo
 from astropy.table import QTable, vstack
@@ -34,6 +37,24 @@ class TapService:
     @property
     def url(self) -> str:
         return self._url
+
+    def check_availability(self) -> bool:
+        availability_url = f"{self._url.rstrip('/')}/availability"
+        try:
+            with urlopen(availability_url, timeout=30) as resp:
+                body = resp.read()
+        except (HTTPError, URLError, TimeoutError, OSError) as e:
+            logger.warning("TAP availability request failed for %s: %s", availability_url, e)
+            return False
+        try:
+            root = ET.fromstring(body)
+        except ET.ParseError as e:
+            logger.warning("TAP availability response from %s is not valid XML: %s", availability_url, e)
+            return False
+        avail_el = root.find(".//{http://www.ivoa.net/xml/VOSIAvailability/v1.0}available")
+        if avail_el is None:
+            return False
+        return (avail_el.text or "").strip().lower() == "true"
 
     @cache
     def _get_tables(self) -> VOSITables:
@@ -84,9 +105,24 @@ class TapService:
             raise KeyError(f"{table_name} not in TapService {self._url}")
         return [c.name for c in tables[table_name].columns]
 
-    def query(self, query_string: str) -> QTable:
-        result = self._service.run_sync(query_string)
-        return result.to_qtable()
+    def query(self, query_string: str, timeout: float = 300.0) -> QTable:
+        last_error = None
+        for attempt in range(1, self._max_retries + 1):
+            try:
+                result = self._service.run_async(query_string, timeout=timeout)
+                return result.to_qtable()
+            except Exception as e:
+                last_error = e
+                if attempt < self._max_retries:
+                    wait = self._retry_backoff * attempt
+                    logger.warning(
+                        "Query to %s failed (attempt %d/%d): %s. Retrying in %.0fs...",
+                        self._url, attempt, self._max_retries, e, wait,
+                    )
+                    time.sleep(wait)
+        raise ConnectionError(
+            f"Query to {self._url} failed after {self._max_retries} attempts: {last_error}"
+        ) from last_error
 
     def query_chunks_iterative(
         self,
