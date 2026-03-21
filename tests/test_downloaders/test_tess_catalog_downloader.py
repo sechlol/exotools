@@ -41,7 +41,7 @@ class TestTessCatalogDownloader:
             mock_get_header.return_value = mock_header
 
             # Create downloader and call download
-            downloader = TessCatalogDownloader(username="test", password="test")
+            downloader = TessCatalogDownloader(user_wsid=12345, password="test")
             result, header = downloader.download(limit=100)
 
             # Assert that _query_ctl_casjob was called
@@ -90,7 +90,7 @@ class TestTessCatalogDownloader:
 
             # Create downloader with custom parameters
             downloader = TessCatalogDownloader(
-                username="test", password="test", star_mass_range=(0.5, 2.0), priority_threshold=0.005
+                user_wsid=12345, password="test", star_mass_range=(0.5, 2.0), priority_threshold=0.005
             )
 
             # Call download
@@ -122,7 +122,7 @@ class TestTessCatalogDownloader:
             mock_tic_service_factory.return_value = mock_tic_service
 
             # Create downloader and call download_by_id
-            downloader = TessCatalogDownloader(username="test", password="test")
+            downloader = TessCatalogDownloader(user_wsid=12345, password="test")
             result, header = downloader.download_by_id(tess_ids)
 
             # Assert that TicService.query was called
@@ -154,7 +154,7 @@ class TestTessCatalogDownloader:
             mock_tic_service_factory.return_value = mock_tic_service
 
             # Create downloader and call download_by_id with extra columns
-            downloader = TessCatalogDownloader(username="test", password="test")
+            downloader = TessCatalogDownloader(user_wsid=12345, password="test")
             result, _ = downloader.download_by_id(tess_ids, columns=extra_columns)
 
             # Check that the query contains the extra columns
@@ -177,7 +177,7 @@ class TestTessCatalogDownloader:
             mock_tic_service_factory.return_value = mock_tic_service
 
             # Create downloader and call download_by_id
-            downloader = TessCatalogDownloader(username="test", password="test")
+            downloader = TessCatalogDownloader(user_wsid=12345, password="test")
             result, _ = downloader.download_by_id(many_ids)
 
             # Assert that TicService.query was called multiple times (once per chunk)
@@ -188,7 +188,7 @@ class TestTessCatalogDownloader:
 
     def test_property_setters(self):
         """Test property setters for star_mass_range and priority_threshold"""
-        downloader = TessCatalogDownloader(username="test", password="test")
+        downloader = TessCatalogDownloader(user_wsid=12345, password="test")
 
         # Test setting star_mass_range
         downloader.star_mass_range = (0.6, 1.5)

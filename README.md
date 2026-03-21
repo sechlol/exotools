@@ -209,7 +209,7 @@ Access TESS Input Catalog (requires MAST authentication):
 from exotools import TicCatalogDataset
 
 # Authenticate with MAST (required for TIC queries)
-TicCatalogDataset.authenticate_casjobs("your_username", "your_password")
+TicCatalogDataset.authenticate_casjobs(user_wsid=12345678, password="your_password")
 
 dataset = TicCatalogDataset(storage=storage)
 

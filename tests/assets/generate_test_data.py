@@ -31,7 +31,7 @@ def generate_test_qtables():
     tic_dataset = TicCatalogDataset(storage=TEST_STORAGE)
 
     TicCatalogDataset.authenticate_casjobs(
-        username=os.environ.get("CASJOB_USER"),
+        user_wsid=os.environ.get("CASJOB_WSID"),
         password=os.environ.get("CASJOB_PASSWORD"),
     )
 

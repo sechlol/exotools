@@ -35,21 +35,19 @@ class TicCatalogDataset(BaseDataset):
         super().__init__(dataset_name=self._DATASET_NAME, dataset_tag=dataset_tag, storage=storage)
 
     @classmethod
-    def authenticate_casjobs(cls, username: str, password: str):
+    def authenticate_casjobs(cls, user_wsid: int, password: str):
         """
-        Authenticate with the MAST CasJobs service using the provided username and password.
-        Authentication is required for querying the TIC
+        Authenticate with the MAST CasJobs service using the provided WSID and password.
+        Authentication is required for querying the TIC.
 
-        Create an account at
-        https://mastweb.stsci.edu/mcasjobs/CreateAccount.aspx
+        Create an account at https://mastweb.stsci.edu/mcasjobs/CreateAccount.aspx
+        The WSID can be found in your CasJobs profile at https://mastweb.stsci.edu/mcasjobs/changedetails.aspx
 
         Args:
-            username: MAST username for authentication. Optional for fetching observation metadata, but required for
-                querying the TIC.
-            password: MAST password for authentication. Optional for fetching observation metadata, but required for
-                querying the TIC.
+            user_wsid: Your numeric CasJobs WSID (not the username). Required for querying the TIC.
+            password: MAST password for authentication. Required for querying the TIC.
         """
-        cls._catalog_downloader = TessCatalogDownloader(username=username, password=password)
+        cls._catalog_downloader = TessCatalogDownloader(user_wsid=user_wsid, password=password)
 
     def download_tic_targets(
         self,
