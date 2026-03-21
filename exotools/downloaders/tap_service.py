@@ -1,7 +1,10 @@
 import logging
 import time
+import xml.etree.ElementTree as ET
 from functools import cache
 from typing import Iterable, Iterator, Optional
+from urllib.error import HTTPError, URLError
+from urllib.request import urlopen
 
 import pyvo as vo
 from astropy.table import QTable, vstack
@@ -34,6 +37,24 @@ class TapService:
     @property
     def url(self) -> str:
         return self._url
+
+    def check_availability(self) -> bool:
+        availability_url = f"{self._url.rstrip('/')}/availability"
+        try:
+            with urlopen(availability_url, timeout=30) as resp:
+                body = resp.read()
+        except (HTTPError, URLError, TimeoutError, OSError) as e:
+            logger.warning("TAP availability request failed for %s: %s", availability_url, e)
+            return False
+        try:
+            root = ET.fromstring(body)
+        except ET.ParseError as e:
+            logger.warning("TAP availability response from %s is not valid XML: %s", availability_url, e)
+            return False
+        avail_el = root.find(".//{http://www.ivoa.net/xml/VOSIAvailability/v1.0}available")
+        if avail_el is None:
+            return False
+        return (avail_el.text or "").strip().lower() == "true"
 
     @cache
     def _get_tables(self) -> VOSITables:
