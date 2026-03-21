@@ -2,6 +2,12 @@
 
 All notable changes to the exotools package will be documented in this file.
 
+## [0.4.0] - 2026-03-21
+
+### Changed
+- Replaced ad-hoc `.env` loading with `ExotoolsSecrets` (`pydantic_settings.BaseSettings`) and `load_secrets(env_file: Path)`.
+- Added runtime dependency on `pydantic-settings`. CasJobs credentials now use `CASJOB_WSID` (integer) instead of `CASJOB_USER`; see `.env.example`.
+
 ## [0.3.0] - 2026-03-12
 
 ### Fixed
