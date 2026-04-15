@@ -163,7 +163,7 @@ from exotools import CandidateExoplanetsDataset
 dataset = CandidateExoplanetsDataset(storage=storage)
 
 # Download candidate exoplanets
-candidates_db = dataset.download_candidate_exoplanets(store=True)
+candidates_db = dataset.download_candidate_exoplanets()
 
 # Load from storage
 candidates_db = dataset.load_candidate_exoplanets_dataset()
@@ -197,8 +197,8 @@ print("Stellar distances:", gaia_db.view["distance_gspphot"][:5])
 print("Effective temperatures:", gaia_db.view["teff_gspphot"][:5])
 
 # Access computed properties
-print("Habitable zone inner edges:", gaia_db.view["hz_inner"][:5])
-print("Habitable zone outer edges:", gaia_db.view["hz_outer"][:5])
+print("Habitable zone inner edges:", gaia_db.view["inner_hz"][:5])
+print("Habitable zone outer edges:", gaia_db.view["outer_hz"][:5])
 ```
 
 ### TESS Catalog Data
@@ -266,11 +266,14 @@ print(f"Downloaded {len(lc_db)} lightcurves")
 # Load previously downloaded lightcurves
 lc_db = lc_dataset.load_lightcurve_dataset()
 
-# Work with individual lightcurves and time conversions
-for lc_plus in lc_db.lightcurves[:3]:  # First 3 lightcurves
+# Work with individual lightcurves per TIC ID
+tic_id = lc_db.unique_tic_ids[0]
+lc_plus_list = lc_db.load_by_tic(tic_id)
+
+for lc_plus in lc_plus_list:
     print(f"Original time system: {lc_plus.time_system}")
 
-    # Convert time formats in place (new API)
+    # Convert time formats in place
     lc_plus.to_jd_time()     # Convert to Julian Date
     print(f"After JD conversion: {lc_plus.time_system}")
 
@@ -293,17 +296,17 @@ dataset = PlanetarySystemsDataset(storage=storage)
 # Download data with Gaia cross-matching (required for star systems)
 exo_db = dataset.download_known_exoplanets(with_gaia_star_data=True)
 
-# Load star system representation
-star_systems = dataset.load_star_system_dataset()
+# Load star system representation (returns a StarSystemDB)
+star_system_db = dataset.load_star_system_dataset()
 
 # Access star systems by name
-kepler_system = star_systems.get_star_system_from_star_name("Kepler-90")
+kepler_system = star_system_db.get_star_system_from_star_name("Kepler-90")
 
-# Access star properties with uncertainties
+# Access star properties with uncertainties (central, lower, upper)
 star = kepler_system.star
 print(f"Star: {star.name}")
-print(f"  Radius: {star.radius.central} ± {star.radius.upper - star.radius.central}")
-print(f"  Mass: {star.mass.central} ± {star.mass.upper - star.mass.central}")
+print(f"  Radius: {star.radius.central} (+{star.radius.upper - star.radius.central} / -{star.radius.central - star.radius.lower})")
+print(f"  Mass: {star.mass.central} (+{star.mass.upper - star.mass.central} / -{star.mass.central - star.mass.lower})")
 
 # Access planets in the system
 for planet in kepler_system.planets:
