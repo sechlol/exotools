@@ -2,6 +2,11 @@
 
 All notable changes to the exotools package will be documented in this file.
 
+## [0.4.3]
+
+### Changed
+- Update README and increase test coverage
+
 ## [0.4.2]
 
 ### Changed
